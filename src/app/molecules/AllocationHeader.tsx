@@ -2,11 +2,11 @@ import React from "react";
 
 const AllocationHeader = () => {
   return (
-    <div className="bg-gradient-to-r from-slate-800 to-slate-700 text-white p-8 text-center">
-      <h1 className="text-4xl md:text-5xl font-bold mb-4">
+    <div className="bg-bg text-text-light p-8 text-center border-b border-accent/20">
+      <h1 className="text-4xl md:text-5xl font-bold mb-4 text-text-light">
         🚀 Painel de Alocação
       </h1>
-      <div className="text-lg opacity-90">
+      <div className="text-lg text-accent/80">
         Time de Desenvolvimento - Semana Vigente
       </div>
     </div>

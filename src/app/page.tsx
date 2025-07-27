@@ -1,20 +1,9 @@
-import HeroSection from "@/app/templates/HeroSection";
-import AboutSection from "@/app/organisms/AboutSection";
-import EducationSection from "@/app/organisms/EducationSection";
-import SkillsSection from "@/app/organisms/SkillsSection";
-import ExperienceSection from "@/app/organisms/ExperienceSection";
-import ContactSection from "@/app/organisms/ContactSection";
+import AllocationPage from "./allocation/page";
 
 export default function Home() {
   return (
     <main className="bg-bg text-text-light">
-      <HeroSection />
-      <AboutSection />
-      <EducationSection />
-      <SkillsSection />
-      <ExperienceSection />
-      {/* <ProjectsSection /> */}
-      <ContactSection />
+      <AllocationPage />
     </main>
   );
 }

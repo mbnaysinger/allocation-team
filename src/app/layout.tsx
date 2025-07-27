@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { I18nProvider } from "./i18n/context";
 import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({
@@ -35,9 +34,7 @@ export default function RootLayout({
         className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        <I18nProvider>
           {children}
-        </I18nProvider>
         <Analytics />
       </body>
     </html>

@@ -1,6 +1,5 @@
 import React from "react";
 import { Plus } from "lucide-react";
-import Button from "../atoms/Button";
 
 interface Allocation {
   id: string;
@@ -50,72 +49,62 @@ const PersonCard: React.FC<PersonCardProps> = ({
   const getTypeClasses = (type: string) => {
     switch (type) {
       case 'normal':
-        return 'bg-gradient-to-r from-blue-500 to-blue-600';
+        return 'bg-gradient-to-r from-accent to-accent/80 text-bg';
       case 'partial':
-        return 'bg-gradient-to-r from-yellow-500 to-yellow-600';
+        return 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-bg';
       case 'overtime':
-        return 'bg-gradient-to-r from-red-500 to-red-600';
+        return 'bg-gradient-to-r from-red-400 to-red-500 text-white';
       default:
-        return 'bg-gradient-to-r from-blue-500 to-blue-600';
+        return 'bg-gradient-to-r from-accent to-accent/80 text-bg';
     }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+    <div className="bg-bg/30 backdrop-blur-sm rounded-xl border border-accent/20 overflow-hidden shadow-glass">
       {/* Header da pessoa */}
-      <div className="bg-gradient-to-r from-slate-600 to-slate-700 text-white p-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-xl font-semibold mb-1">
+      <div className="bg-gradient-to-r from-bg/80 to-bg/60 text-text-light p-4 md:p-6 border-b border-accent/20">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex-1">
+            <h3 className="text-lg md:text-xl font-semibold mb-1 text-text-light">
               {person.emoji} {person.name}
             </h3>
-            <div className="text-slate-300 text-sm">
+            <div className="text-accent/80 text-sm">
               {person.role}
             </div>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold">{getTotalHours()}h</div>
-            <div className="text-slate-300 text-sm">Total Semana</div>
+            <div className="text-2xl md:text-3xl font-bold text-accent">{getTotalHours()}h</div>
+            <div className="text-accent/60 text-sm">Total Semana</div>
           </div>
         </div>
       </div>
 
       {/* Grade de alocação */}
-      <div className="p-6">
-        {/* Cabeçalho dos dias */}
-        <div className="grid grid-cols-5 gap-4 mb-6">
+      <div className="p-4 md:p-6">
+        {/* Cabeçalho dos dias - responsivo */}
+        <div className="grid grid-cols-5 gap-2 md:gap-4 mb-4 md:mb-6">
           {dayNames.map((dayName, index) => (
             <div key={index} className="text-center">
-              <div className="font-semibold text-slate-700">{dayName}</div>
-              <div className="text-sm text-slate-500">{getDayDate(index)}</div>
+              <div className="font-semibold text-text-light text-xs md:text-sm">{dayName}</div>
+              <div className="text-xs text-accent/60">{getDayDate(index)}</div>
             </div>
           ))}
         </div>
 
-        {/* Grade de alocações */}
-        <div className="grid grid-cols-5 gap-4">
+        {/* Grade de alocações - responsivo */}
+        <div className="grid grid-cols-5 gap-2 md:gap-4">
           {days.map((day, index) => (
-            <div key={day} className="min-h-[120px] border-2 border-dashed border-slate-300 rounded-lg p-4">
+            <div key={day} className="min-h-[100px] md:min-h-[120px] border-2 border-dashed border-accent/30 rounded-lg p-2 md:p-4 bg-bg/20">
               {person.allocations[day]?.map((allocation) => (
                 <div
                   key={allocation.id}
-                  className={`${getTypeClasses(allocation.type)} text-white p-3 rounded-lg mb-2 cursor-pointer hover:scale-105 transition-transform`}
+                  className={`${getTypeClasses(allocation.type)} p-2 md:p-3 rounded-lg mb-2 cursor-pointer hover:scale-105 transition-transform text-xs md:text-sm`}
                   onClick={() => onEditAllocation(allocation.id)}
                 >
-                  <div className="font-bold text-lg">{allocation.hours}h</div>
-                  <div className="text-sm opacity-90">{allocation.project}</div>
+                  <div className="font-bold text-sm md:text-lg">{allocation.hours}h</div>
+                  <div className="text-xs md:text-sm opacity-90 truncate">{allocation.project}</div>
                 </div>
               ))}
-              
-              <Button
-                onClick={() => onAddAllocation(day)}
-                variant="outline"
-                size="sm"
-                className="w-full mt-2 text-green-600 border-green-600 hover:bg-green-600 hover:text-white"
-              >
-                <Plus size={16} className="mr-1" />
-                Adicionar
-              </Button>
             </div>
           ))}
         </div>

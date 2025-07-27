@@ -6,7 +6,6 @@ import AllocationControls from "../molecules/AllocationControls";
 import PersonCard from "../molecules/PersonCard";
 import AllocationLegend from "../molecules/AllocationLegend";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import Button from "../atoms/Button";
 
 interface Allocation {
   id: string;
@@ -137,7 +136,7 @@ const AllocationPage = () => {
           onAddPerson={() => alert('Funcionalidade para adicionar pessoa')}
         />
 
-        <div className="p-8 space-y-8">
+        <div className="p-4 md:p-8 space-y-6 md:space-y-8">
           {people.map((person) => (
             <PersonCard
               key={person.id}
