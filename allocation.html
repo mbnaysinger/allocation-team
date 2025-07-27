@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Alocação - Time de Desenvolvimento</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .week-info {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .week-navigation {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .add-person-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .add-person-btn:hover {
+            background: #1e7e34;
+            transform: translateY(-2px);
+        }
+
+        .team-grid {
+            padding: 30px;
+        }
+
+        .person-card {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .person-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .person-header {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .person-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .person-role {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .total-hours {
+            text-align: right;
+        }
+
+        .total-hours .number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .total-hours .label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .week-schedule {
+            padding: 25px;
+        }
+
+        .days-header {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .day-header {
+            text-align: center;
+            font-weight: bold;
+            color: #495057;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .day-date {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .allocation-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        .day-allocation {
+            min-height: 120px;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .day-allocation:hover {
+            border-color: #007bff;
+            background: #f8f9fa;
+        }
+
+        .allocation-block {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .allocation-block:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+        }
+
+        .allocation-block.partial {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        }
+
+        .allocation-block.overtime {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .block-hours {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .block-project {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-top: 3px;
+        }
+
+        .add-allocation {
+            width: 100%;
+            height: 40px;
+            border: 2px dashed #28a745;
+            background: transparent;
+            color: #28a745;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .add-allocation:hover {
+            background: #28a745;
+            color: white;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .normal { background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); }
+        .partial { background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); }
+        .overtime { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .days-header,
+            .allocation-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .legend {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Painel de Alocação</h1>
+            <div class="week-info">Time de Desenvolvimento - Semana Vigente</div>
+        </div>
+
+        <div class="controls">
+            <div class="week-navigation">
+                <button class="nav-btn">← Semana Anterior</button>
+                <span><strong>23/12/2024 - 27/12/2024</strong></span>
+                <button class="nav-btn">Próxima Semana →</button>
+            </div>
+            <button class="add-person-btn">+ Adicionar Pessoa</button>
+        </div>
+
+        <div class="team-grid">
+            <!-- Pessoa 1 -->
+            <div class="person-card">
+                <div class="person-header">
+                    <div class="person-info">
+                        <h3>👨‍💻 João Silva</h3>
+                        <div class="person-role">Senior Frontend Developer</div>
+                    </div>
+                    <div class="total-hours">
+                        <div class="number">38h</div>
+                        <div class="label">Total Semana</div>
+                    </div>
+                </div>
+                <div class="week-schedule">
+                    <div class="days-header">
+                        <div class="day-header">
+                            Segunda
+                            <div class="day-date">23/12</div>
+                        </div>
+                        <div class="day-header">
+                            Terça
+                            <div class="day-date">24/12</div>
+                        </div>
+                        <div class="day-header">
+                            Quarta
+                            <div class="day-date">25/12</div>
+                        </div>
+                        <div class="day-header">
+                            Quinta
+                            <div class="day-date">26/12</div>
+                        </div>
+                        <div class="day-header">
+                            Sexta
+                            <div class="day-date">27/12</div>
+                        </div>
+                    </div>
+                    <div class="allocation-grid">
+                        <div class="day-allocation">
+                            <div class="allocation-block">
+                                <div class="block-hours">8h</div>
+                                <div class="block-project">Projeto Alpha</div>
+                            </div>
+                        </div>
+                        <div class="day-allocation">
+                            <div class="allocation-block partial">
+                                <div class="block-hours">4h</div>
+                                <div class="block-project">Projeto Beta</div>
+                            </div>
+                            <button class="add-allocation">+ Adicionar</button>
+                        </div>
+                        <div class="day-allocation">
+                            <div class="allocation-block">
+                                <div class="block-hours">8h</div>
+                                <div class="block-project">Projeto Alpha</div>
+                            </div>
+                        </div>
+                        <div class="day-allocation">
+                            <div class="allocation-block">
+                                <div class="block-hours">6h</div>
+                                <div class="block-project">Code Review</div>
+                            </div>
+                            <div class="allocation-block overtime">
+                                <div class="block-hours">2h</div>
+                                <div class="block-project">Hotfix</div>
+                            </div>
+                        </div>
+                        <div class="day-allocation">
+                            <div class="allocation-block">
+                                <div class="block-hours">8h</div>
+                                <div class="block-project">Projeto Gamma</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pessoa 2 -->
+            <div class="person-card">
+                <div class="person-header">
+                    <div class="person-info">
+                        <h3>👩‍💻 Maria Santos</h3>
+                        <div class="person-role">Backend Developer</div>
+                    </div>
+                    <div class="total-hours">
+                        <div class="number">40h</div>
+                        <div class="label">Total Semana</div>
+                    </div>
+                </div>
+                <div class="week-schedule">
+                    <div class="days-header">
+                        <div class="day-header">
+                            Segunda
+                            <div class="day-date">23/12</div>
+                        </div>
+                        <div class="day-header">
+                            Terça
+                            <div class="day-date">24/12</div>
+                        </div>
+                        <div class="day-header">
+                            Quarta
+                            <div class="day-date">25/12</div>
+                        </div>
+                        <div class="day-header">
+                            Quinta
+                            <div class="day-date">26/12</div>
+                        </div>
+                        <div class="day-header">
+                            Sexta
+                            <div class="day-date">27/12</div>
+                        </div>
+                    </div>
+                    <div class="allocation-grid">
+                        <div class="day-allocation">
+                            <div class="allocation-block">
+                                <div class="block-hours">8h</div>
+                                <div class="block-project">API Development</div>
+                            </div>
+                        </div>
+                        <div class="day-allocation">
+                            <div class="allocation-block">
+                                <div class="block-hours">8h</div>
+                                <div class="block-project">Database Migration</div>
+                            </div>
+                        </div>
+                        <div class="day-allocation">
+                            <div class="allocation-block">
+                                <div class="block-hours">8h</div>
+                                <div class="block-project">API Development</div>
+                            </div>
+                        </div>
+                        <div class="day-allocation">
+                            <div class="allocation-block">
+                                <div class="block-hours">8h</div>
+                                <div class="block-project">Testing</div>
+                            </div>
+                        </div>
+                        <div class="day-allocation">
+                            <div class="allocation-block">
+                                <div class="block-hours">8h</div>
+                                <div class="block-project">Documentation</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pessoa 3 -->
+            <div class="person-card">
+                <div class="person-header">
+                    <div class="person-info">
+                        <h3>🎨 Carlos Design</h3>
+                        <div class="person-role">UX/UI Designer</div>
+                    </div>
+                    <div class="total-hours">
+                        <div class="number">32h</div>
+                        <div class="label">Total Semana</div>
+                    </div>
+                </div>
+                <div class="week-schedule">
+                    <div class="days-header">
+                        <div class="day-header">
+                            Segunda
+                            <div class="day-date">23/12</div>
+                        </div>
+                        <div class="day-header">
+                            Terça
+                            <div class="day-date">24/12</div>
+                        </div>
+                        <div class="day-header">
+                            Quarta
+                            <div class="day-date">25/12</div>
+                        </div>
+                        <div class="day-header">
+                            Quinta
+                            <div class="day-date">26/12</div>
+                        </div>
+                        <div class="day-header">
+                            Sexta
+                            <div class="day-date">27/12</div>
+                        </div>
+                    </div>
+                    <div class="allocation-grid">
+                        <div class="day-allocation">
+                            <div class="allocation-block">
+                                <div class="block-hours">8h</div>
+                                <div class="block-project">UI Mockups</div>
+                            </div>
+                        </div>
+                        <div class="day-allocation">
+                            <div class="allocation-block partial">
+                                <div class="block-hours">6h</div>
+                                <div class="block-project">User Research</div>
+                            </div>
+                        </div>
+                        <div class="day-allocation">
+                            <button class="add-allocation">+ Adicionar Alocação</button>
+                        </div>
+                        <div class="day-allocation">
+                            <div class="allocation-block">
+                                <div class="block-hours">8h</div>
+                                <div class="block-project">Prototyping</div>
+                            </div>
+                        </div>
+                        <div class="day-allocation">
+                            <div class="allocation-block">
+                                <div class="block-hours">8h</div>
+                                <div class="block-project">Design System</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color normal"></div>
+                <span>Alocação Normal (até 8h)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color partial"></div>
+                <span>Alocação Parcial (menos de 8h)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color overtime"></div>
+                <span>Hora Extra (acima de 8h)</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funcionalidade básica para interação
+        document.addEventListener('DOMContentLoaded', function() {
+            // Adicionar event listeners para botões
+            const addButtons = document.querySelectorAll('.add-allocation');
+            addButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('Funcionalidade para adicionar alocação - implementar modal/formulário');
+                });
+            });
+
+            // Event listeners para blocos de alocação
+            const allocationBlocks = document.querySelectorAll('.allocation-block');
+            allocationBlocks.forEach(block => {
+                block.addEventListener('click', function() {
+                    alert('Funcionalidade para editar alocação - implementar modal/formulário');
+                });
+            });
+
+            // Navegação de semanas
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('Funcionalidade para navegar entre semanas - implementar lógica de datas');
+                });
+            });
+
+            // Adicionar pessoa
+            const addPersonBtn = document.querySelector('.add-person-btn');
+            addPersonBtn.addEventListener('click', function() {
+                alert('Funcionalidade para adicionar nova pessoa - implementar formulário');
+            });
+        });
+    </script>
+</body>
+</html>
