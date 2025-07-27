@@ -1,5 +1,6 @@
 import React from "react";
 import { Plus } from "lucide-react";
+import Button from "../atoms/Button";
 
 interface Allocation {
   id: string;
@@ -105,6 +106,16 @@ const PersonCard: React.FC<PersonCardProps> = ({
                   <div className="text-xs md:text-sm opacity-90 truncate">{allocation.project}</div>
                 </div>
               ))}
+              
+              <Button
+                onClick={() => onAddAllocation(day)}
+                variant="outline"
+                size="sm"
+                className="w-full mt-2 text-accent border-accent/50 hover:bg-accent hover:text-bg text-xs"
+              >
+                <Plus size={12} className="mr-1" />
+                <span className="hidden sm:inline">Adicionar</span>
+              </Button>
             </div>
           ))}
         </div>
