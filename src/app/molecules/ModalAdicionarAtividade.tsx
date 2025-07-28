@@ -275,7 +275,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
               placeholder="Descrição ou link do Jira"
             />
             <div className="flex justify-between items-center mt-1">
-              <ContadorCaracteres texto={formData.descricaoJira} limite={100} />
+              <ContadorCaracteres texto={formData.descricaoJira || ''} limite={100} />
               {errors.descricaoJira && (
                 <p className="text-red-500 text-sm">{errors.descricaoJira}</p>
               )}
