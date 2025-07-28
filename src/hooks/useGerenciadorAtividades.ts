@@ -7,9 +7,12 @@ import {
   criarProjeto, 
   criarAtividade, 
   atualizarAtividade, 
+  deletarAtividade,
+  clonarAtividade,
   getTotalHorasPorDia
 } from '../lib/firestore';
 import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade } from '../types/allocation';
+import { useScrollPreservation } from './useScrollPreservation';
 
 interface UseGerenciadorAtividadesProps {
   dataInicio: string;
@@ -23,6 +26,7 @@ export const useGerenciadorAtividades = ({ dataInicio, dataFim }: UseGerenciador
   const [projetos, setProjetos] = useState<Projeto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { executeWithScrollPreservation } = useScrollPreservation();
 
   // Função para recarregar todos os dados
   const recarregarDados = useCallback(async () => {
@@ -54,68 +58,93 @@ export const useGerenciadorAtividades = ({ dataInicio, dataFim }: UseGerenciador
 
   // Função para adicionar pessoa
   const adicionarPessoa = useCallback(async (dadosPessoa: DadosPessoa) => {
-    try {
-      setError(null);
-      await criarPessoa(dadosPessoa);
-      await recarregarDados();
-    } catch (err) {
-      console.error('Erro ao adicionar pessoa:', err);
-      setError(err instanceof Error ? err.message : 'Erro ao adicionar pessoa');
-      throw err;
-    }
-  }, [recarregarDados]);
+    return executeWithScrollPreservation(async () => {
+      try {
+        setError(null);
+        await criarPessoa(dadosPessoa);
+        await recarregarDados();
+      } catch (err) {
+        console.error('Erro ao adicionar pessoa:', err);
+        setError(err instanceof Error ? err.message : 'Erro ao adicionar pessoa');
+        throw err;
+      }
+    });
+  }, [recarregarDados, executeWithScrollPreservation]);
 
   // Função para adicionar projeto
   const adicionarProjeto = useCallback(async (dadosProjeto: DadosProjeto) => {
-    try {
-      setError(null);
-      await criarProjeto(dadosProjeto);
-      await recarregarDados();
-    } catch (err) {
-      console.error('Erro ao adicionar projeto:', err);
-      setError(err instanceof Error ? err.message : 'Erro ao adicionar projeto');
-      throw err;
-    }
-  }, [recarregarDados]);
+    return executeWithScrollPreservation(async () => {
+      try {
+        setError(null);
+        await criarProjeto(dadosProjeto);
+        await recarregarDados();
+      } catch (err) {
+        console.error('Erro ao adicionar projeto:', err);
+        setError(err instanceof Error ? err.message : 'Erro ao adicionar projeto');
+        throw err;
+      }
+    });
+  }, [recarregarDados, executeWithScrollPreservation]);
 
   // Função para adicionar atividade
   const adicionarAtividade = useCallback(async (dadosAtividade: DadosAtividade) => {
-    try {
-      setError(null);
-      await criarAtividade(dadosAtividade);
-      await recarregarDados();
-    } catch (err) {
-      console.error('Erro ao adicionar atividade:', err);
-      setError(err instanceof Error ? err.message : 'Erro ao adicionar atividade');
-      throw err;
-    }
-  }, [recarregarDados]);
+    return executeWithScrollPreservation(async () => {
+      try {
+        setError(null);
+        await criarAtividade(dadosAtividade);
+        await recarregarDados();
+      } catch (err) {
+        console.error('Erro ao adicionar atividade:', err);
+        setError(err instanceof Error ? err.message : 'Erro ao adicionar atividade');
+        throw err;
+      }
+    });
+  }, [recarregarDados, executeWithScrollPreservation]);
 
   // Função para editar atividade
   const editarAtividade = useCallback(async (atividadeId: string, dadosAtualizados: Partial<DadosAtividade>) => {
-    try {
-      setError(null);
-      await atualizarAtividade(atividadeId, dadosAtualizados);
-      await recarregarDados();
-    } catch (err) {
-      console.error('Erro ao editar atividade:', err);
-      setError(err instanceof Error ? err.message : 'Erro ao editar atividade');
-      throw err;
-    }
-  }, [recarregarDados]);
+    return executeWithScrollPreservation(async () => {
+      try {
+        setError(null);
+        await atualizarAtividade(atividadeId, dadosAtualizados);
+        await recarregarDados();
+      } catch (err) {
+        console.error('Erro ao editar atividade:', err);
+        setError(err instanceof Error ? err.message : 'Erro ao editar atividade');
+        throw err;
+      }
+    });
+  }, [recarregarDados, executeWithScrollPreservation]);
 
   // Função para deletar atividade
   const deletarAtividade = useCallback(async (atividadeId: string) => {
-    try {
-      setError(null);
-      await deletarAtividade(atividadeId);
-      await recarregarDados();
-    } catch (err) {
-      console.error('Erro ao deletar atividade:', err);
-      setError(err instanceof Error ? err.message : 'Erro ao deletar atividade');
-      throw err;
-    }
-  }, [recarregarDados]);
+    return executeWithScrollPreservation(async () => {
+      try {
+        setError(null);
+        await deletarAtividade(atividadeId);
+        await recarregarDados();
+      } catch (err) {
+        console.error('Erro ao deletar atividade:', err);
+        setError(err instanceof Error ? err.message : 'Erro ao deletar atividade');
+        throw err;
+      }
+    });
+  }, [recarregarDados, executeWithScrollPreservation]);
+
+  // Função para clonar atividade
+  const clonarAtividade = useCallback(async (atividadeId: string) => {
+    return executeWithScrollPreservation(async () => {
+      try {
+        setError(null);
+        await clonarAtividade(atividadeId);
+        await recarregarDados();
+      } catch (err) {
+        console.error('Erro ao clonar atividade:', err);
+        setError(err instanceof Error ? err.message : 'Erro ao clonar atividade');
+        throw err;
+      }
+    });
+  }, [recarregarDados, executeWithScrollPreservation]);
 
   // Função para calcular horas do dia (com cache local)
   const calcularHorasDia = useCallback(async (pessoaId: string, data: string): Promise<number> => {
@@ -159,6 +188,7 @@ export const useGerenciadorAtividades = ({ dataInicio, dataFim }: UseGerenciador
     adicionarAtividade,
     editarAtividade,
     deletarAtividade,
+    clonarAtividade,
     calcularHorasDia,
     
     // Funções utilitárias

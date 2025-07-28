@@ -227,6 +227,35 @@ export const deletarAtividade = async (atividadeId: string): Promise<void> => {
   }
 };
 
+export const clonarAtividade = async (atividadeId: string): Promise<string> => {
+  try {
+    // Buscar a atividade original
+    const atividadeRef = doc(db, 'atividades', atividadeId);
+    const atividadeDoc = await getDoc(atividadeRef);
+    
+    if (!atividadeDoc.exists()) {
+      throw new Error('Atividade não encontrada');
+    }
+    
+    const atividadeData = atividadeDoc.data();
+    
+    // Criar uma nova atividade com os mesmos dados, mas sem o ID original
+    const { id, ...dadosParaClonar } = atividadeData;
+    
+    const atividadesRef = collection(db, 'atividades');
+    const docRef = await addDoc(atividadesRef, {
+      ...dadosParaClonar,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    
+    return docRef.id;
+  } catch (error) {
+    console.error('Erro ao clonar atividade:', error);
+    throw error;
+  }
+};
+
 // ==================== UTILITÁRIOS ====================
 export const getTotalHorasPorDia = async (pessoaId: string, data: string): Promise<number> => {
   try {
