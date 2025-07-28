@@ -1,5 +1,7 @@
 import React from 'react';
 import { getCoresHoras } from '../../types/allocation';
+import { ClockAlert } from 'lucide-react';
+import { Tooltip } from 'react-tooltip';
 
 interface TarjaHorasProps {
   totalHoras: number;
@@ -11,8 +13,8 @@ const TarjaHoras: React.FC<TarjaHorasProps> = ({ totalHoras, data, className = '
   const cores = getCoresHoras(totalHoras);
   
   const formatarData = (data: string) => {
-    const [ano, mes, dia] = data.split('-');
-    return `${dia}/${mes}/${ano}`;
+    const [ano,mes, dia] = data.split('-');
+    return `${dia}/${mes}`;
   };
 
   return (
@@ -26,6 +28,12 @@ const TarjaHoras: React.FC<TarjaHorasProps> = ({ totalHoras, data, className = '
       <span className="font-semibold">
         {formatarData(data)}
       </span>
+      {totalHoras > 8 && (
+        <span className="font-bold text-lg" data-tooltip-id="clock" data-tooltip-content="Muitas horas alocadas neste dia">
+          <ClockAlert />
+          <Tooltip id="clock" />
+        </span>
+      )}
       <span className="font-bold text-lg">
         {totalHoras}h
       </span>

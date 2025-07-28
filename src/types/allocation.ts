@@ -93,9 +93,9 @@ export const ENTIDADES: Entidade[] = [
 
 // Utilitários
 export const getCoresHoras = (totalHoras: number) => {
-  if (totalHoras === 0) return { cor: '#f8f9fa', texto: '#6c757d' }; // Cinza claro
-  if (totalHoras <= 4) return { cor: '#fff3cd', texto: '#856404' };   // Amarelo claro
-  if (totalHoras <= 8) return { cor: '#d1edff', texto: '#0c5460' };   // Azul claro
-  if (totalHoras > 8) return { cor: '#f8d7da', texto: '#721c24' };    // Vermelho claro
-  return { cor: '#f8f9fa', texto: '#6c757d' };
+  if (totalHoras === 0) return { cor: '#f3f4f6', texto: '#000000' }; // Cinza claro
+  if (totalHoras <= 4) return { cor: '#f7fc6d', texto: '#000000' };   // Amarelo claro
+  if (totalHoras <= 8) return { cor: '#6af27a', texto: '#000000' };   // Verde claro
+  if (totalHoras > 8) return { cor: '#f53b3b', texto: '#FFFFFF' };    // Vermelho claro
+  return { cor: '#f3f4f6', texto: '#000000' };
 }; 

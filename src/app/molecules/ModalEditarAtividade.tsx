@@ -141,7 +141,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
 
   return (
     <div className="fixed inset-0 bg-overlay/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-bg/95 backdrop-blur-md rounded-xl border border-accent/20 shadow-glass max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-gray-100/95 backdrop-blur-md rounded-xl border border-accent/20 shadow-glass max-w-lg w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-accent/20">
           <h2 className="text-xl font-semibold text-text-light">
