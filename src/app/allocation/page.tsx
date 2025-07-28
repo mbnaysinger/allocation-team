@@ -139,6 +139,17 @@ const AllocationPage = () => {
     }
   };
 
+  const handleMoveAtividade = async (atividadeId: string, novaData: string) => {
+    setLoading(true);
+    try {
+      await editarAtividade(atividadeId, { data: novaData });
+    } catch (error) {
+      console.error('Erro ao mover atividade:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddAllocation = (data: string) => {
     setDataSelecionada(data);
     setModalAdicionarAtividade(true);
@@ -194,6 +205,7 @@ const AllocationPage = () => {
               onAddAllocation={handleAddAllocation}
               onEditAllocation={handleEditAllocation}
               onCloneAllocation={handleClonarAtividade}
+              onMoveAtividade={handleMoveAtividade}
               calcularHorasDia={calcularHorasDia}
             />
           ))}

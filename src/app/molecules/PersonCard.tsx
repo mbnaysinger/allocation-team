@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Plus, Copy } from "lucide-react";
 import Button from "../atoms/Button";
 import TarjaHoras from "../atoms/TarjaHoras";
+import DroppableDayColumn from "../atoms/DroppableDayColumn";
+import DraggableActivityCard from "../atoms/DraggableActivityCard";
 import { Pessoa, AtividadeCompleta } from "../../types/allocation";
+import { useDragAndDrop } from "../../hooks/useDragAndDrop";
 
 interface PersonCardProps {
   person: Pessoa;
@@ -11,6 +14,7 @@ interface PersonCardProps {
   onAddAllocation: (day: string) => void;
   onEditAllocation: (atividadeId: string) => void;
   onCloneAllocation: (atividadeId: string) => void;
+  onMoveAtividade: (atividadeId: string, novaData: string) => Promise<void>;
   calcularHorasDia: (pessoaId: string, data: string) => Promise<number>;
 }
 
@@ -21,11 +25,18 @@ const PersonCard: React.FC<PersonCardProps> = ({
   onAddAllocation,
   onEditAllocation,
   onCloneAllocation,
+  onMoveAtividade,
   calcularHorasDia,
 }) => {
   const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
   const dayNames = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
   const [horasPorDia, setHorasPorDia] = useState<Record<string, number>>({});
+  const [dragOverData, setDragOverData] = useState<string | null>(null);
+
+  // Hook para drag and drop
+  const { draggedItem, isDragging, handleDragStart, handleDragEnd, handleDragCancel } = useDragAndDrop({
+    onMoveAtividade
+  });
 
   // Calcular horas por dia
   useEffect(() => {
@@ -60,17 +71,13 @@ const PersonCard: React.FC<PersonCardProps> = ({
     );
   };
 
-  const getTypeClasses = (tipo: string) => {
-    switch (tipo) {
-      case 'Projeto':
-        return 'bg-gray-300 from-accent to-accent/80 text-bg';
-      case 'Melhoria':
-        return 'bg-gray-300 from-accent to-accent/80 text-bg';
-      case 'Sustentação':
-        return 'bg-gray-200 from-accent to-accent/80 text-bg';
-      default:
-        return 'bg-gray-200 from-accent to-accent/80 text-bg';
-    }
+  // Handlers para drag and drop
+  const handleDragOver = (data: string) => {
+    setDragOverData(data);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverData(null);
   };
 
   return (
@@ -110,57 +117,26 @@ const PersonCard: React.FC<PersonCardProps> = ({
             const data = getDayDate(index);
             const atividadesDoDia = getAtividadesDoDia(data);
             const totalHoras = horasPorDia[data] || 0;
+            const isDragOver = dragOverData === data;
             
             return (
-              <div key={day} className="min-h-[100px] md:min-h-[120px] border-2 border-dashed border-accent/30 rounded-lg p-2 md:p-4 bg-bg/20">
-                {/* Tarja de horas */}
-                <TarjaHoras 
-                  totalHoras={totalHoras} 
-                  data={data} 
-                  className="mb-2"
-                />
-                
-                {/* Atividades do dia */}
-                {atividadesDoDia.map((atividade) => (
-                  <div
-                    key={atividade.id}
-                    className={`${getTypeClasses(atividade.tipo)} p-2 md:p-3 rounded-lg mb-2 cursor-pointer hover:scale-105 transition-transform text-xs md:text-sm relative group`}
-                    onClick={() => onEditAllocation(atividade.id)}
-                  >
-                    <div className="font-bold text-sm md:text-lg">{atividade.horas}h</div>
-                    <div className="text-xs md:text-sm opacity-90 truncate">
-                      {atividade.titulo}
-                    </div>
-                    {atividade.projeto && (
-                      <div className="text-xs opacity-75 truncate">
-                        {atividade.projeto.abreviatura}
-                      </div>
-                    )}
-                    
-                    {/* Ícone de clonar no canto inferior direito */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onCloneAllocation(atividade.id);
-                      }}
-                      className="absolute bottom-1 right-1 p-1 bg-white/80 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm"
-                      title="Clonar atividade"
-                    >
-                      <Copy size={12} className="text-accent" />
-                    </button>
-                  </div>
-                ))}
-                
-                <Button
-                  onClick={() => onAddAllocation(data)}
-                  variant="outline"
-                  size="sm"
-                  className="w-full mt-2 text-accent border-accent/50 hover:bg-accent hover:text-bg text-xs"
-                >
-                  <Plus size={12} className="mr-1" />
-                  <span className="hidden sm:inline">Adicionar</span>
-                </Button>
-              </div>
+              <DroppableDayColumn
+                key={day}
+                data={data}
+                atividades={atividadesDoDia}
+                totalHoras={totalHoras}
+                onAddAllocation={onAddAllocation}
+                onEditAllocation={onEditAllocation}
+                onCloneAllocation={onCloneAllocation}
+                onDrop={(dropData) => {
+                  handleDragEnd(dropData);
+                  setDragOverData(null);
+                }}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDragStart={handleDragStart}
+                isDragOver={isDragOver}
+              />
             );
           })}
         </div>
