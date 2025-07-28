@@ -7,7 +7,7 @@ const AllocationHeader = () => {
         🚀 Painel de Alocação
       </h1>
       <div className="text-lg text-accent/80">
-        Time de Desenvolvimento - Semana Vigente
+        Time de Soluções
       </div>
     </div>
   );

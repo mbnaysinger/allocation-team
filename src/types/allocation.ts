@@ -77,8 +77,8 @@ export const CARGOS: Cargo[] = [
 ];
 
 export const TIPOS_ATIVIDADE: TipoAtividade[] = [
-  'Projeto',
   'Melhoria',
+  'Projeto',
   'Sustentação'
 ];
 

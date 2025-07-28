@@ -5,8 +5,8 @@ export const CONFIG = {
   
   // Configurações do MongoDB
   MONGODB: {
-    URI: process.env.MONGODB_URI || 'mongodb://admin:password123@localhost:27017/allocation_team',
-    DB: process.env.MONGODB_DB || 'allocation_team'
+    URI: process.env.MONGODB_URI,
+    DB: process.env.MONGODB_DB,
   },
   
   // Configurações do Firebase (mantidas para compatibilidade)

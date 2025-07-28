@@ -43,7 +43,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
               <span className="hidden sm:inline">Semana Anterior</span>
             </Button>
             
-            <span className="font-semibold text-text-light text-sm md:text-base text-center">
+            <span className="font-semibold text-text-black text-sm md:text-base text-center">
               {formatDateRange(weekStart, weekEnd)}
             </span>
             

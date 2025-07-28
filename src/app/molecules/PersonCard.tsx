@@ -61,18 +61,18 @@ const PersonCard: React.FC<PersonCardProps> = ({
   const getTypeClasses = (tipo: string) => {
     switch (tipo) {
       case 'Projeto':
-        return 'bg-gradient-to-r from-accent to-accent/80 text-bg';
+        return 'bg-gray-300 from-accent to-accent/80 text-bg';
       case 'Melhoria':
-        return 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-bg';
+        return 'bg-gray-300 from-accent to-accent/80 text-bg';
       case 'Sustentação':
-        return 'bg-gradient-to-r from-red-400 to-red-500 text-white';
+        return 'bg-gray-200 from-accent to-accent/80 text-bg';
       default:
-        return 'bg-gradient-to-r from-accent to-accent/80 text-bg';
+        return 'bg-gray-200 from-accent to-accent/80 text-bg';
     }
   };
 
   return (
-    <div className="bg-bg/30 backdrop-blur-sm rounded-xl border border-accent/20 overflow-hidden shadow-glass">
+    <div className="bg-gray-100 backdrop-blur-sm rounded-xl border border-accent/20 overflow-hidden shadow-glass">
       {/* Header da pessoa */}
       <div className="bg-gradient-to-r from-bg/80 to-bg/60 text-text-light p-4 md:p-6 border-b border-accent/20">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -98,7 +98,6 @@ const PersonCard: React.FC<PersonCardProps> = ({
           {dayNames.map((dayName, index) => (
             <div key={index} className="text-center">
               <div className="font-semibold text-text-light text-xs md:text-sm">{dayName}</div>
-              <div className="text-xs text-accent/60">{getDayDate(index)}</div>
             </div>
           ))}
         </div>
