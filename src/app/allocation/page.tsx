@@ -10,8 +10,8 @@ import ModalAdicionarProjeto from "../molecules/ModalAdicionarProjeto";
 import ModalAdicionarAtividade from "../molecules/ModalAdicionarAtividade";
 import ModalEditarAtividade from "../molecules/ModalEditarAtividade";
 import FirebaseDebugger from "../atoms/FirebaseDebugger";
-import { useGerenciadorAtividades } from "../../hooks/useGerenciadorAtividades";
-import { DadosPessoa, DadosProjeto, DadosAtividade, AtividadeCompleta } from "../../types/allocation";
+import { useDatabase } from "../../hooks/useDatabase";
+import { DadosPessoa, DadosProjeto, DadosAtividade, AtividadeCompleta, Pessoa } from "../../types/allocation";
 import { transactionLogger } from "../../lib/logger";
 
 
@@ -58,7 +58,7 @@ const AllocationPage = () => {
     editarAtividade,
     deletarAtividade,
     calcularHorasDia
-  } = useGerenciadorAtividades({
+  } = useDatabase({
     dataInicio: start.toISOString().split('T')[0],
     dataFim: end.toISOString().split('T')[0]
   });
@@ -133,7 +133,7 @@ const AllocationPage = () => {
   };
 
   const handleEditAllocation = (atividadeId: string) => {
-    const atividade = atividades.find(a => a.id === atividadeId);
+    const atividade = atividades.find((a: AtividadeCompleta) => a.id === atividadeId);
     if (atividade) {
       setAtividadeSelecionada(atividade);
       setModalEditarAtividade(true);
@@ -173,7 +173,7 @@ const AllocationPage = () => {
         )}
 
         <div className="p-4 md:p-8 space-y-6 md:space-y-8">
-          {pessoas.map((pessoa) => (
+          {(pessoas as Pessoa[]).map((pessoa: Pessoa) => (
             <PersonCard
               key={pessoa.id}
               person={pessoa}
