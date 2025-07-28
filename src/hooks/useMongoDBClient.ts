@@ -131,6 +131,19 @@ export const useMongoDBClient = ({ dataInicio, dataFim }: UseMongoDBClientProps)
     }
   }, [makeRequest, recarregarDados]);
 
+  // Função para clonar atividade
+  const clonarAtividade = useCallback(async (atividadeId: string) => {
+    try {
+      setError(null);
+      await makeRequest('cloneAtividade', { id: atividadeId });
+      await recarregarDados();
+    } catch (err) {
+      console.error('Erro ao clonar atividade:', err);
+      setError(err instanceof Error ? err.message : 'Erro ao clonar atividade');
+      throw err;
+    }
+  }, [makeRequest, recarregarDados]);
+
   // Função para calcular horas do dia
   const calcularHorasDia = useCallback(async (pessoaId: string, data: string): Promise<number> => {
     try {
@@ -159,6 +172,7 @@ export const useMongoDBClient = ({ dataInicio, dataFim }: UseMongoDBClientProps)
     adicionarAtividade,
     editarAtividade,
     deletarAtividade,
+    clonarAtividade,
     calcularHorasDia,
     
     // Função para limpar erro

@@ -67,6 +67,10 @@ export async function POST(request: NextRequest) {
         const deletado = await MongoDBService.deleteAtividade(data.id);
         return NextResponse.json({ success: deletado });
 
+      case 'cloneAtividade':
+        const atividadeClonada = await MongoDBService.cloneAtividade(data.id);
+        return NextResponse.json({ success: true, data: atividadeClonada });
+
       default:
         return NextResponse.json(
           { error: 'Ação não reconhecida' },

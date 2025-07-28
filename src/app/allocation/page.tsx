@@ -57,6 +57,7 @@ const AllocationPage = () => {
     adicionarAtividade,
     editarAtividade,
     deletarAtividade,
+    clonarAtividade,
     calcularHorasDia
   } = useDatabase({
     dataInicio: start.toISOString().split('T')[0],
@@ -127,6 +128,17 @@ const AllocationPage = () => {
     }
   };
 
+  const handleClonarAtividade = async (atividadeId: string) => {
+    setLoading(true);
+    try {
+      await clonarAtividade(atividadeId);
+    } catch (error) {
+      console.error('Erro ao clonar atividade:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddAllocation = (data: string) => {
     setDataSelecionada(data);
     setModalAdicionarAtividade(true);
@@ -181,6 +193,7 @@ const AllocationPage = () => {
               atividades={atividades}
               onAddAllocation={handleAddAllocation}
               onEditAllocation={handleEditAllocation}
+              onCloneAllocation={handleClonarAtividade}
               calcularHorasDia={calcularHorasDia}
             />
           ))}

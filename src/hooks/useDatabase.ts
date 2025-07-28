@@ -18,6 +18,7 @@ interface DatabaseHookReturn {
   adicionarAtividade: (dados: any) => Promise<void>;
   editarAtividade: (id: string, dados: any) => Promise<void>;
   deletarAtividade: (id: string) => Promise<void>;
+  clonarAtividade: (id: string) => Promise<void>;
   calcularHorasDia: (pessoaId: string, data: string) => Promise<number>;
   recarregarDados: () => Promise<void>;
   limparErro: () => void;

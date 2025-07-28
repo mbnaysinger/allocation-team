@@ -313,6 +313,43 @@ export class MongoDBService {
     }
   }
 
+  static async cloneAtividade(atividadeId: string): Promise<Atividade | null> {
+    try {
+      const collection = await getCollection('atividades');
+      
+      // Buscar a atividade original
+      const atividadeOriginal = await collection.findOne({ id: atividadeId });
+      if (!atividadeOriginal) {
+        throw new Error('Atividade não encontrada');
+      }
+
+      // Criar cópia com novo ID e título modificado
+      const now = new Date();
+      const novaAtividade = {
+        id: Date.now().toString(),
+        titulo: `${atividadeOriginal.titulo} - Cópia`,
+        data: atividadeOriginal.data,
+        pessoaId: atividadeOriginal.pessoaId,
+        tipo: atividadeOriginal.tipo,
+        projetoId: atividadeOriginal.projetoId,
+        descricaoJira: atividadeOriginal.descricaoJira,
+        horas: atividadeOriginal.horas,
+        createdAt: now,
+        updatedAt: now
+      };
+
+      await collection.insertOne(novaAtividade);
+      return {
+        ...novaAtividade,
+        createdAt: convertToTimestamp(novaAtividade.createdAt),
+        updatedAt: convertToTimestamp(novaAtividade.updatedAt)
+      };
+    } catch (error) {
+      console.error('Erro ao clonar atividade:', error);
+      return null;
+    }
+  }
+
   // ===== MÉTODOS DE BUSCA =====
   static async getAtividadesPorData(data: string): Promise<Atividade[]> {
     try {

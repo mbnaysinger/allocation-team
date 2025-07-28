@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Copy } from "lucide-react";
 import Button from "../atoms/Button";
 import TarjaHoras from "../atoms/TarjaHoras";
 import { Pessoa, AtividadeCompleta } from "../../types/allocation";
@@ -10,6 +10,7 @@ interface PersonCardProps {
   atividades: AtividadeCompleta[];
   onAddAllocation: (day: string) => void;
   onEditAllocation: (atividadeId: string) => void;
+  onCloneAllocation: (atividadeId: string) => void;
   calcularHorasDia: (pessoaId: string, data: string) => Promise<number>;
 }
 
@@ -19,6 +20,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
   atividades,
   onAddAllocation,
   onEditAllocation,
+  onCloneAllocation,
   calcularHorasDia,
 }) => {
   const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
@@ -122,7 +124,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
                 {atividadesDoDia.map((atividade) => (
                   <div
                     key={atividade.id}
-                    className={`${getTypeClasses(atividade.tipo)} p-2 md:p-3 rounded-lg mb-2 cursor-pointer hover:scale-105 transition-transform text-xs md:text-sm`}
+                    className={`${getTypeClasses(atividade.tipo)} p-2 md:p-3 rounded-lg mb-2 cursor-pointer hover:scale-105 transition-transform text-xs md:text-sm relative group`}
                     onClick={() => onEditAllocation(atividade.id)}
                   >
                     <div className="font-bold text-sm md:text-lg">{atividade.horas}h</div>
@@ -134,6 +136,18 @@ const PersonCard: React.FC<PersonCardProps> = ({
                         {atividade.projeto.abreviatura}
                       </div>
                     )}
+                    
+                    {/* Ícone de clonar no canto inferior direito */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCloneAllocation(atividade.id);
+                      }}
+                      className="absolute bottom-1 right-1 p-1 bg-white/80 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm"
+                      title="Clonar atividade"
+                    >
+                      <Copy size={12} className="text-accent" />
+                    </button>
                   </div>
                 ))}
                 
