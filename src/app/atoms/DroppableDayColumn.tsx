@@ -73,7 +73,7 @@ const DroppableDayColumn: React.FC<DroppableDayColumnProps> = ({
       <TarjaHoras 
         totalHoras={totalHoras} 
         data={data} 
-        className="mb-2"
+        className="mb-6"
       />
       
       {/* Atividades do dia */}
@@ -91,9 +91,9 @@ const DroppableDayColumn: React.FC<DroppableDayColumnProps> = ({
         onClick={() => onAddAllocation(data)}
         variant="outline"
         size="sm"
-        className="w-full mt-2 text-accent border-accent/50 hover:bg-accent hover:text-bg text-xs"
+        className="w-full mt-4 text-accent border-accent/50 hover:bg-accent hover:text-bg text-xs"
       >
-        <Plus size={12} className="mr-1" />
+        <Plus size={12} className="mr-" />
         <span className="hidden sm:inline">Adicionar</span>
       </Button>
     </div>

@@ -32,7 +32,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
   const dayNames = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
   const [horasPorDia, setHorasPorDia] = useState<Record<string, number>>({});
   const [dragOverData, setDragOverData] = useState<string | null>(null);
-
+  
   // Hook para drag and drop
   const { draggedItem, isDragging, handleDragStart, handleDragEnd, handleDragCancel } = useDragAndDrop({
     onMoveAtividade
@@ -66,7 +66,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
   };
 
   const getAtividadesDoDia = (data: string) => {
-    return atividades.filter(atividade => 
+    return atividades.filter(atividade =>
       atividade.pessoaId === person.id && atividade.data === data
     );
   };
@@ -86,8 +86,8 @@ const PersonCard: React.FC<PersonCardProps> = ({
       <div className="bg-gradient-to-r from-bg/80 to-bg/60 text-text-light p-4 md:p-6 border-b border-accent/20">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex-1">
-            <h3 className="text-lg md:text-xl font-semibold mb-1 text-text-light">
-              👨‍💻 {person.nome}
+            <h3 className="text-lg md:text-xl font-semibold mb-1 text-text-light uppercase">
+              {person.nome}
             </h3>
             <div className="text-accent/80 text-sm">
               {person.cargo}
@@ -106,7 +106,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
         <div className="grid grid-cols-5 gap-2 md:gap-4 mb-4 md:mb-6">
           {dayNames.map((dayName, index) => (
             <div key={index} className="text-center">
-              <div className="font-semibold text-text-light text-xs md:text-sm">{dayName}</div>
+              <div className="font-semibold text-text-light text-xs md:text-sm border border-accent/40 rounded-md p-2 mb-0">{dayName}</div>
             </div>
           ))}
         </div>
@@ -118,7 +118,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
             const atividadesDoDia = getAtividadesDoDia(data);
             const totalHoras = horasPorDia[data] || 0;
             const isDragOver = dragOverData === data;
-            
+
             return (
               <DroppableDayColumn
                 key={day}
