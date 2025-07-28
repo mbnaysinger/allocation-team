@@ -26,6 +26,7 @@ const AllocationPage = () => {
   const [modalEditarAtividade, setModalEditarAtividade] = useState(false);
   const [modalFirebaseDebugger, setModalFirebaseDebugger] = useState(false);
   const [dataSelecionada, setDataSelecionada] = useState('');
+  const [pessoaSelecionada, setPessoaSelecionada] = useState<Pessoa | null>(null);
   const [atividadeSelecionada, setAtividadeSelecionada] = useState<AtividadeCompleta | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -196,8 +197,9 @@ const AllocationPage = () => {
     }
   };
 
-  const handleAddAllocation = (data: string) => {
+  const handleAddAllocation = (data: string, pessoa: Pessoa) => {
     setDataSelecionada(data);
+    setPessoaSelecionada(pessoa);
     setModalAdicionarAtividade(true);
   };
 
@@ -276,11 +278,15 @@ const AllocationPage = () => {
 
         <ModalAdicionarAtividade
           isOpen={modalAdicionarAtividade}
-          onClose={() => setModalAdicionarAtividade(false)}
+          onClose={() => {
+            setModalAdicionarAtividade(false);
+            setPessoaSelecionada(null);
+          }}
           onSubmit={handleAdicionarAtividade}
           pessoas={pessoas}
           projetos={projetos}
           dataSelecionada={dataSelecionada}
+          pessoaSelecionada={pessoaSelecionada}
           loading={loading}
         />
 

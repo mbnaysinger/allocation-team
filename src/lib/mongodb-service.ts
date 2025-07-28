@@ -1,13 +1,5 @@
-import { connectToDatabase, getCollection } from './mongodb';
+import { getCollection } from './mongodb';
 import { Pessoa, Projeto, Atividade, AtividadeCompleta } from '../types/allocation';
-
-// Função para converter FirestoreTimestamp para Date
-const convertTimestamp = (timestamp: any): Date => {
-  if (timestamp && timestamp.seconds) {
-    return new Date(timestamp.seconds * 1000);
-  }
-  return new Date();
-};
 
 // Função para converter Date para FirestoreTimestamp
 const convertToTimestamp = (date: Date) => {

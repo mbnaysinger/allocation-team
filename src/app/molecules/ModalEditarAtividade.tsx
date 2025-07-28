@@ -21,7 +21,6 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
   onSubmit,
   onDelete,
   atividade,
-  pessoas,
   projetos,
   loading = false
 }) => {
@@ -215,7 +214,17 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
             )}
           </div>
 
-          {/* Pessoa */}
+          {/* Pessoa - Hidden field */}
+          <input
+            type="hidden"
+            id="pessoaId"
+            value={formData.pessoaId}
+          />
+          {errors.pessoaId && (
+            <p className="text-red-500 text-sm mt-1">{errors.pessoaId}</p>
+          )}
+
+          {/* Pessoa
           <div>
             <label htmlFor="pessoaId" className="block text-sm font-medium text-text-light mb-2">
               Pessoa *
@@ -242,6 +251,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               <p className="text-red-500 text-sm mt-1">{errors.pessoaId}</p>
             )}
           </div>
+          */}
 
           {/* Tipo */}
           <div>

@@ -11,6 +11,7 @@ interface ModalAdicionarAtividadeProps {
   pessoas: Pessoa[];
   projetos: Projeto[];
   dataSelecionada: string;
+  pessoaSelecionada?: Pessoa | null;
   loading?: boolean;
 }
 
@@ -18,21 +19,30 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
   isOpen,
   onClose,
   onSubmit,
-  pessoas,
   projetos,
   dataSelecionada,
+  pessoaSelecionada,
   loading = false
 }) => {
   const [formData, setFormData] = useState<DadosAtividade>({
     titulo: '',
     data: dataSelecionada,
-    pessoaId: '',
+    pessoaId: pessoaSelecionada?.id || '',
     tipo: 'Melhoria',
     projetoId: '',
     descricaoJira: '',
     horas: 8
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Atualizar formData quando dataSelecionada ou pessoaSelecionada mudarem
+  React.useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      data: dataSelecionada,
+      pessoaId: pessoaSelecionada?.id || ''
+    }));
+  }, [dataSelecionada, pessoaSelecionada]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +88,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
     setFormData({
       titulo: '',
       data: dataSelecionada,
-      pessoaId: '',
+      pessoaId: pessoaSelecionada?.id || '',
       tipo: 'Melhoria',
       projetoId: '',
       descricaoJira: '',
@@ -165,33 +175,15 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
             )}
           </div>
 
-          {/* Pessoa */}
-          <div>
-            <label htmlFor="pessoaId" className="block text-sm font-medium text-text-light mb-2">
-              Pessoa *
-            </label>
-            <select
-              id="pessoaId"
-              value={formData.pessoaId}
-              onChange={(e) => {
-                setFormData(prev => ({ ...prev, pessoaId: e.target.value }));
-                clearError('pessoaId');
-              }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.pessoaId ? 'border-red-500' : 'border-accent/20'
-              }`}
-            >
-              <option value="">Selecione uma pessoa</option>
-              {pessoas.map((pessoa) => (
-                <option key={pessoa.id} value={pessoa.id}>
-                  {pessoa.nome} - {pessoa.cargo}
-                </option>
-              ))}
-            </select>
-            {errors.pessoaId && (
-              <p className="text-red-500 text-sm mt-1">{errors.pessoaId}</p>
-            )}
-          </div>
+          {/* Pessoa - Hidden field */}
+          <input
+            type="hidden"
+            id="pessoaId"
+            value={formData.pessoaId}
+          />
+          {errors.pessoaId && (
+            <p className="text-red-500 text-sm mt-1">{errors.pessoaId}</p>
+          )}
 
           {/* Tipo */}
           <div>

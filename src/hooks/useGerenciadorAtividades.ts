@@ -7,8 +7,6 @@ import {
   criarProjeto, 
   criarAtividade, 
   atualizarAtividade, 
-  deletarAtividade,
-  clonarAtividade,
   getTotalHorasPorDia
 } from '../lib/firestore';
 import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade } from '../types/allocation';

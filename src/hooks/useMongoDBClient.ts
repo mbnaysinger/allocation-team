@@ -46,7 +46,7 @@ export const useMongoDBClient = ({ dataInicio, dataFim }: UseMongoDBClientProps)
   }, [recarregarDados]);
 
   // Função para fazer requisições POST
-  const makeRequest = useCallback(async (action: string, data: any) => {
+  const makeRequest = useCallback(async (action: string, data: unknown) => {
     try {
       const response = await fetch('/api/mongodb', {
         method: 'POST',

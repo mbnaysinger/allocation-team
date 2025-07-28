@@ -1,6 +1,6 @@
 import { useMongoDBClient } from './useMongoDBClient';
 import { isUsingMongoDB } from '../lib/config';
-import { Pessoa, Projeto, AtividadeCompleta } from '../types/allocation';
+import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade } from '../types/allocation';
 
 interface UseDatabaseProps {
   dataInicio: string;
@@ -13,10 +13,10 @@ interface DatabaseHookReturn {
   atividades: AtividadeCompleta[];
   loading: boolean;
   error: string | null;
-  adicionarPessoa: (dados: any) => Promise<void>;
-  adicionarProjeto: (dados: any) => Promise<void>;
-  adicionarAtividade: (dados: any) => Promise<void>;
-  editarAtividade: (id: string, dados: any) => Promise<void>;
+  adicionarPessoa: (dados: DadosPessoa) => Promise<void>;
+  adicionarProjeto: (dados: DadosProjeto) => Promise<void>;
+  adicionarAtividade: (dados: DadosAtividade) => Promise<void>;
+  editarAtividade: (id: string, dados: Partial<DadosAtividade>) => Promise<void>;
   deletarAtividade: (id: string) => Promise<void>;
   clonarAtividade: (id: string) => Promise<void>;
   calcularHorasDia: (pessoaId: string, data: string) => Promise<number>;
@@ -25,8 +25,8 @@ interface DatabaseHookReturn {
   databaseType: 'mongodb' | 'firebase';
   
   // Funções otimizadas para atualizações específicas
-  adicionarAtividadeOptimized?: (dados: any, pessoaId: string) => Promise<void>;
-  editarAtividadeOptimized?: (id: string, dados: any, pessoaId: string) => Promise<void>;
+  adicionarAtividadeOptimized?: (dados: DadosAtividade, pessoaId: string) => Promise<void>;
+  editarAtividadeOptimized?: (id: string, dados: Partial<DadosAtividade>, pessoaId: string) => Promise<void>;
   deletarAtividadeOptimized?: (id: string, pessoaId: string) => Promise<void>;
   clonarAtividadeOptimized?: (id: string, pessoaId: string) => Promise<void>;
 }
@@ -46,7 +46,9 @@ export const useDatabase = ({ dataInicio, dataFim }: UseDatabaseProps): Database
     };
   } else {
     // Importação dinâmica do Firebase apenas quando necessário
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { useGerenciadorAtividades } = require('./useGerenciadorAtividades');
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const firebaseHook = useGerenciadorAtividades({ dataInicio, dataFim });
     
     return {
@@ -66,6 +68,7 @@ export const useMongoDBOnly = ({ dataInicio, dataFim }: UseDatabaseProps): Datab
 
 // Hook específico para Firebase (força o uso do Firebase)
 export const useFirebaseOnly = ({ dataInicio, dataFim }: UseDatabaseProps): DatabaseHookReturn => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { useGerenciadorAtividades } = require('./useGerenciadorAtividades');
   return {
     ...useGerenciadorAtividades({ dataInicio, dataFim }),

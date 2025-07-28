@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { MongoDBService } from '../lib/mongodb-service';
-import { Pessoa, Projeto, Atividade, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade } from '../types/allocation';
+import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade } from '../types/allocation';
 
 interface UseMongoDBProps {
   dataInicio: string;

@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Copy } from "lucide-react";
-import Button from "../atoms/Button";
-import TarjaHoras from "../atoms/TarjaHoras";
 import DroppableDayColumn from "../atoms/DroppableDayColumn";
-import DraggableActivityCard from "../atoms/DraggableActivityCard";
 import { Pessoa, AtividadeCompleta } from "../../types/allocation";
 import { useDragAndDrop } from "../../hooks/useDragAndDrop";
 
@@ -11,7 +7,7 @@ interface PersonCardProps {
   person: Pessoa;
   weekStart: Date;
   atividades: AtividadeCompleta[];
-  onAddAllocation: (day: string) => void;
+  onAddAllocation: (day: string, pessoa: Pessoa) => void;
   onEditAllocation: (atividadeId: string) => void;
   onCloneAllocation: (atividadeId: string) => void;
   onMoveAtividade: (atividadeId: string, novaData: string) => Promise<void>;
@@ -34,7 +30,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
   const [dragOverData, setDragOverData] = useState<string | null>(null);
   
   // Hook para drag and drop
-  const { draggedItem, isDragging, handleDragStart, handleDragEnd, handleDragCancel } = useDragAndDrop({
+  const { handleDragStart, handleDragEnd } = useDragAndDrop({
     onMoveAtividade
   });
 
@@ -125,7 +121,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
                 data={data}
                 atividades={atividadesDoDia}
                 totalHoras={totalHoras}
-                onAddAllocation={onAddAllocation}
+                onAddAllocation={(data) => onAddAllocation(data, person)}
                 onEditAllocation={onEditAllocation}
                 onCloneAllocation={onCloneAllocation}
                 onDrop={(dropData) => {

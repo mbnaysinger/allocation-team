@@ -240,6 +240,7 @@ export const clonarAtividade = async (atividadeId: string): Promise<string> => {
     const atividadeData = atividadeDoc.data();
     
     // Criar uma nova atividade com os mesmos dados, mas sem o ID original
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, ...dadosParaClonar } = atividadeData;
     
     const atividadesRef = collection(db, 'atividades');
