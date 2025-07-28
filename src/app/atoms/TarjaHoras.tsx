@@ -11,7 +11,7 @@ const TarjaHoras: React.FC<TarjaHorasProps> = ({ totalHoras, data, className = '
   const cores = getCoresHoras(totalHoras);
   
   const formatarData = (data: string) => {
-    const [ano, mes, dia] = data.split('-');
+    const [mes, dia] = data.split('-');
     return `${dia}/${mes}`;
   };
 

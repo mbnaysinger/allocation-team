@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:firebase": "node scripts/test-firebase.js"
   },
   "dependencies": {
     "@vercel/analytics": "^1.5.0",

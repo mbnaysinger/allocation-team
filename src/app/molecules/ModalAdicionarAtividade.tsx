@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from '../atoms/Button';
 import ContadorCaracteres from '../atoms/ContadorCaracteres';
 import { X } from 'lucide-react';
-import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto } from '../../types/allocation';
+import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto, TipoAtividade } from '../../types/allocation';
 
 interface ModalAdicionarAtividadeProps {
   isOpen: boolean;
@@ -69,7 +69,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
     try {
       await onSubmit(formData);
       handleClose();
-    } catch (error) {
+    } catch {
       // Erro será tratado pelo componente pai
     }
   };
@@ -204,7 +204,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
               onChange={(e) => {
                 setFormData(prev => ({ 
                   ...prev, 
-                  tipo: e.target.value as any,
+                  tipo: e.target.value as TipoAtividade,
                   projetoId: e.target.value === 'Projeto' ? prev.projetoId : ''
                 }));
                 clearError('tipo');

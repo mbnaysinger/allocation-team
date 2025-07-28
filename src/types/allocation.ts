@@ -2,13 +2,19 @@ export type Cargo = 'Analista de TI' | 'Analista de Negócios';
 export type TipoAtividade = 'Projeto' | 'Melhoria' | 'Sustentação';
 export type Entidade = 'SESI' | 'SENAI' | 'IEL' | 'CIERGS' | 'GINFO' | 'SISTEMA FIERGS';
 
+// Tipo para timestamp do Firestore
+export type FirestoreTimestamp = {
+  seconds: number;
+  nanoseconds: number;
+};
+
 export interface Pessoa {
   id: string;
   nome: string;
   cargo: Cargo;
   ativo: boolean;
-  createdAt: any; // Firestore Timestamp
-  updatedAt: any; // Firestore Timestamp
+  createdAt: FirestoreTimestamp;
+  updatedAt: FirestoreTimestamp;
 }
 
 export interface Projeto {
@@ -19,8 +25,8 @@ export interface Projeto {
   entidade?: Entidade;
   linkJira?: string;
   ativo: boolean;
-  createdAt: any; // Firestore Timestamp
-  updatedAt: any; // Firestore Timestamp
+  createdAt: FirestoreTimestamp;
+  updatedAt: FirestoreTimestamp;
 }
 
 export interface Atividade {
@@ -32,8 +38,8 @@ export interface Atividade {
   projetoId?: string; // Obrigatório se tipo === "Projeto"
   descricaoJira?: string; // Máximo 100 caracteres
   horas: number;
-  createdAt: any; // Firestore Timestamp
-  updatedAt: any; // Firestore Timestamp
+  createdAt: FirestoreTimestamp;
+  updatedAt: FirestoreTimestamp;
 }
 
 export interface AtividadeCompleta extends Atividade {

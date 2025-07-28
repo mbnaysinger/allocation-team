@@ -9,8 +9,10 @@ import ModalAdicionarPessoa from "../molecules/ModalAdicionarPessoa";
 import ModalAdicionarProjeto from "../molecules/ModalAdicionarProjeto";
 import ModalAdicionarAtividade from "../molecules/ModalAdicionarAtividade";
 import ModalEditarAtividade from "../molecules/ModalEditarAtividade";
+import FirebaseDebugger from "../atoms/FirebaseDebugger";
 import { useGerenciadorAtividades } from "../../hooks/useGerenciadorAtividades";
 import { DadosPessoa, DadosProjeto, DadosAtividade, AtividadeCompleta } from "../../types/allocation";
+import { transactionLogger } from "../../lib/logger";
 
 
 
@@ -22,6 +24,7 @@ const AllocationPage = () => {
   const [modalAdicionarProjeto, setModalAdicionarProjeto] = useState(false);
   const [modalAdicionarAtividade, setModalAdicionarAtividade] = useState(false);
   const [modalEditarAtividade, setModalEditarAtividade] = useState(false);
+  const [modalFirebaseDebugger, setModalFirebaseDebugger] = useState(false);
   const [dataSelecionada, setDataSelecionada] = useState('');
   const [atividadeSelecionada, setAtividadeSelecionada] = useState<AtividadeCompleta | null>(null);
   const [loading, setLoading] = useState(false);
@@ -62,11 +65,19 @@ const AllocationPage = () => {
 
   // Handlers dos modais
   const handleAdicionarPessoa = async (dados: DadosPessoa) => {
+    const transactionId = transactionLogger.startTransaction('handleAdicionarPessoa', { dados });
+    
     setLoading(true);
     try {
+      transactionLogger.logOperation('Iniciando adição de pessoa na página', { dados });
       await adicionarPessoa(dados);
+      transactionLogger.successTransaction(transactionId, 'handleAdicionarPessoa', { dados });
+      // Fechar modal apenas em caso de sucesso
+      setModalAdicionarPessoa(false);
     } catch (error) {
+      transactionLogger.errorTransaction(transactionId, 'handleAdicionarPessoa', error);
       console.error('Erro ao adicionar pessoa:', error);
+      // Não fechar modal em caso de erro para permitir correção
     } finally {
       setLoading(false);
     }
@@ -152,6 +163,7 @@ const AllocationPage = () => {
           onNextWeek={() => navigateWeek('next')}
           onAddPerson={() => setModalAdicionarPessoa(true)}
           onAddProject={() => setModalAdicionarProjeto(true)}
+          onOpenFirebaseDebugger={() => setModalFirebaseDebugger(true)}
         />
 
         {error && (
@@ -214,6 +226,14 @@ const AllocationPage = () => {
           projetos={projetos}
           loading={loading}
         />
+
+        {/* Firebase Debugger para desenvolvimento */}
+        {process.env.NODE_ENV === 'development' && (
+          <FirebaseDebugger
+            isOpen={modalFirebaseDebugger}
+            onClose={() => setModalFirebaseDebugger(false)}
+          />
+        )}
       </div>
     </main>
   );

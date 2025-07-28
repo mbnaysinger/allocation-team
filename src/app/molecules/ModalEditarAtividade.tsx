@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Button from '../atoms/Button';
 import ContadorCaracteres from '../atoms/ContadorCaracteres';
 import { X, Trash2 } from 'lucide-react';
-import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto, AtividadeCompleta } from '../../types/allocation';
+import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto, AtividadeCompleta, TipoAtividade } from '../../types/allocation';
 
 interface ModalEditarAtividadeProps {
   isOpen: boolean;
@@ -90,7 +90,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
     try {
       await onSubmit(atividade.id, formData);
       handleClose();
-    } catch (error) {
+    } catch {
       // Erro será tratado pelo componente pai
     }
   };
@@ -106,7 +106,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
       setDeleteLoading(true);
       await onDelete(atividade.id);
       handleClose();
-    } catch (error) {
+    } catch {
       // Erro será tratado pelo componente pai
     } finally {
       setDeleteLoading(false);
@@ -254,7 +254,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               onChange={(e) => {
                 setFormData(prev => ({ 
                   ...prev, 
-                  tipo: e.target.value as any,
+                  tipo: e.target.value as TipoAtividade,
                   projetoId: e.target.value === 'Projeto' ? prev.projetoId : ''
                 }));
                 clearError('tipo');

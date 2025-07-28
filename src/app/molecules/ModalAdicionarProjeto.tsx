@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Button from '../atoms/Button';
 import { X } from 'lucide-react';
-import { ENTIDADES, DadosProjeto } from '../../types/allocation';
+import { ENTIDADES, DadosProjeto, Entidade } from '../../types/allocation';
 
 interface ModalAdicionarProjetoProps {
   isOpen: boolean;
@@ -48,7 +48,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
     try {
       await onSubmit(formData);
       handleClose();
-    } catch (error) {
+    } catch {
       // Erro será tratado pelo componente pai
     }
   };
@@ -177,7 +177,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
               onChange={(e) => {
                 setFormData(prev => ({ 
                   ...prev, 
-                  entidade: e.target.value as any || undefined 
+                  entidade: e.target.value as Entidade || undefined 
                 }));
               }}
               className="w-full px-4 py-3 bg-bg/50 border border-accent/20 rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all"

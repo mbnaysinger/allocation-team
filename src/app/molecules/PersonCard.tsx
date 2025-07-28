@@ -4,23 +4,6 @@ import Button from "../atoms/Button";
 import TarjaHoras from "../atoms/TarjaHoras";
 import { Pessoa, AtividadeCompleta } from "../../types/allocation";
 
-interface Allocation {
-  id: string;
-  hours: number;
-  project: string;
-  type: "normal" | "partial" | "overtime";
-}
-
-interface Person {
-  id: string;
-  name: string;
-  role: string;
-  emoji: string;
-  allocations: {
-    [day: string]: Allocation[];
-  };
-}
-
 interface PersonCardProps {
   person: Pessoa;
   weekStart: Date;

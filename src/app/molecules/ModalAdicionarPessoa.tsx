@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Button from '../atoms/Button';
 import { X } from 'lucide-react';
-import { CARGOS, DadosPessoa } from '../../types/allocation';
+import { CARGOS, DadosPessoa, Cargo } from '../../types/allocation';
 
 interface ModalAdicionarPessoaProps {
   isOpen: boolean;
@@ -42,7 +42,7 @@ const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
     try {
       await onSubmit(formData);
       handleClose();
-    } catch (error) {
+    } catch {
       // Erro será tratado pelo componente pai
     }
   };
@@ -111,7 +111,7 @@ const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
               id="cargo"
               value={formData.cargo}
               onChange={(e) => {
-                setFormData(prev => ({ ...prev, cargo: e.target.value as any }));
+                setFormData(prev => ({ ...prev, cargo: e.target.value as Cargo }));
                 if (errors.cargo) setErrors(prev => {
                   const newErrors = { ...prev };
                   delete newErrors.cargo;
