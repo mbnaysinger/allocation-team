@@ -58,7 +58,12 @@ const AllocationPage = () => {
     editarAtividade,
     deletarAtividade,
     clonarAtividade,
-    calcularHorasDia
+    calcularHorasDia,
+    // Funções otimizadas
+    adicionarAtividadeOptimized,
+    editarAtividadeOptimized,
+    deletarAtividadeOptimized,
+    clonarAtividadeOptimized
   } = useDatabase({
     dataInicio: start.toISOString().split('T')[0],
     dataFim: end.toISOString().split('T')[0]
@@ -98,7 +103,12 @@ const AllocationPage = () => {
   const handleAdicionarAtividade = async (dados: DadosAtividade) => {
     setLoading(true);
     try {
-      await adicionarAtividade(dados);
+      // Usar função otimizada se disponível, senão usar a normal
+      if (adicionarAtividadeOptimized) {
+        await adicionarAtividadeOptimized(dados, dados.pessoaId);
+      } else {
+        await adicionarAtividade(dados);
+      }
     } catch (error) {
       console.error('Erro ao adicionar atividade:', error);
     } finally {
@@ -109,7 +119,16 @@ const AllocationPage = () => {
   const handleEditarAtividade = async (atividadeId: string, dados: Partial<DadosAtividade>) => {
     setLoading(true);
     try {
-      await editarAtividade(atividadeId, dados);
+      // Encontrar a atividade para obter o pessoaId
+      const atividade = atividades.find(a => a.id === atividadeId);
+      const pessoaId = atividade?.pessoaId;
+      
+      // Usar função otimizada se disponível e pessoaId encontrado, senão usar a normal
+      if (editarAtividadeOptimized && pessoaId) {
+        await editarAtividadeOptimized(atividadeId, dados, pessoaId);
+      } else {
+        await editarAtividade(atividadeId, dados);
+      }
     } catch (error) {
       console.error('Erro ao editar atividade:', error);
     } finally {
@@ -120,7 +139,16 @@ const AllocationPage = () => {
   const handleDeletarAtividade = async (atividadeId: string) => {
     setLoading(true);
     try {
-      await deletarAtividade(atividadeId);
+      // Encontrar a atividade para obter o pessoaId
+      const atividade = atividades.find(a => a.id === atividadeId);
+      const pessoaId = atividade?.pessoaId;
+      
+      // Usar função otimizada se disponível e pessoaId encontrado, senão usar a normal
+      if (deletarAtividadeOptimized && pessoaId) {
+        await deletarAtividadeOptimized(atividadeId, pessoaId);
+      } else {
+        await deletarAtividade(atividadeId);
+      }
     } catch (error) {
       console.error('Erro ao deletar atividade:', error);
     } finally {
@@ -131,7 +159,16 @@ const AllocationPage = () => {
   const handleClonarAtividade = async (atividadeId: string) => {
     setLoading(true);
     try {
-      await clonarAtividade(atividadeId);
+      // Encontrar a atividade para obter o pessoaId
+      const atividade = atividades.find(a => a.id === atividadeId);
+      const pessoaId = atividade?.pessoaId;
+      
+      // Usar função otimizada se disponível e pessoaId encontrado, senão usar a normal
+      if (clonarAtividadeOptimized && pessoaId) {
+        await clonarAtividadeOptimized(atividadeId, pessoaId);
+      } else {
+        await clonarAtividade(atividadeId);
+      }
     } catch (error) {
       console.error('Erro ao clonar atividade:', error);
     } finally {
@@ -142,7 +179,16 @@ const AllocationPage = () => {
   const handleMoveAtividade = async (atividadeId: string, novaData: string) => {
     setLoading(true);
     try {
-      await editarAtividade(atividadeId, { data: novaData });
+      // Encontrar a atividade para obter o pessoaId
+      const atividade = atividades.find(a => a.id === atividadeId);
+      const pessoaId = atividade?.pessoaId;
+      
+      // Usar função otimizada se disponível e pessoaId encontrado, senão usar a normal
+      if (editarAtividadeOptimized && pessoaId) {
+        await editarAtividadeOptimized(atividadeId, { data: novaData }, pessoaId);
+      } else {
+        await editarAtividade(atividadeId, { data: novaData });
+      }
     } catch (error) {
       console.error('Erro ao mover atividade:', error);
     } finally {

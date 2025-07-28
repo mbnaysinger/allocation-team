@@ -23,6 +23,12 @@ interface DatabaseHookReturn {
   recarregarDados: () => Promise<void>;
   limparErro: () => void;
   databaseType: 'mongodb' | 'firebase';
+  
+  // Funções otimizadas para atualizações específicas
+  adicionarAtividadeOptimized?: (dados: any, pessoaId: string) => Promise<void>;
+  editarAtividadeOptimized?: (id: string, dados: any, pessoaId: string) => Promise<void>;
+  deletarAtividadeOptimized?: (id: string, pessoaId: string) => Promise<void>;
+  clonarAtividadeOptimized?: (id: string, pessoaId: string) => Promise<void>;
 }
 
 /**

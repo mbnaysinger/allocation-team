@@ -158,6 +158,125 @@ export const useMongoDBClient = ({ dataInicio, dataFim }: UseMongoDBClientProps)
     });
   }, [makeRequest, recarregarDados, executeWithScrollPreservation]);
 
+  // ===== FUNÇÕES OTIMIZADAS PARA ATUALIZAÇÕES ESPECÍFICAS =====
+  
+  // Função para adicionar atividade otimizada
+  const adicionarAtividadeOptimized = useCallback(async (dadosAtividade: DadosAtividade, pessoaId: string) => {
+    return executeWithScrollPreservation(async () => {
+      try {
+        setError(null);
+        const response = await makeRequest('addAtividadeOptimized', {
+          ...dadosAtividade,
+          pessoaId,
+          dataInicio,
+          dataFim
+        });
+        
+        if (response.success && response.data) {
+          // Atualizar apenas as atividades do usuário específico
+          setAtividades(prevAtividades => {
+            // Remover atividades antigas do usuário
+            const outrasAtividades = prevAtividades.filter(a => a.pessoaId !== pessoaId);
+            // Adicionar as novas atividades
+            return [...outrasAtividades, ...response.data];
+          });
+        }
+      } catch (err) {
+        console.error('Erro ao adicionar atividade otimizada:', err);
+        setError(err instanceof Error ? err.message : 'Erro ao adicionar atividade');
+        throw err;
+      }
+    });
+  }, [makeRequest, dataInicio, dataFim, executeWithScrollPreservation]);
+
+  // Função para editar atividade otimizada
+  const editarAtividadeOptimized = useCallback(async (atividadeId: string, dadosAtualizados: Partial<DadosAtividade>, pessoaId: string) => {
+    return executeWithScrollPreservation(async () => {
+      try {
+        setError(null);
+        const response = await makeRequest('updateAtividadeOptimized', {
+          id: atividadeId,
+          pessoaId,
+          dataInicio,
+          dataFim,
+          ...dadosAtualizados
+        });
+        
+        if (response.success && response.data) {
+          // Atualizar apenas as atividades do usuário específico
+          setAtividades(prevAtividades => {
+            // Remover atividades antigas do usuário
+            const outrasAtividades = prevAtividades.filter(a => a.pessoaId !== pessoaId);
+            // Adicionar as novas atividades
+            return [...outrasAtividades, ...response.data];
+          });
+        }
+      } catch (err) {
+        console.error('Erro ao editar atividade otimizada:', err);
+        setError(err instanceof Error ? err.message : 'Erro ao editar atividade');
+        throw err;
+      }
+    });
+  }, [makeRequest, dataInicio, dataFim, executeWithScrollPreservation]);
+
+  // Função para deletar atividade otimizada
+  const deletarAtividadeOptimized = useCallback(async (atividadeId: string, pessoaId: string) => {
+    return executeWithScrollPreservation(async () => {
+      try {
+        setError(null);
+        const response = await makeRequest('deleteAtividadeOptimized', {
+          id: atividadeId,
+          pessoaId,
+          dataInicio,
+          dataFim
+        });
+        
+        if (response.success && response.data) {
+          // Atualizar apenas as atividades do usuário específico
+          setAtividades(prevAtividades => {
+            // Remover atividades antigas do usuário
+            const outrasAtividades = prevAtividades.filter(a => a.pessoaId !== pessoaId);
+            // Adicionar as novas atividades
+            return [...outrasAtividades, ...response.data];
+          });
+        }
+      } catch (err) {
+        console.error('Erro ao deletar atividade otimizada:', err);
+        setError(err instanceof Error ? err.message : 'Erro ao deletar atividade');
+        throw err;
+      }
+    });
+  }, [makeRequest, dataInicio, dataFim, executeWithScrollPreservation]);
+
+  // Função para clonar atividade otimizada
+  const clonarAtividadeOptimized = useCallback(async (atividadeId: string, pessoaId: string) => {
+    return executeWithScrollPreservation(async () => {
+      try {
+        setError(null);
+        const response = await makeRequest('cloneAtividadeOptimized', {
+          id: atividadeId,
+          pessoaId,
+          dataInicio,
+          dataFim
+        });
+        
+        if (response.success && response.data) {
+          // Atualizar apenas as atividades do usuário específico
+          setAtividades(prevAtividades => {
+            // Remover atividades antigas do usuário
+            const outrasAtividades = prevAtividades.filter(a => a.pessoaId !== pessoaId);
+            // Adicionar as novas atividades
+            return [...outrasAtividades, ...response.data];
+          });
+        }
+      } catch (err) {
+        console.error('Erro ao clonar atividade otimizada:', err);
+        setError(err instanceof Error ? err.message : 'Erro ao clonar atividade');
+        throw err;
+      }
+    });
+  }, [makeRequest, dataInicio, dataFim, executeWithScrollPreservation]);
+
   // Função para calcular horas do dia
   const calcularHorasDia = useCallback(async (pessoaId: string, data: string): Promise<number> => {
     try {
@@ -188,6 +307,12 @@ export const useMongoDBClient = ({ dataInicio, dataFim }: UseMongoDBClientProps)
     deletarAtividade,
     clonarAtividade,
     calcularHorasDia,
+    
+    // Funções otimizadas
+    adicionarAtividadeOptimized,
+    editarAtividadeOptimized,
+    deletarAtividadeOptimized,
+    clonarAtividadeOptimized,
     
     // Função para limpar erro
     limparErro: () => setError(null)

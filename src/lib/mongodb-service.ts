@@ -419,4 +419,116 @@ export class MongoDBService {
       return [];
     }
   }
+
+  // ===== MÉTODOS OTIMIZADOS PARA ATUALIZAÇÕES ESPECÍFICAS =====
+  
+  static async getAtividadesCompletasPorPessoaESemana(pessoaId: string, dataInicio: string, dataFim: string): Promise<AtividadeCompleta[]> {
+    try {
+      const atividadesCollection = await getCollection('atividades');
+      const pessoasCollection = await getCollection('pessoas');
+      const projetosCollection = await getCollection('projetos');
+      
+      const atividades = await atividadesCollection.find({
+        pessoaId,
+        data: { $gte: dataInicio, $lte: dataFim }
+      }).toArray();
+      
+      // Buscar apenas a pessoa específica e projetos necessários
+      const pessoa = await pessoasCollection.findOne({ id: pessoaId });
+      const projetoIds = [...new Set(atividades.map(a => a.projetoId).filter(Boolean))];
+      const projetos = projetoIds.length > 0 
+        ? await projetosCollection.find({ id: { $in: projetoIds } }).toArray()
+        : [];
+
+      return atividades.map(atividade => {
+        const projeto = atividade.projetoId ? projetos.find(p => p.id === atividade.projetoId) : undefined;
+
+        // Garantir que pessoa existe, caso contrário não retornar a atividade
+        if (!pessoa) {
+          console.warn(`Pessoa ${pessoaId} não encontrada`);
+          return null;
+        }
+
+        return {
+          id: atividade.id,
+          titulo: atividade.titulo,
+          data: atividade.data,
+          pessoaId: atividade.pessoaId,
+          tipo: atividade.tipo,
+          projetoId: atividade.projetoId,
+          descricaoJira: atividade.descricaoJira,
+          horas: atividade.horas,
+          createdAt: convertToTimestamp(atividade.createdAt),
+          updatedAt: convertToTimestamp(atividade.updatedAt),
+          pessoa: {
+            id: pessoa.id,
+            nome: pessoa.nome,
+            cargo: pessoa.cargo,
+            ativo: pessoa.ativo,
+            createdAt: convertToTimestamp(pessoa.createdAt),
+            updatedAt: convertToTimestamp(pessoa.updatedAt)
+          },
+          projeto: projeto ? {
+            id: projeto.id,
+            nome: projeto.nome,
+            abreviatura: projeto.abreviatura,
+            descricao: projeto.descricao,
+            entidade: projeto.entidade,
+            linkJira: projeto.linkJira,
+            ativo: projeto.ativo,
+            createdAt: convertToTimestamp(projeto.createdAt),
+            updatedAt: convertToTimestamp(projeto.updatedAt)
+          } : undefined
+        };
+      }).filter(Boolean) as AtividadeCompleta[];
+    } catch (error) {
+      console.error('Erro ao buscar atividades por pessoa e semana:', error);
+      return [];
+    }
+  }
+
+  static async getPessoaById(pessoaId: string): Promise<Pessoa | null> {
+    try {
+      const collection = await getCollection('pessoas');
+      const pessoa = await collection.findOne({ id: pessoaId });
+      
+      if (!pessoa) return null;
+      
+      return {
+        id: pessoa.id,
+        nome: pessoa.nome,
+        cargo: pessoa.cargo,
+        ativo: pessoa.ativo,
+        createdAt: convertToTimestamp(pessoa.createdAt),
+        updatedAt: convertToTimestamp(pessoa.updatedAt)
+      };
+    } catch (error) {
+      console.error('Erro ao buscar pessoa por ID:', error);
+      return null;
+    }
+  }
+
+  static async getProjetoById(projetoId: string): Promise<Projeto | null> {
+    try {
+      const collection = await getCollection('projetos');
+      const projeto = await collection.findOne({ id: projetoId });
+      
+      if (!projeto) return null;
+      
+      return {
+        id: projeto.id,
+        nome: projeto.nome,
+        abreviatura: projeto.abreviatura,
+        descricao: projeto.descricao,
+        entidade: projeto.entidade,
+        linkJira: projeto.linkJira,
+        ativo: projeto.ativo,
+        createdAt: convertToTimestamp(projeto.createdAt),
+        updatedAt: convertToTimestamp(projeto.updatedAt)
+      };
+    } catch (error) {
+      console.error('Erro ao buscar projeto por ID:', error);
+      return null;
+    }
+  }
 } 

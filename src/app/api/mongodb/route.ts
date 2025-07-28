@@ -71,6 +71,90 @@ export async function POST(request: NextRequest) {
         const atividadeClonada = await MongoDBService.cloneAtividade(data.id);
         return NextResponse.json({ success: true, data: atividadeClonada });
 
+      // ===== NOVOS CASOS PARA ATUALIZAÇÕES OTIMIZADAS =====
+      
+      case 'updateAtividadeOptimized':
+        const { id: atividadeId, pessoaId, dataInicio, dataFim, ...dadosAtualizados } = data;
+        const sucessoUpdate = await MongoDBService.updateAtividade(atividadeId, dadosAtualizados);
+        
+        if (sucessoUpdate && pessoaId && dataInicio && dataFim) {
+          // Retornar apenas os dados atualizados do usuário específico
+          const atividadesAtualizadas = await MongoDBService.getAtividadesCompletasPorPessoaESemana(
+            pessoaId, 
+            dataInicio, 
+            dataFim
+          );
+          return NextResponse.json({ 
+            success: true, 
+            data: atividadesAtualizadas,
+            pessoaId,
+            dataInicio,
+            dataFim
+          });
+        }
+        return NextResponse.json({ success: sucessoUpdate });
+
+      case 'addAtividadeOptimized':
+        const novaAtividadeOpt = await MongoDBService.addAtividade(data);
+        if (novaAtividadeOpt && data.pessoaId && data.dataInicio && data.dataFim) {
+          // Retornar apenas os dados atualizados do usuário específico
+          const atividadesAtualizadas = await MongoDBService.getAtividadesCompletasPorPessoaESemana(
+            data.pessoaId, 
+            data.dataInicio, 
+            data.dataFim
+          );
+          return NextResponse.json({ 
+            success: true, 
+            data: atividadesAtualizadas,
+            pessoaId: data.pessoaId,
+            dataInicio: data.dataInicio,
+            dataFim: data.dataFim
+          });
+        }
+        return NextResponse.json({ success: true, data: novaAtividadeOpt });
+
+      case 'deleteAtividadeOptimized':
+        const { id: atividadeIdDelete, pessoaId: pessoaIdDelete, dataInicio: dataInicioDelete, dataFim: dataFimDelete } = data;
+        const deletadoOpt = await MongoDBService.deleteAtividade(atividadeIdDelete);
+        
+        if (deletadoOpt && pessoaIdDelete && dataInicioDelete && dataFimDelete) {
+          // Retornar apenas os dados atualizados do usuário específico
+          const atividadesAtualizadas = await MongoDBService.getAtividadesCompletasPorPessoaESemana(
+            pessoaIdDelete, 
+            dataInicioDelete, 
+            dataFimDelete
+          );
+          return NextResponse.json({ 
+            success: true, 
+            data: atividadesAtualizadas,
+            pessoaId: pessoaIdDelete,
+            dataInicio: dataInicioDelete,
+            dataFim: dataFimDelete
+          });
+        }
+        return NextResponse.json({ success: deletadoOpt });
+
+      case 'cloneAtividadeOptimized':
+        const { id: atividadeIdClone, pessoaId: pessoaIdClone, dataInicio: dataInicioClone, dataFim: dataFimClone } = data;
+        const atividadeClonadaOpt = await MongoDBService.cloneAtividade(atividadeIdClone);
+        
+        if (atividadeClonadaOpt && pessoaIdClone && dataInicioClone && dataFimClone) {
+          // Retornar apenas os dados atualizados do usuário específico
+          const atividadesAtualizadas = await MongoDBService.getAtividadesCompletasPorPessoaESemana(
+            pessoaIdClone, 
+            dataInicioClone, 
+            dataFimClone
+          );
+          return NextResponse.json({ 
+            success: true, 
+            data: atividadesAtualizadas,
+            pessoaId: pessoaIdClone,
+            dataInicio: dataInicioClone,
+            dataFim: dataFimClone
+          });
+        }
+        return NextResponse.json({ success: true, data: atividadeClonadaOpt });
+
       default:
         return NextResponse.json(
           { error: 'Ação não reconhecida' },
