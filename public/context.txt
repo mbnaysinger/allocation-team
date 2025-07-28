@@ -1,0 +1,391 @@
+{
+  id: "auto_generated_id",
+  nome: "João Silva",
+  cargo: "Analista de TI", // ENUM: ["Analista de TI", "Analista de Negócios"]
+  ativo: true,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+
+{
+  id: "auto_generated_id",
+  abreviatura: "PROJ-001", // Código único do projeto
+  nome: "Sistema de Gestão",
+  descricao: "Desenvolvimento do novo sistema de gestão integrada",
+  entidade: "SESI", // ENUM: ["SESI", "SENAI", "IEL", "CIERGS", "GINFO", "SISTEMA"] (opcional)
+  linkJira: "https://jira.empresa.com/projeto/PROJ-001", // URL opcional
+  ativo: true,
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+
+{
+  id: "auto_generated_id",
+  titulo: "Desenvolvimento da API de usuários",
+  data: "2024-12-23", // Formato YYYY-MM-DD
+  pessoaId: "ref_para_pessoa", // Referência para documento em 'pessoas'
+  tipo: "Projeto", // ENUM: ["Projeto", "Melhoria", "Sustentação"]
+  projetoId: "ref_para_projeto", // Referência para documento em 'projetos' (obrigatório se tipo === "Projeto")
+  descricaoJira: "PROJ-001-123: Implementar endpoints REST", // Máximo 100 caracteres
+  horas: 8, // Número de horas alocadas
+  createdAt: timestamp,
+  updatedAt: timestamp
+}
+
+import { 
+  collection, 
+  doc, 
+  getDocs, 
+  getDoc,
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  query, 
+  where, 
+  orderBy,
+  serverTimestamp 
+} from 'firebase/firestore'
+import { db } from './firebase'
+
+// ==================== PESSOAS ====================
+export const getPessoas = async () => {
+  try {
+    const pessoasRef = collection(db, 'pessoas')
+    const q = query(pessoasRef, where('ativo', '==', true), orderBy('nome', 'asc'))
+    const snapshot = await getDocs(q)
+    
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+  } catch (error) {
+    console.error('Erro ao buscar pessoas:', error)
+    throw error
+  }
+}
+
+export const criarPessoa = async (dadosPessoa) => {
+  try {
+    const pessoasRef = collection(db, 'pessoas')
+    const docRef = await addDoc(pessoasRef, {
+      ...dadosPessoa,
+      ativo: true,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    })
+    
+    return docRef.id
+  } catch (error) {
+    console.error('Erro ao criar pessoa:', error)
+    throw error
+  }
+}
+
+// ==================== PROJETOS ====================
+export const getProjetos = async () => {
+  try {
+    const projetosRef = collection(db, 'projetos')
+    const q = query(projetosRef, where('ativo', '==', true), orderBy('nome', 'asc'))
+    const snapshot = await getDocs(q)
+    
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+  } catch (error) {
+    console.error('Erro ao buscar projetos:', error)
+    throw error
+  }
+}
+
+export const criarProjeto = async (dadosProjeto) => {
+  try {
+    const projetosRef = collection(db, 'projetos')
+    const docRef = await addDoc(projetosRef, {
+      ...dadosProjeto,
+      ativo: true,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    })
+    
+    return docRef.id
+  } catch (error) {
+    console.error('Erro ao criar projeto:', error)
+    throw error
+  }
+}
+
+// ==================== ATIVIDADES ====================
+export const getAtividadesSemana = async (dataInicio, dataFim) => {
+  try {
+    const atividadesRef = collection(db, 'atividades')
+    const q = query(
+      atividadesRef,
+      where('data', '>=', dataInicio),
+      where('data', '<=', dataFim),
+      orderBy('data'),
+      orderBy('pessoaId')
+    )
+    
+    const snapshot = await getDocs(q)
+    const atividades = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+
+    // Buscar dados das pessoas e projetos relacionados
+    const pessoasIds = [...new Set(atividades.map(a => a.pessoaId))]
+    const projetosIds = [...new Set(atividades.filter(a => a.projetoId).map(a => a.projetoId))]
+    
+    const pessoas = await Promise.all(
+      pessoasIds.map(async (id) => {
+        const pessoaDoc = await getDoc(doc(db, 'pessoas', id))
+        return { id, ...pessoaDoc.data() }
+      })
+    )
+    
+    const projetos = await Promise.all(
+      projetosIds.map(async (id) => {
+        const projetoDoc = await getDoc(doc(db, 'projetos', id))
+        return { id, ...projetoDoc.data() }
+      })
+    )
+
+    // Mapear dados completos
+    return atividades.map(atividade => ({
+      ...atividade,
+      pessoa: pessoas.find(p => p.id === atividade.pessoaId),
+      projeto: atividade.projetoId ? projetos.find(p => p.id === atividade.projetoId) : null
+    }))
+    
+  } catch (error) {
+    console.error('Erro ao buscar atividades:', error)
+    throw error
+  }
+}
+
+export const criarAtividade = async (dadosAtividade) => {
+  try {
+    // Validação: se tipo é "Projeto", projetoId é obrigatório
+    if (dadosAtividade.tipo === 'Projeto' && !dadosAtividade.projetoId) {
+      throw new Error('Projeto é obrigatório quando o tipo é "Projeto"')
+    }
+    
+    const atividadesRef = collection(db, 'atividades')
+    const docRef = await addDoc(atividadesRef, {
+      ...dadosAtividade,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    })
+    
+    return docRef.id
+  } catch (error) {
+    console.error('Erro ao criar atividade:', error)
+    throw error
+  }
+}
+
+export const atualizarAtividade = async (atividadeId, dadosAtualizados) => {
+  try {
+    const atividadeRef = doc(db, 'atividades', atividadeId)
+    await updateDoc(atividadeRef, {
+      ...dadosAtualizados,
+      updatedAt: serverTimestamp()
+    })
+  } catch (error) {
+    console.error('Erro ao atualizar atividade:', error)
+    throw error
+  }
+}
+
+export const deletarAtividade = async (atividadeId) => {
+  try {
+    const atividadeRef = doc(db, 'atividades', atividadeId)
+    await deleteDoc(atividadeRef)
+  } catch (error) {
+    console.error('Erro ao deletar atividade:', error)
+    throw error
+  }
+}
+
+// ==================== UTILITÁRIOS ====================
+export const getTotalHorasPorDia = async (pessoaId, data) => {
+  try {
+    const atividadesRef = collection(db, 'atividades')
+    const q = query(
+      atividadesRef,
+      where('pessoaId', '==', pessoaId),
+      where('data', '==', data)
+    )
+    
+    const snapshot = await getDocs(q)
+    const atividades = snapshot.docs.map(doc => doc.data())
+    
+    return atividades.reduce((total, atividade) => total + (atividade.horas || 0), 0)
+  } catch (error) {
+    console.error('Erro ao calcular total de horas:', error)
+    throw error
+  }
+}
+
+export const getAtividadesPorPessoa = async (pessoaId, dataInicio, dataFim) => {
+  try {
+    const atividadesRef = collection(db, 'atividades')
+    const q = query(
+      atividadesRef,
+      where('pessoaId', '==', pessoaId),
+      where('data', '>=', dataInicio),
+      where('data', '<=', dataFim),
+      orderBy('data')
+    )
+    
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+  } catch (error) {
+    console.error('Erro ao buscar atividades por pessoa:', error)
+    throw error
+  }
+}
+
+const getCoresHoras = (totalHoras) => {
+  if (totalHoras === 0) return { cor: '#f8f9fa', texto: '#6c757d' } // Cinza claro
+  if (totalHoras <= 4) return { cor: '#fff3cd', texto: '#856404' }   // Amarelo claro
+  if (totalHoras <= 8) return { cor: '#d1edff', texto: '#0c5460' }   // Azul claro
+  if (totalHoras > 8) return { cor: '#f8d7da', texto: '#721c24' }    // Vermelho claro
+}
+
+export const CARGOS = [
+  'Analista de TI',
+  'Analista de Negócios'
+]
+
+export const TIPOS_ATIVIDADE = [
+  'Projeto',
+  'Melhoria',
+  'Sustentação'
+]
+
+export const ENTIDADES = [
+  'SESI',
+  'SENAI', 
+  'IEL',
+  'CIERGS',
+  'GINFO',
+  'SISTEMA FIERGS'
+]
+
+🔄 Regras de Negócio
+Pessoas
+✅ Ordenação alfabética por nome
+✅ Pessoas ativas ficam disponíveis para semanas futuras
+✅ Cargo limitado a: "Analista de TI" ou "Analista de Negócios"
+Atividades
+✅ Título obrigatório
+✅ Data obrigatória (date picker)
+✅ Pessoa obrigatória (select das pessoas ativas)
+✅ Tipo obrigatório (Projeto/Melhoria/Sustentação)
+✅ Se tipo = "Projeto", campo projeto torna-se obrigatório
+✅ Descrição/Link Jira opcional (máximo 100 caracteres)
+✅ Horas obrigatórias (número)
+Projetos
+✅ Abreviatura obrigatória (código único)
+✅ Nome obrigatório
+✅ Descrição obrigatória
+✅ Entidade opcional (select das opções disponíveis)
+✅ Link Jira opcional
+Visualização
+✅ Tarja colorida acima das atividades mostrando total de horas do dia
+✅ Cores baseadas na carga horária diária
+✅ Modal de projetos acessível via botão ao lado de "Adicionar Pessoas"
+🛠️ Componentes Necessários
+Modais
+ModalAdicionarPessoa - Formulário para cadastrar nova pessoa
+ModalAdicionarProjeto - Formulário para cadastrar novo projeto
+ModalListaProjetos - Lista de projetos com opção de adicionar
+ModalAdicionarAtividade - Formulário para cadastrar atividade
+ModalEditarAtividade - Formulário para editar atividade existente
+Componentes de Interface
+CardPessoa - Card individual de cada pessoa com suas atividades
+CardAtividade - Card individual de cada atividade
+TarjaHoras - Componente da tarja colorida com total de horas
+SeletorSemana - Navegação entre semanas
+ContadorCaracteres - Para campo descrição/Jira (máx 100 chars)
+
+
+export const useGerenciadorAtividades = (dataInicio, dataFim) => {
+  // Estados
+  const [atividades, setAtividades] = useState([])
+  const [pessoas, setPessoas] = useState([])
+  const [projetos, setProjetos] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // Funções
+  const recarregarDados = async () => { /* implementação */ }
+  const adicionarPessoa = async (dadosPessoa) => { /* implementação */ }
+  const adicionarProjeto = async (dadosProjeto) => { /* implementação */ }
+  const adicionarAtividade = async (dadosAtividade) => { /* implementação */ }
+  const editarAtividade = async (id, dados) => { /* implementação */ }
+  const deletarAtividade = async (id) => { /* implementação */ }
+  const calcularHorasDia = (pessoaId, data) => { /* implementação */ }
+
+  return {
+    atividades,
+    pessoas,
+    projetos,
+    loading,
+    error,
+    recarregarDados,
+    adicionarPessoa,
+    adicionarProjeto,
+    adicionarAtividade,
+    editarAtividade,
+    deletarAtividade,
+    calcularHorasDia
+  }
+}
+
+const validarAtividade = (dados) => {
+  const erros = {}
+  
+  if (!dados.titulo?.trim()) erros.titulo = 'Título é obrigatório'
+  if (!dados.data) erros.data = 'Data é obrigatória'
+  if (!dados.pessoaId) erros.pessoaId = 'Pessoa é obrigatória'
+  if (!dados.tipo) erros.tipo = 'Tipo é obrigatório'
+  if (dados.tipo === 'Projeto' && !dados.projetoId) {
+    erros.projetoId = 'Projeto é obrigatório quando tipo é "Projeto"'
+  }
+  if (dados.descricaoJira && dados.descricaoJira.length > 100) {
+    erros.descricaoJira = 'Descrição deve ter no máximo 100 caracteres'
+  }
+  if (!dados.horas || dados.horas <= 0) {
+    erros.horas = 'Horas deve ser um número positivo'
+  }
+  
+  return erros
+}
+
+ Próximos Passos de Implementação
+Configurar Firebase conforme estrutura definida
+Implementar funções de banco (lib/firestore.js)
+Criar hook principal (useGerenciadorAtividades)
+Desenvolver componentes de modal para CRUD
+Implementar interface principal com cards e tarjas
+Adicionar validações e tratamento de erros
+Testar fluxos completos de uso
+Otimizar performance com cache local se necessário
+
+Checklist de Funcionalidades
+ CRUD de Pessoas (ordenação alfabética)
+ CRUD de Projetos (modal dedicado)
+ CRUD de Atividades (com validações)
+ Navegação entre semanas
+ Tarja colorida com total de horas
+ Validação de campos obrigatórios
+ Contador de caracteres (descrição Jira)
+ Persistência no Firebase
+ Interface responsiva
+ Tratamento de erros

@@ -5,97 +5,26 @@ import AllocationHeader from "../molecules/AllocationHeader";
 import AllocationControls from "../molecules/AllocationControls";
 import PersonCard from "../molecules/PersonCard";
 import AllocationLegend from "../molecules/AllocationLegend";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import ModalAdicionarPessoa from "../molecules/ModalAdicionarPessoa";
+import ModalAdicionarProjeto from "../molecules/ModalAdicionarProjeto";
+import ModalAdicionarAtividade from "../molecules/ModalAdicionarAtividade";
+import ModalEditarAtividade from "../molecules/ModalEditarAtividade";
+import { useGerenciadorAtividades } from "../../hooks/useGerenciadorAtividades";
+import { DadosPessoa, DadosProjeto, DadosAtividade, AtividadeCompleta } from "../../types/allocation";
 
-interface Allocation {
-  id: string;
-  hours: number;
-  project: string;
-  type: "normal" | "partial" | "overtime";
-}
 
-interface Person {
-  id: string;
-  name: string;
-  role: string;
-  emoji: string;
-  allocations: {
-    [day: string]: Allocation[];
-  };
-}
 
 const AllocationPage = () => {
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [people, setPeople] = useState<Person[]>([
-    {
-      id: "1",
-      name: "João Silva",
-      role: "Senior Frontend Developer",
-      emoji: "👨‍💻",
-      allocations: {
-        monday: [
-          { id: "1", hours: 8, project: "Projeto Alpha", type: "normal" }
-        ],
-        tuesday: [
-          { id: "2", hours: 4, project: "Projeto Beta", type: "partial" }
-        ],
-        wednesday: [
-          { id: "3", hours: 8, project: "Projeto Alpha", type: "normal" }
-        ],
-        thursday: [
-          { id: "4", hours: 6, project: "Code Review", type: "normal" },
-          { id: "5", hours: 2, project: "Hotfix", type: "overtime" }
-        ],
-        friday: [
-          { id: "6", hours: 8, project: "Projeto Gamma", type: "normal" }
-        ]
-      }
-    },
-    {
-      id: "2",
-      name: "Maria Santos",
-      role: "Backend Developer",
-      emoji: "👩‍💻",
-      allocations: {
-        monday: [
-          { id: "7", hours: 8, project: "API Development", type: "normal" }
-        ],
-        tuesday: [
-          { id: "8", hours: 8, project: "Database Migration", type: "normal" }
-        ],
-        wednesday: [
-          { id: "9", hours: 8, project: "API Development", type: "normal" }
-        ],
-        thursday: [
-          { id: "10", hours: 8, project: "Testing", type: "normal" }
-        ],
-        friday: [
-          { id: "11", hours: 8, project: "Documentation", type: "normal" }
-        ]
-      }
-    },
-    {
-      id: "3",
-      name: "Carlos Design",
-      role: "UX/UI Designer",
-      emoji: "🎨",
-      allocations: {
-        monday: [
-          { id: "12", hours: 8, project: "UI Mockups", type: "normal" }
-        ],
-        tuesday: [
-          { id: "13", hours: 6, project: "User Research", type: "partial" }
-        ],
-        wednesday: [],
-        thursday: [
-          { id: "14", hours: 8, project: "Prototyping", type: "normal" }
-        ],
-        friday: [
-          { id: "15", hours: 8, project: "Design System", type: "normal" }
-        ]
-      }
-    }
-  ]);
+  
+  // Estados dos modais
+  const [modalAdicionarPessoa, setModalAdicionarPessoa] = useState(false);
+  const [modalAdicionarProjeto, setModalAdicionarProjeto] = useState(false);
+  const [modalAdicionarAtividade, setModalAdicionarAtividade] = useState(false);
+  const [modalEditarAtividade, setModalEditarAtividade] = useState(false);
+  const [dataSelecionada, setDataSelecionada] = useState('');
+  const [atividadeSelecionada, setAtividadeSelecionada] = useState<AtividadeCompleta | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const getWeekDates = (date: Date) => {
     const start = new Date(date);
@@ -105,16 +34,6 @@ const AllocationPage = () => {
     return { start, end };
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-  };
-
-  const getTotalHours = (person: Person) => {
-    return Object.values(person.allocations).reduce((total, dayAllocations) => {
-      return total + dayAllocations.reduce((dayTotal, allocation) => dayTotal + allocation.hours, 0);
-    }, 0);
-  };
-
   const navigateWeek = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentWeek);
     newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
@@ -122,6 +41,104 @@ const AllocationPage = () => {
   };
 
   const { start, end } = getWeekDates(currentWeek);
+  
+  // Hook para gerenciar dados
+  const {
+    pessoas,
+    projetos,
+    atividades,
+    loading: dadosLoading,
+    error,
+    adicionarPessoa,
+    adicionarProjeto,
+    adicionarAtividade,
+    editarAtividade,
+    deletarAtividade,
+    calcularHorasDia
+  } = useGerenciadorAtividades({
+    dataInicio: start.toISOString().split('T')[0],
+    dataFim: end.toISOString().split('T')[0]
+  });
+
+  // Handlers dos modais
+  const handleAdicionarPessoa = async (dados: DadosPessoa) => {
+    setLoading(true);
+    try {
+      await adicionarPessoa(dados);
+    } catch (error) {
+      console.error('Erro ao adicionar pessoa:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAdicionarProjeto = async (dados: DadosProjeto) => {
+    setLoading(true);
+    try {
+      await adicionarProjeto(dados);
+    } catch (error) {
+      console.error('Erro ao adicionar projeto:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAdicionarAtividade = async (dados: DadosAtividade) => {
+    setLoading(true);
+    try {
+      await adicionarAtividade(dados);
+    } catch (error) {
+      console.error('Erro ao adicionar atividade:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditarAtividade = async (atividadeId: string, dados: Partial<DadosAtividade>) => {
+    setLoading(true);
+    try {
+      await editarAtividade(atividadeId, dados);
+    } catch (error) {
+      console.error('Erro ao editar atividade:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeletarAtividade = async (atividadeId: string) => {
+    setLoading(true);
+    try {
+      await deletarAtividade(atividadeId);
+    } catch (error) {
+      console.error('Erro ao deletar atividade:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddAllocation = (data: string) => {
+    setDataSelecionada(data);
+    setModalAdicionarAtividade(true);
+  };
+
+  const handleEditAllocation = (atividadeId: string) => {
+    const atividade = atividades.find(a => a.id === atividadeId);
+    if (atividade) {
+      setAtividadeSelecionada(atividade);
+      setModalEditarAtividade(true);
+    }
+  };
+
+  if (dadosLoading) {
+    return (
+      <main className="min-h-screen bg-bg text-text-light flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+          <p className="text-text-light">Carregando dados...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-bg text-text-light">
@@ -133,22 +150,70 @@ const AllocationPage = () => {
           weekEnd={end}
           onPreviousWeek={() => navigateWeek('prev')}
           onNextWeek={() => navigateWeek('next')}
-          onAddPerson={() => alert('Funcionalidade para adicionar pessoa')}
+          onAddPerson={() => setModalAdicionarPessoa(true)}
+          onAddProject={() => setModalAdicionarProjeto(true)}
         />
 
+        {error && (
+          <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 mx-4 md:mx-8 mb-4">
+            <p className="text-red-400">{error}</p>
+          </div>
+        )}
+
         <div className="p-4 md:p-8 space-y-6 md:space-y-8">
-          {people.map((person) => (
+          {pessoas.map((pessoa) => (
             <PersonCard
-              key={person.id}
-              person={person}
+              key={pessoa.id}
+              person={pessoa}
               weekStart={start}
-              onAddAllocation={(day: string) => alert(`Adicionar alocação para ${day}`)}
-              onEditAllocation={(allocationId: string) => alert(`Editar alocação ${allocationId}`)}
+              atividades={atividades}
+              onAddAllocation={handleAddAllocation}
+              onEditAllocation={handleEditAllocation}
+              calcularHorasDia={calcularHorasDia}
             />
           ))}
         </div>
 
         <AllocationLegend />
+
+        {/* Modais */}
+        <ModalAdicionarPessoa
+          isOpen={modalAdicionarPessoa}
+          onClose={() => setModalAdicionarPessoa(false)}
+          onSubmit={handleAdicionarPessoa}
+          loading={loading}
+        />
+
+        <ModalAdicionarProjeto
+          isOpen={modalAdicionarProjeto}
+          onClose={() => setModalAdicionarProjeto(false)}
+          onSubmit={handleAdicionarProjeto}
+          loading={loading}
+        />
+
+        <ModalAdicionarAtividade
+          isOpen={modalAdicionarAtividade}
+          onClose={() => setModalAdicionarAtividade(false)}
+          onSubmit={handleAdicionarAtividade}
+          pessoas={pessoas}
+          projetos={projetos}
+          dataSelecionada={dataSelecionada}
+          loading={loading}
+        />
+
+        <ModalEditarAtividade
+          isOpen={modalEditarAtividade}
+          onClose={() => {
+            setModalEditarAtividade(false);
+            setAtividadeSelecionada(null);
+          }}
+          onSubmit={handleEditarAtividade}
+          onDelete={handleDeletarAtividade}
+          atividade={atividadeSelecionada}
+          pessoas={pessoas}
+          projetos={projetos}
+          loading={loading}
+        />
       </div>
     </main>
   );

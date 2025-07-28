@@ -8,6 +8,7 @@ interface AllocationControlsProps {
   onPreviousWeek: () => void;
   onNextWeek: () => void;
   onAddPerson: () => void;
+  onAddProject: () => void;
 }
 
 const AllocationControls: React.FC<AllocationControlsProps> = ({
@@ -16,6 +17,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   onPreviousWeek,
   onNextWeek,
   onAddPerson,
+  onAddProject,
 }) => {
   const formatDateRange = (start: Date, end: Date) => {
     const startStr = start.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -54,15 +56,26 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
           </div>
         </div>
         
-        <Button
-          onClick={onAddPerson}
-          variant="primary"
-          size="sm"
-          className="flex items-center gap-2 w-full sm:w-auto"
-        >
-          <Plus size={16} />
-          Adicionar Pessoa
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button
+            onClick={onAddPerson}
+            variant="primary"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Plus size={16} />
+            Adicionar Pessoa
+          </Button>
+          <Button
+            onClick={onAddProject}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Plus size={16} />
+            Adicionar Projeto
+          </Button>
+        </div>
       </div>
     </div>
   );
