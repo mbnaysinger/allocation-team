@@ -24,9 +24,9 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
       case 'Melhoria':
         return 'bg-gray-300 from-accent to-accent/80 text-bg';
       case 'Sustentação':
-        return 'bg-gray-200 from-accent to-accent/80 text-bg';
+        return 'bg-gray-300 from-accent to-accent/80 text-bg';
       default:
-        return 'bg-gray-200 from-accent to-accent/80 text-bg';
+        return 'bg-gray-300 from-accent to-accent/80 text-bg';
     }
   };
 
@@ -55,15 +55,18 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
       onClick={() => onEdit(atividade.id)}
       onDragStart={handleDragStart}
     >
-      <div className="font-bold text-sm md:text-lg">{atividade.horas}h</div>
+      <div className="font-bold text-base md:text-md truncate">{atividade.titulo}</div>
       <div className="text-xs md:text-sm opacity-90 truncate">
-        {atividade.titulo}
+        {atividade.horas}h
       </div>
       {atividade.projeto && (
-        <div className="text-xs opacity-75 truncate">
+        <div className="text-xs opacity-90 truncate">
           {atividade.projeto.abreviatura}
         </div>
       )}
+      <div className="font-bold text-xs md:text-sm opacity-90 truncate">
+        {atividade.tipo}
+      </div>
       
       {/* Ícone de clonar no canto inferior direito */}
       <button

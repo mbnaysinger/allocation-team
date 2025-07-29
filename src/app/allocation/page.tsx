@@ -224,7 +224,7 @@ const AllocationPage = () => {
 
   return (
     <main className="min-h-screen bg-bg text-text-light">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-8xl mx-auto">
         <AllocationHeader />
         
         <AllocationControls
