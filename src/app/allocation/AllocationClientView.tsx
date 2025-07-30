@@ -90,12 +90,146 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       setLoading(false);
     }
   };
-  const handleAdicionarProjeto = async (dados: DadosProjeto) => { console.log("TODO: Adicionar projeto via API", dados); setModalAdicionarProjeto(false); };
-  const handleAdicionarAtividade = async (dados: DadosAtividade) => { console.log("TODO: Adicionar atividade via API", dados); setModalAdicionarAtividade(false); };
-  const handleEditarAtividade = async (atividadeId: string, dados: Partial<DadosAtividade>) => { console.log("TODO: Editar atividade via API", atividadeId, dados); setModalEditarAtividade(false); };
-  const handleDeletarAtividade = async (atividadeId: string) => { console.log("TODO: Deletar atividade via API", atividadeId); setModalEditarAtividade(false); };
-  const handleClonarAtividade = async (atividadeId: string) => { console.log("TODO: Clonar atividade via API", atividadeId); };
-  const handleMoveAtividade = async (atividadeId: string, novaData: string) => { console.log("TODO: Mover atividade via API", atividadeId, novaData); };
+  const handleAdicionarProjeto = async (dados: DadosProjeto) => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/v1/projetos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Falha ao adicionar projeto.');
+      }
+      
+      setModalAdicionarProjeto(false);
+      router.refresh(); 
+
+    } catch (error) {
+      console.error(error);
+      // TODO: Mostrar o erro para o usuário no modal
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleAdicionarAtividade = async (dados: DadosAtividade) => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/v1/atividades', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Falha ao adicionar atividade.');
+      }
+      
+      setModalAdicionarAtividade(false);
+      router.refresh();
+
+    } catch (error) {
+      console.error(error);
+      // TODO: Mostrar erro no modal
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleEditarAtividade = async (atividadeId: string, dados: Partial<DadosAtividade>) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/v1/atividades/${atividadeId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Falha ao editar atividade.');
+      }
+      
+      setModalEditarAtividade(false);
+      router.refresh();
+
+    } catch (error) {
+      console.error(error);
+      // TODO: Mostrar erro no modal
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleDeletarAtividade = async (atividadeId: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/v1/atividades/${atividadeId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Falha ao deletar atividade.');
+      }
+      
+      setModalEditarAtividade(false); // Fecha o modal após deletar
+      router.refresh();
+
+    } catch (error) {
+      console.error(error);
+      // TODO: Mostrar erro no modal
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleClonarAtividade = async (atividadeId: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/v1/atividades/${atividadeId}/clone`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Falha ao clonar atividade.');
+      }
+      
+      router.refresh();
+
+    } catch (error) {
+      console.error(error);
+      // TODO: Mostrar erro no modal
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleMoveAtividade = async (atividadeId: string, novaData: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/v1/atividades/${atividadeId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: novaData }), // Envia apenas a nova data
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Falha ao mover atividade.');
+      }
+      
+      router.refresh();
+
+    } catch (error) {
+      console.error(error);
+      // TODO: Mostrar erro no modal
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddAllocation = (data: string, pessoa: Pessoa) => {
     setDataSelecionada(data);

@@ -76,4 +76,10 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
     const collection = await this.getAtividadesCollection();
     await collection.deleteOne({ id });
   }
+
+  async buscarPorId(id: string): Promise<Atividade | null> {
+    const collection = await this.getAtividadesCollection();
+    const document = await collection.findOne({ id });
+    return document ? fromDocument(document) : null;
+  }
 }

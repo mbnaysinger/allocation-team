@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { BuscarAlocacaoSemana } from '../../../../core/services/BuscarAlocacaoSemana';
+import { CriarAtividade } from '../../../../core/services/CriarAtividade';
 import { MongoDbAtividadeRepository } from '../../../../infrastructure/repositories/mongodb/MongoDbAtividadeRepository';
 import { MongoDbPessoaRepository } from '../../../../infrastructure/repositories/mongodb/MongoDbPessoaRepository';
 import { MongoDbProjetoRepository } from '../../../../infrastructure/repositories/mongodb/MongoDbProjetoRepository';
+import { DadosAtividade } from '../../../../core/models';
 
 export async function GET(request: Request) {
   try {
@@ -37,6 +39,27 @@ export async function GET(request: Request) {
     return NextResponse.json(
       { message: 'Erro interno do servidor.', error: err.message },
       { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const dados: DadosAtividade = await request.json();
+
+    const atividadeRepository = new MongoDbAtividadeRepository();
+    const criarAtividade = new CriarAtividade(atividadeRepository);
+
+    const novaAtividade = await criarAtividade.execute(dados);
+
+    return NextResponse.json(novaAtividade, { status: 201 });
+  } catch (error) {
+    const err = error as Error;
+    console.error('Erro na API ao criar atividade:', err.message);
+    
+    return NextResponse.json(
+      { message: err.message },
+      { status: 400 }
     );
   }
 }

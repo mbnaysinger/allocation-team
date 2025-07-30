@@ -38,7 +38,11 @@ async function getAlocacaoData(dataInicio: string, dataFim: string) {
   }
 }
 
-const AllocationPage: React.FC<AllocationPageProps> = async ({ searchParams }) => {
+export default async function AllocationPage({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
   // Determina a data base para a semana (pela URL ou data atual)
   const dateParam = searchParams?.data as string | undefined;
   const baseDate = dateParam ? new Date(dateParam) : new Date();
@@ -56,5 +60,3 @@ const AllocationPage: React.FC<AllocationPageProps> = async ({ searchParams }) =
     </main>
   );
 };
-
-export default AllocationPage;
