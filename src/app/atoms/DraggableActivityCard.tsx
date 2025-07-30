@@ -1,6 +1,7 @@
 import React from 'react';
 import { Copy } from 'lucide-react';
 import { AtividadeCompleta } from '../../types/allocation';
+import { Tooltip } from 'react-tooltip';
 
 interface DraggableActivityCardProps {
   atividade: AtividadeCompleta;
@@ -74,10 +75,12 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
           e.stopPropagation();
           onClone(atividade.id);
         }}
-        className="absolute bottom-1 right-1 p-1 bg-white/80 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm"
-        title="Clonar atividade"
+        className="absolute bottom-1 right-1 p-1 bg-white/80 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm font-bold"
+        data-tooltip-id="clone-tooltip"
+        data-tooltip-content="Clonar"
       >
         <Copy size={12} className="text-accent" />
+        <Tooltip id="clone-tooltip" />
       </button>
     </div>
   );
