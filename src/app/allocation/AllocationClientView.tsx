@@ -188,9 +188,10 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   const handleClonarAtividade = async (atividadeId: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/v1/atividades/${atividadeId}/clone`, {
+      const response = await fetch(`/api/v1/clone-atividade`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: atividadeId }), // Envia o ID no corpo
       });
 
       if (!response.ok) {

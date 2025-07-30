@@ -1,0 +1,28 @@
+import { NextResponse } from 'next/server';
+import { ClonarAtividade } from '../../../../core/services/ClonarAtividade';
+import { MongoDbAtividadeRepository } from '../../../../infrastructure/repositories/mongodb/MongoDbAtividadeRepository';
+
+export async function POST(request: Request) {
+  try {
+    const { id } = await request.json(); // ID vem do corpo da requisição
+
+    if (!id) {
+      return NextResponse.json({ message: 'O ID da atividade é obrigatório.' }, { status: 400 });
+    }
+
+    const atividadeRepository = new MongoDbAtividadeRepository();
+    const clonarAtividade = new ClonarAtividade(atividadeRepository);
+
+    const atividadeClonada = await clonarAtividade.execute(id);
+
+    return NextResponse.json(atividadeClonada, { status: 201 });
+  } catch (error) {
+    const err = error as Error;
+    console.error('Erro na API ao clonar atividade:', err.message);
+
+    return NextResponse.json(
+      { message: err.message },
+      { status: 400 }
+    );
+  }
+} 

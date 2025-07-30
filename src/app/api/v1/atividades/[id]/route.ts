@@ -3,7 +3,6 @@ import { AtualizarAtividade } from '../../../../../core/services/AtualizarAtivid
 import { MongoDbAtividadeRepository } from '../../../../../infrastructure/repositories/mongodb/MongoDbAtividadeRepository';
 import { DadosAtividade } from '../../../../../core/models';
 import { DeletarAtividade } from '../../../../../core/services/DeletarAtividade';
-import { ClonarAtividade } from '../../../../../core/services/ClonarAtividade';
 
 interface ActivityRouteParams {
   params: { id: string };
@@ -46,27 +45,6 @@ export async function DELETE(request: Request, { params }: ActivityRouteParams) 
     const err = error as Error;
     console.error('Erro na API ao deletar atividade:', err.message);
     
-    return NextResponse.json(
-      { message: err.message },
-      { status: 400 }
-    );
-  }
-} 
-
-export async function POST_CLONE(request: Request, { params }: ActivityRouteParams) {
-  try {
-    const { id } = params;
-
-    const atividadeRepository = new MongoDbAtividadeRepository();
-    const clonarAtividade = new ClonarAtividade(atividadeRepository); // Chama o serviço
-
-    const atividadeClonada = await clonarAtividade.execute(id);
-
-    return NextResponse.json(atividadeClonada, { status: 201 });
-  } catch (error) {
-    const err = error as Error;
-    console.error('Erro na API ao clonar atividade:', err.message);
-
     return NextResponse.json(
       { message: err.message },
       { status: 400 }

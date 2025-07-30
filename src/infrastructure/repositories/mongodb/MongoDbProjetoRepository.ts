@@ -70,7 +70,7 @@ export class MongoDbProjetoRepository implements IProjetoRepository {
       { returnDocument: 'after' }
     );
 
-    return result?.value ? fromDocument(result.value) : null;
+    return result ? fromDocument(result) : null;
   }
 
   async alternarAtivo(id: string, ativo: boolean): Promise<Projeto | null> {
@@ -82,6 +82,6 @@ export class MongoDbProjetoRepository implements IProjetoRepository {
       { returnDocument: 'after' }
     );
 
-    return result?.value ? fromDocument(result.value) : null;
+    return result ? fromDocument(result) : null;
   }
 }

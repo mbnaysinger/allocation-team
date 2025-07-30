@@ -61,6 +61,9 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
   }
 
   async atualizar(id: string, dados: Partial<DadosAtividade>): Promise<Atividade | null> {
+    console.log(`[Repository] Tentando atualizar atividade com ID: ${id}`);
+    console.log(`[Repository] Dados para atualização:`, dados);
+
     const collection = await this.getAtividadesCollection();
 
     const result = await collection.findOneAndUpdate(
@@ -68,8 +71,10 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
       { $set: { ...dados, updatedAt: new Date() } },
       { returnDocument: 'after' }
     );
+    
+    console.log('[Repository] Resultado do findOneAndUpdate:', result);
 
-    return result?.value ? fromDocument(result.value) : null;
+    return result ? fromDocument(result) : null;
   }
 
   async deletar(id: string): Promise<void> {
