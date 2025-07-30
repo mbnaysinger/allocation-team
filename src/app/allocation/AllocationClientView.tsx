@@ -64,7 +64,6 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       .reduce((acc, a) => acc + a.horas, 0);
   };
 
-  // --- Handlers de MUTAÇÃO (serão reativados na próxima etapa com 'fetch') ---
   const handleAdicionarPessoa = async (dados: DadosPessoa) => {
     setLoading(true);
     try {
@@ -129,7 +128,8 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       }
       
       setModalAdicionarAtividade(false);
-      router.refresh();
+      const novaAtividade = await response.json();
+      setAtividades(prev => [...prev, novaAtividade]);
 
     } catch (error) {
       console.error(error);
@@ -153,7 +153,12 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       }
       
       setModalEditarAtividade(false);
-      router.refresh();
+      const atividadeAtualizada = await response.json();
+      setAtividades(prev => 
+        prev.map(atividade => 
+          atividade.id === atividadeId ? atividadeAtualizada : atividade
+        )
+      );
 
     } catch (error) {
       console.error(error);
@@ -175,8 +180,8 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         throw new Error(errorData.message || 'Falha ao deletar atividade.');
       }
       
-      setModalEditarAtividade(false); // Fecha o modal após deletar
-      router.refresh();
+      setModalEditarAtividade(false);
+      setAtividades(prev => prev.filter(atividade => atividade.id !== atividadeId));
 
     } catch (error) {
       console.error(error);
@@ -199,8 +204,10 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         throw new Error(errorData.message || 'Falha ao clonar atividade.');
       }
       
-      router.refresh();
-
+      const atividadeClonada = await response.json();
+    
+      // ✅ Adiciona apenas a nova atividade ao estado existente
+      setAtividades(prev => [...prev, atividadeClonada]);
     } catch (error) {
       console.error(error);
       // TODO: Mostrar erro no modal
@@ -221,8 +228,13 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         const errorData = await response.json();
         throw new Error(errorData.message || 'Falha ao mover atividade.');
       }
-      
-      router.refresh();
+      //atualiza no formato otimista
+      const atividadeAtualizada = await response.json();
+      setAtividades(prev => 
+        prev.map(atividade => 
+          atividade.id === atividadeId ? atividadeAtualizada : atividade
+        )
+      );
 
     } catch (error) {
       console.error(error);

@@ -4,17 +4,16 @@ import { MongoDbAtividadeRepository } from '../../../../../infrastructure/reposi
 import { DadosAtividade } from '../../../../../core/models';
 import { DeletarAtividade } from '../../../../../core/services/DeletarAtividade';
 
-interface ActivityRouteParams {
-  params: { id: string };
-}
-
-export async function PUT(request: Request, { params }: ActivityRouteParams) {
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const { id } = params; // Captura o ID da URL
+    const { id } = await params;
     const dados: Partial<DadosAtividade> = await request.json();
 
     const atividadeRepository = new MongoDbAtividadeRepository();
-    const atualizarAtividade = new AtualizarAtividade(atividadeRepository); // Chama o serviço
+    const atualizarAtividade = new AtualizarAtividade(atividadeRepository);
 
     const atividadeAtualizada = await atualizarAtividade.execute(id, dados);
 
@@ -23,20 +22,22 @@ export async function PUT(request: Request, { params }: ActivityRouteParams) {
     const err = error as Error;
     console.error('Erro na API ao atualizar atividade:', err.message);
 
-    // Retorna a mensagem de erro da validação do serviço
     return NextResponse.json(
       { message: err.message },
-      { status: 400 } // Bad Request para erros de validação
+      { status: 400 }
     );
   }
 }
 
-export async function DELETE(request: Request, { params }: ActivityRouteParams) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const atividadeRepository = new MongoDbAtividadeRepository();
-    const deletarAtividade = new DeletarAtividade(atividadeRepository); // Chama o serviço
+    const deletarAtividade = new DeletarAtividade(atividadeRepository);
 
     await deletarAtividade.execute(id);
 
@@ -50,4 +51,4 @@ export async function DELETE(request: Request, { params }: ActivityRouteParams) 
       { status: 400 }
     );
   }
-} 
+}

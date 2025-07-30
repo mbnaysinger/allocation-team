@@ -3,7 +3,7 @@ import AllocationClientView from "./AllocationClientView";
 import { getWeekDates, formatDate } from "../utils/date";
 
 interface AllocationPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 // Helper para garantir que a baseURL está correta tanto no servidor quanto no cliente
@@ -40,11 +40,12 @@ async function getAlocacaoData(dataInicio: string, dataFim: string) {
 
 export default async function AllocationPage({
   searchParams,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) {
+}: AllocationPageProps) {
+  // ✅ Aguarda os searchParams antes de usar
+  const params = await searchParams;
+  
   // Determina a data base para a semana (pela URL ou data atual)
-  const dateParam = searchParams?.data as string | undefined;
+  const dateParam = params?.data as string | undefined;
   const baseDate = dateParam ? new Date(dateParam) : new Date();
 
   const week = getWeekDates(baseDate);
@@ -59,4 +60,4 @@ export default async function AllocationPage({
       </div>
     </main>
   );
-};
+}
