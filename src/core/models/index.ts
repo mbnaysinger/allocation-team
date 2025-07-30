@@ -2,19 +2,13 @@ export type Cargo = 'Analista de TI' | 'Analista de Negócios';
 export type TipoAtividade = 'Projeto' | 'Melhoria' | 'Sustentação';
 export type Entidade = 'SESI' | 'SENAI' | 'IEL' | 'CIERGS' | 'GINFO' | 'SISTEMA FIERGS';
 
-// Tipo para timestamp do Firestore
-export type FirestoreTimestamp = {
-  seconds: number;
-  nanoseconds: number;
-};
-
 export interface Pessoa {
   id: string;
   nome: string;
   cargo: Cargo;
   ativo: boolean;
-  createdAt: FirestoreTimestamp;
-  updatedAt: FirestoreTimestamp;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Projeto {
@@ -25,12 +19,12 @@ export interface Projeto {
   entidade?: Entidade;
   linkJira?: string;
   ativo: boolean;
-  createdAt: FirestoreTimestamp;
-  updatedAt: FirestoreTimestamp;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Atividade {
-  id: string;
+  id:string;
   titulo: string;
   data: string; // YYYY-MM-DD format
   pessoaId: string;
@@ -38,8 +32,8 @@ export interface Atividade {
   projetoId?: string; // Obrigatório se tipo === "Projeto"
   descricaoJira?: string; // Máximo 100 caracteres
   horas: number;
-  createdAt: FirestoreTimestamp;
-  updatedAt: FirestoreTimestamp;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface AtividadeCompleta extends Atividade {
@@ -90,12 +84,3 @@ export const ENTIDADES: Entidade[] = [
   'GINFO',
   'SISTEMA FIERGS'
 ];
-
-// Utilitários
-export const getCoresHoras = (totalHoras: number) => {
-  if (totalHoras === 0) return { cor: '#f3f4f6', texto: '#000000' }; // Cinza claro
-  if (totalHoras <= 4) return { cor: '#f7fc6d', texto: '#000000' };   // Amarelo claro
-  if (totalHoras <= 8) return { cor: '#6af27a', texto: '#000000' };   // Verde claro
-  if (totalHoras > 8) return { cor: '#f53b3b', texto: '#FFFFFF' };    // Vermelho claro
-  return { cor: '#f3f4f6', texto: '#000000' };
-}; 
