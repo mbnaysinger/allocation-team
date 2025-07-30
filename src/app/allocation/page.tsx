@@ -1,39 +1,20 @@
 import React from "react";
 import AllocationClientView from "./AllocationClientView";
 import { getWeekDates, formatDate } from "@/app/utils/date";
+import { dependencyFactory } from "@/infrastructure/factories/DependencyFactory";
 
 interface AllocationPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-// Helper para garantir que a baseURL está correta tanto no servidor quanto no cliente
-const getBaseUrl = () => {
-  if (typeof window !== 'undefined') return ''; // No browser, use caminhos relativos
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // Vercel
-  return `http://localhost:${process.env.PORT ?? 3000}`; // Ambiente local
-};
-
 async function getAlocacaoData(dataInicio: string, dataFim: string) {
-  const baseUrl = getBaseUrl();
-  const url = new URL('/api/v1/atividades', baseUrl);
-  url.searchParams.append('dataInicio', dataInicio);
-  url.searchParams.append('dataFim', dataFim);
-  
   try {
-    const res = await fetch(url.toString(), {
-      // Usar 'no-store' para garantir que os dados sejam sempre frescos a cada navegação de semana
-      cache: 'no-store', 
-    });
-
-    if (!res.ok) {
-      const errorBody = await res.json();
-      throw new Error(`Erro na API: ${res.status} - ${errorBody.message}`);
-    }
-
-    return await res.json();
+    const buscarAlocacaoSemana = dependencyFactory.createBuscarAlocacaoSemana();
+    // Chama o serviço diretamente em vez de fazer um fetch
+    return await buscarAlocacaoSemana.execute({ dataInicio, dataFim });
   } catch (error) {
-    console.error("Falha ao buscar dados de alocação:", error);
-    // Retornar um estado vazio em caso de falha na busca
+    console.error("Falha ao buscar dados de alocação diretamente do serviço:", error);
+    // Retornar um estado vazio em caso de falha
     return { pessoas: [], projetos: [], atividades: [] };
   }
 }

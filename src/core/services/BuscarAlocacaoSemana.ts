@@ -60,11 +60,12 @@ export class BuscarAlocacaoSemana {
         return null;
       }
 
-      return {
+      const novaAtividade: AtividadeCompleta = {
         ...atividade,
         pessoa,
-        projeto,
+        projeto: projeto || undefined,
       };
+      return novaAtividade;
     }).filter((a): a is AtividadeCompleta => a !== null);
   }
 }

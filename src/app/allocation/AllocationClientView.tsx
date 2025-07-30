@@ -12,7 +12,6 @@ import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionar
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
 import FirebaseDebugger from "@/components/ui/FirebaseDebugger";
 import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade } from "@/core/models";
-import { transactionLogger } from "@/lib/logger";
 
 interface AllocationClientViewProps {
   initialData: {

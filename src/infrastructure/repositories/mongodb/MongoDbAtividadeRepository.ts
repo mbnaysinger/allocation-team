@@ -69,7 +69,11 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
       { returnDocument: 'after' }
     );
     
-    return result ? fromDocument(result) : null;
+    if (result && result.value) {
+      return fromDocument(result.value as Document);
+    }
+    
+    return null;
   }
 
   async deletar(id: string): Promise<void> {

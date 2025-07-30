@@ -68,7 +68,11 @@ export class MongoDbPessoaRepository implements IPessoaRepository {
       { returnDocument: 'after' }
     );
 
-    return result ? fromDocument(result) : null;
+    if (result && result.value) {
+      return fromDocument(result.value as Document);
+    }
+    
+    return null;
   }
   
   async alternarAtivo(id: string, ativo: boolean): Promise<Pessoa | null> {
@@ -80,6 +84,10 @@ export class MongoDbPessoaRepository implements IPessoaRepository {
       { returnDocument: 'after' }
     );
 
-    return result ? fromDocument(result) : null;
+    if (result && result.value) {
+      return fromDocument(result.value as Document);
+    }
+    
+    return null;
   }
 }
