@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '../atoms/Button';
 import ContadorCaracteres from '../atoms/ContadorCaracteres';
+import SearchableSelect, { SelectOption } from '../atoms/SearchableSelect'; // Importar o novo componente
 import { X } from 'lucide-react';
 import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto, TipoAtividade } from '../../core/models';
 
@@ -109,6 +110,14 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
   };
 
   if (!isOpen) return null;
+
+  // Formatar projetos para o SearchableSelect
+  const projectOptions: SelectOption[] = projetos.map(p => ({
+    value: p.id,
+    label: `${p.abreviatura} - ${p.nome}`
+  }));
+
+  const selectedProject = projectOptions.find(p => p.value === formData.projetoId) || null;
 
   return (
     <div className="fixed inset-0 bg-overlay/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -223,24 +232,18 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
               <label htmlFor="projetoId" className="block text-sm font-medium text-text-light mb-2">
                 Projeto *
               </label>
-              <select
+              <SearchableSelect
                 id="projetoId"
-                value={formData.projetoId}
-                                 onChange={(e) => {
-                   setFormData(prev => ({ ...prev, projetoId: e.target.value || '' }));
-                   clearError('projetoId');
-                 }}
-                className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                  errors.projetoId ? 'border-red-500' : 'border-accent/20'
-                }`}
-              >
-                <option value="">Selecione um projeto</option>
-                {projetos.map((projeto) => (
-                  <option key={projeto.id} value={projeto.id}>
-                    {projeto.abreviatura} - {projeto.nome}
-                  </option>
-                ))}
-              </select>
+                instanceId="add-activity-project-select"
+                options={projectOptions}
+                value={selectedProject}
+                onChange={(option) => {
+                  setFormData(prev => ({ ...prev, projetoId: option?.value || '' }));
+                  clearError('projetoId');
+                }}
+                isClearable
+                isSearchable
+              />
               {errors.projetoId && (
                 <p className="text-red-500 text-sm mt-1">{errors.projetoId}</p>
               )}

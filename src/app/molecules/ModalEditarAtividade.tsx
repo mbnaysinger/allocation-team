@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '../atoms/Button';
 import ContadorCaracteres from '../atoms/ContadorCaracteres';
+import SearchableSelect, { SelectOption } from '../atoms/SearchableSelect';
 import { X, Trash2 } from 'lucide-react';
 import { AtividadeCompleta, DadosAtividade, Pessoa, Projeto, TipoAtividade, TIPOS_ATIVIDADE } from '../../core/models';
 
@@ -138,8 +139,16 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
 
   if (!isOpen || !atividade) return null;
 
+  // Formatar projetos para o SearchableSelect
+  const projectOptions: SelectOption[] = projetos.map(p => ({
+    value: p.id,
+    label: `${p.abreviatura} - ${p.nome}`
+  }));
+
+  const selectedProject = projectOptions.find(p => p.value === formData.projetoId) || null;
+
   return (
-    <div className="fixed inset-0 bg-overlay/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-overlay/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-gray-100/95 backdrop-blur-md rounded-xl border border-accent/20 shadow-glass max-w-lg w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-accent/20">
@@ -292,24 +301,18 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               <label htmlFor="projetoId" className="block text-sm font-medium text-text-light mb-2">
                 Projeto *
               </label>
-              <select
+              <SearchableSelect
                 id="projetoId"
-                value={formData.projetoId}
-                onChange={(e) => {
-                  setFormData((prev: DadosAtividade) => ({ ...prev, projetoId: e.target.value || '' }));
+                instanceId="edit-activity-project-select"
+                options={projectOptions}
+                value={selectedProject}
+                onChange={(option) => {
+                  setFormData((prev: DadosAtividade) => ({ ...prev, projetoId: option?.value || '' }));
                   clearError('projetoId');
                 }}
-                className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                  errors.projetoId ? 'border-red-500' : 'border-accent/20'
-                }`}
-              >
-                <option value="">Selecione um projeto</option>
-                {projetos.map((projeto) => (
-                  <option key={projeto.id} value={projeto.id}>
-                    {projeto.abreviatura} - {projeto.nome}
-                  </option>
-                ))}
-              </select>
+                isClearable
+                isSearchable
+              />
               {errors.projetoId && (
                 <p className="text-red-500 text-sm mt-1">{errors.projetoId}</p>
               )}
