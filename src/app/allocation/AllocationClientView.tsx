@@ -2,17 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
-import AllocationHeader from "../molecules/AllocationHeader";
-import AllocationControls from "../molecules/AllocationControls";
-import PersonCard from "../molecules/PersonCard";
-import AllocationLegend from "../molecules/AllocationLegend";
-import ModalAdicionarPessoa from "../molecules/ModalAdicionarPessoa";
-import ModalAdicionarProjeto from "../molecules/ModalAdicionarProjeto";
-import ModalAdicionarAtividade from "../molecules/ModalAdicionarAtividade";
-import ModalEditarAtividade from "../molecules/ModalEditarAtividade";
-import FirebaseDebugger from "../atoms/FirebaseDebugger";
-import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade } from "../../core/models";
-import { transactionLogger } from "../../lib/logger";
+import AllocationHeader from "@/components/features/allocation/AllocationHeader";
+import AllocationControls from "@/components/features/allocation/AllocationControls";
+import PersonCard from "@/components/features/allocation/PersonCard";
+import AllocationLegend from "@/components/features/allocation/AllocationLegend";
+import ModalAdicionarPessoa from "@/components/features/modals/ModalAdicionarPessoa";
+import ModalAdicionarProjeto from "@/components/features/modals/ModalAdicionarProjeto";
+import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionarAtividade";
+import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
+import FirebaseDebugger from "@/components/ui/FirebaseDebugger";
+import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade } from "@/core/models";
+import { transactionLogger } from "@/lib/logger";
 
 interface AllocationClientViewProps {
   initialData: {

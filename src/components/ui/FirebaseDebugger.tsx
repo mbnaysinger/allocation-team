@@ -3,7 +3,7 @@ import Button from './Button';
 import { X, Database, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import { getPessoas, getProjetos, getAtividadesSemana } from '../../lib/firestore';
 import { transactionLogger } from '../../lib/logger';
-import { Pessoa, Projeto, AtividadeCompleta } from '../../types/allocation';
+import { Pessoa, Projeto, AtividadeCompleta } from '@/core/models';
 
 interface FirebaseDebuggerProps {
   isOpen: boolean;

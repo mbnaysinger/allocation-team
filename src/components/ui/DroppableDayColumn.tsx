@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import Button from './Button';
 import TarjaHoras from './TarjaHoras';
 import DraggableActivityCard from './DraggableActivityCard';
-import { AtividadeCompleta } from '../../types/allocation';
+import { AtividadeCompleta } from '@/core/models';
 
 interface DroppableDayColumnProps {
   data: string;

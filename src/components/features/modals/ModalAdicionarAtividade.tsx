@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import Button from '../atoms/Button';
-import ContadorCaracteres from '../atoms/ContadorCaracteres';
-import SearchableSelect, { SelectOption } from '../atoms/SearchableSelect'; // Importar o novo componente
+import Button from '@/components/ui/Button';
+import ContadorCaracteres from '@/components/ui/ContadorCaracteres';
+import SearchableSelect, { SelectOption } from '@/components/ui/SearchableSelect'; // Importar o novo componente
 import { X } from 'lucide-react';
-import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto, TipoAtividade } from '../../core/models';
+import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto, TipoAtividade } from '@/core/models';
 
 interface ModalAdicionarAtividadeProps {
   isOpen: boolean;

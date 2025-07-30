@@ -1,6 +1,6 @@
 import React from 'react';
 import { Copy } from 'lucide-react';
-import { AtividadeCompleta } from '../../types/allocation';
+import { AtividadeCompleta } from '@/core/models';
 import { Tooltip } from 'react-tooltip';
 
 interface DraggableActivityCardProps {

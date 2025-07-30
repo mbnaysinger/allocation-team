@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import DroppableDayColumn from "../atoms/DroppableDayColumn";
-import { Pessoa, AtividadeCompleta } from "../../core/models";
-import { useDragAndDrop } from "../../hooks/useDragAndDrop";
+import DroppableDayColumn from "@/components/ui/DroppableDayColumn";
+import { Pessoa, AtividadeCompleta } from "@/core/models";
+import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 
 interface PersonCardProps {
   person: Pessoa;

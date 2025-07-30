@@ -1,5 +1,5 @@
 import React from 'react';
-import { getCoresHoras } from '../utils/colors';
+import { getCoresHoras } from '@/app/utils/colors';
 import { ClockAlert } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 
