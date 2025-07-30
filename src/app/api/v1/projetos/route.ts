@@ -1,15 +1,12 @@
 import { NextResponse } from 'next/server';
-import { CriarProjeto } from '../../../../core/services/CriarProjeto';
-import { MongoDbProjetoRepository } from '../../../../infrastructure/repositories/mongodb/MongoDbProjetoRepository';
+import { dependencyFactory } from '../../../../infrastructure/factories/DependencyFactory';
 import { DadosProjeto } from '../../../../core/models';
 
 export async function POST(request: Request) {
   try {
     const dados: DadosProjeto = await request.json();
 
-    const projetoRepository = new MongoDbProjetoRepository();
-    const criarProjeto = new CriarProjeto(projetoRepository);
-
+    const criarProjeto = dependencyFactory.createCriarProjeto();
     const novoProjeto = await criarProjeto.execute(dados);
 
     return NextResponse.json(novoProjeto, { status: 201 });
@@ -22,4 +19,4 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-} 
+}

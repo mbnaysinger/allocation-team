@@ -1,5 +1,5 @@
 import { Collection, Document } from 'mongodb';
-import { getCollection } from '../../database/mongodb';
+import { getCollection } from '../../../config/databases/mongodb';
 import { IProjetoRepository } from '../../../core/ports/IProjetoRepository';
 import { Projeto, DadosProjeto } from '../../../core/models';
 

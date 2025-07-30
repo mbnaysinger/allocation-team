@@ -1,16 +1,21 @@
+// src/infrastructure/database/mongodb.ts
 import { MongoClient, Db } from 'mongodb';
+import { configService } from '@/config/ConfigService';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://admin:password123@localhost:27017/allocation_team?authSource=admin';
-const MONGODB_DB = process.env.MONGODB_DB || 'allocation_team';
+// 1. Obter configurações do nosso ConfigService
+const MONGODB_URI = configService.get<string>('config.database.mongodb.uri');
+const MONGODB_DB = configService.get<string>('config.database.mongodb.db_name');
 
+// 2. Validar se as configurações foram carregadas
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+  throw new Error('URI do MongoDB não encontrada. Verifique seu .env.yml ou as variáveis de ambiente de produção.');
 }
 
 if (!MONGODB_DB) {
-  throw new Error('Please define the MONGODB_DB environment variable inside .env.local');
+  throw new Error('Nome do banco de dados MongoDB não encontrado. Verifique seu .env.yml ou as variáveis de ambiente de produção.');
 }
 
+// O restante do arquivo (lógica de cache de conexão) permanece o mesmo
 declare global {
   var mongo: {
     conn: { client: MongoClient; db: Db } | null;

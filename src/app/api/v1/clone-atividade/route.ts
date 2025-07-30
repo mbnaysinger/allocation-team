@@ -1,6 +1,6 @@
+// src/app/api/v1/clone-atividade/route.ts
 import { NextResponse } from 'next/server';
-import { ClonarAtividade } from '../../../../core/services/ClonarAtividade';
-import { MongoDbAtividadeRepository } from '../../../../infrastructure/repositories/mongodb/MongoDbAtividadeRepository';
+import { dependencyFactory } from '../../../../infrastructure/factories/DependencyFactory';
 
 export async function POST(request: Request) {
   try {
@@ -10,9 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'O ID da atividade é obrigatório.' }, { status: 400 });
     }
 
-    const atividadeRepository = new MongoDbAtividadeRepository();
-    const clonarAtividade = new ClonarAtividade(atividadeRepository);
-
+    const clonarAtividade = dependencyFactory.createClonarAtividade();
     const atividadeClonada = await clonarAtividade.execute(id);
 
     return NextResponse.json(atividadeClonada, { status: 201 });
@@ -25,4 +23,4 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-} 
+}

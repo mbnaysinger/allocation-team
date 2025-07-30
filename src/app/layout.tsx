@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import 'swagger-ui-react/swagger-ui.css';
 import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({

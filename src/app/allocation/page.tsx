@@ -1,6 +1,6 @@
 import React from "react";
 import AllocationClientView from "./AllocationClientView";
-import { getWeekDates, formatDate } from "../utils/date";
+import { getWeekDates, formatDate } from "@/app/utils/date";
 
 interface AllocationPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
