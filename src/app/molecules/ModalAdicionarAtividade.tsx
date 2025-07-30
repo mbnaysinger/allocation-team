@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from '../atoms/Button';
 import ContadorCaracteres from '../atoms/ContadorCaracteres';
 import { X } from 'lucide-react';
-import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto, TipoAtividade } from '../../types/allocation';
+import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto, TipoAtividade } from '../../core/models';
 
 interface ModalAdicionarAtividadeProps {
   isOpen: boolean;

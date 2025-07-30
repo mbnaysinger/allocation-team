@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Button from '../atoms/Button';
 import ContadorCaracteres from '../atoms/ContadorCaracteres';
 import { X, Trash2 } from 'lucide-react';
-import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto, AtividadeCompleta, TipoAtividade } from '../../types/allocation';
+import { AtividadeCompleta, DadosAtividade, Pessoa, Projeto, TipoAtividade, TIPOS_ATIVIDADE } from '../../core/models';
 
 interface ModalEditarAtividadeProps {
   isOpen: boolean;
@@ -179,7 +179,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               id="titulo"
               value={formData.titulo}
               onChange={(e) => {
-                setFormData(prev => ({ ...prev, titulo: e.target.value }));
+                setFormData((prev: DadosAtividade) => ({ ...prev, titulo: e.target.value }));
                 clearError('titulo');
               }}
               className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light placeholder-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
@@ -202,7 +202,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               id="data"
               value={formData.data}
               onChange={(e) => {
-                setFormData(prev => ({ ...prev, data: e.target.value }));
+                setFormData((prev: DadosAtividade) => ({ ...prev, data: e.target.value }));
                 clearError('data');
               }}
               className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
@@ -262,10 +262,11 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               id="tipo"
               value={formData.tipo}
               onChange={(e) => {
-                setFormData(prev => ({ 
+                const newTipo = e.target.value as TipoAtividade;
+                setFormData((prev: DadosAtividade) => ({ 
                   ...prev, 
-                  tipo: e.target.value as TipoAtividade,
-                  projetoId: e.target.value === 'Projeto' ? prev.projetoId : ''
+                  tipo: newTipo,
+                  projetoId: newTipo === 'Projeto' ? prev.projetoId : ''
                 }));
                 clearError('tipo');
                 clearError('projetoId');
@@ -274,7 +275,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
                 errors.tipo ? 'border-red-500' : 'border-accent/20'
               }`}
             >
-              {TIPOS_ATIVIDADE.map((tipo) => (
+              {TIPOS_ATIVIDADE.map((tipo: TipoAtividade) => (
                 <option key={tipo} value={tipo}>
                   {tipo}
                 </option>
@@ -295,7 +296,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
                 id="projetoId"
                 value={formData.projetoId}
                 onChange={(e) => {
-                  setFormData(prev => ({ ...prev, projetoId: e.target.value || '' }));
+                  setFormData((prev: DadosAtividade) => ({ ...prev, projetoId: e.target.value || '' }));
                   clearError('projetoId');
                 }}
                 className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
@@ -324,7 +325,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               id="descricaoJira"
               value={formData.descricaoJira}
               onChange={(e) => {
-                setFormData(prev => ({ ...prev, descricaoJira: e.target.value }));
+                setFormData((prev: DadosAtividade) => ({ ...prev, descricaoJira: e.target.value }));
                 clearError('descricaoJira');
               }}
               rows={2}
@@ -354,7 +355,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               max="24"
               value={formData.horas}
               onChange={(e) => {
-                setFormData(prev => ({ ...prev, horas: parseInt(e.target.value) || 0 }));
+                setFormData((prev: DadosAtividade) => ({ ...prev, horas: parseInt(e.target.value) || 0 }));
                 clearError('horas');
               }}
               className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${

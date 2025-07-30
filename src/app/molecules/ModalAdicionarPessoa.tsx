@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Button from '../atoms/Button';
+import ContadorCaracteres from '../atoms/ContadorCaracteres';
 import { X } from 'lucide-react';
-import { CARGOS, DadosPessoa, Cargo } from '../../types/allocation';
+import { DadosPessoa, CARGOS, Cargo } from '../../core/models';
 
 interface ModalAdicionarPessoaProps {
   isOpen: boolean;

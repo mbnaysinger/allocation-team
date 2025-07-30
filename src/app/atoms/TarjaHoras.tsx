@@ -1,5 +1,5 @@
 import React from 'react';
-import { getCoresHoras } from '../../types/allocation';
+import { getCoresHoras } from '../utils/colors';
 import { ClockAlert } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 

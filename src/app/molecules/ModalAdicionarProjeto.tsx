@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Button from '../atoms/Button';
+import ContadorCaracteres from '../atoms/ContadorCaracteres';
 import { X } from 'lucide-react';
-import { ENTIDADES, DadosProjeto, Entidade } from '../../types/allocation';
+import { DadosProjeto, ENTIDADES, Entidade } from '../../core/models';
 
 interface ModalAdicionarProjetoProps {
   isOpen: boolean;

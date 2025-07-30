@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DroppableDayColumn from "../atoms/DroppableDayColumn";
-import { Pessoa, AtividadeCompleta } from "../../types/allocation";
+import { Pessoa, AtividadeCompleta } from "../../core/models";
 import { useDragAndDrop } from "../../hooks/useDragAndDrop";
 
 interface PersonCardProps {
@@ -11,7 +11,7 @@ interface PersonCardProps {
   onEditAllocation: (atividadeId: string) => void;
   onCloneAllocation: (atividadeId: string) => void;
   onMoveAtividade: (atividadeId: string, novaData: string) => Promise<void>;
-  calcularHorasDia: (pessoaId: string, data: string) => Promise<number>;
+  calcularHorasDia: (pessoaId: string, data: string) => number;
 }
 
 const PersonCard: React.FC<PersonCardProps> = ({
@@ -36,18 +36,18 @@ const PersonCard: React.FC<PersonCardProps> = ({
 
   // Calcular horas por dia
   useEffect(() => {
-    const calcularHoras = async () => {
+    const calcularHoras = () => {
       const horas: Record<string, number> = {};
       for (let i = 0; i < 5; i++) {
         const date = new Date(weekStart);
         date.setDate(date.getDate() + i);
         const dataStr = date.toISOString().split('T')[0];
-        horas[dataStr] = await calcularHorasDia(person.id, dataStr);
+        horas[dataStr] = calcularHorasDia(person.id, dataStr);
       }
       setHorasPorDia(horas);
     };
     calcularHoras();
-  }, [person.id, weekStart, calcularHorasDia]);
+  }, [person.id, weekStart, atividades, calcularHorasDia]);
 
   const getTotalHours = () => {
     return atividades
