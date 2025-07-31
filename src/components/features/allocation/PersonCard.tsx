@@ -58,7 +58,10 @@ const PersonCard: React.FC<PersonCardProps> = ({
   const getDayDate = (dayIndex: number) => {
     const date = new Date(weekStart);
     date.setDate(date.getDate() + dayIndex);
-    return date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const getAtividadesDoDia = (data: string) => {
@@ -111,6 +114,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
         <div className="grid grid-cols-5 gap-2 md:gap-4">
           {days.map((day, index) => {
             const data = getDayDate(index);
+            const dataFormatada = new Date(data + 1);
             const atividadesDoDia = getAtividadesDoDia(data);
             const totalHoras = horasPorDia[data] || 0;
             const isDragOver = dragOverData === data;

@@ -22,12 +22,10 @@ async function getAlocacaoData(dataInicio: string, dataFim: string) {
 export default async function AllocationPage({
   searchParams,
 }: AllocationPageProps) {
-  // ✅ Aguarda os searchParams antes de usar
   const params = await searchParams;
   
-  // Determina a data base para a semana (pela URL ou data atual)
   const dateParam = params?.data as string | undefined;
-  const baseDate = dateParam ? new Date(dateParam) : new Date();
+  const baseDate = dateParam ? new Date(`${dateParam}T00:00:00`) : new Date();
 
   const week = getWeekDates(baseDate);
 

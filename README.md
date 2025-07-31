@@ -1,280 +1,153 @@
-# 🚀 Portfólio Full-Stack Developer - Maike Naysinger Borges
+# Allocation Team - Ferramenta de Alocação de Equipes
 
-Uma landing page single-page responsiva e moderna para portfólio de desenvolvedor full-stack, construída com React, Next.js 15 e TypeScript, seguindo os princípios do Atomic Design.
+## Visão Geral
 
-## 🎯 Características Principais
+O **Allocation Team** é uma aplicação web Full-Stack construída com **Next.js**, projetada para facilitar o gerenciamento e a alocação de tempo de equipes em diferentes projetos e atividades. A ferramenta oferece uma interface visual intuitiva que permite aos gestores visualizar a carga de trabalho de cada membro da equipe, adicionar, editar e mover tarefas em uma linha do tempo semanal.
 
-### 🎨 Design & UX
-- **Design Responsivo**: Mobile-first com grid de 12 colunas fluidas
-- **Arquitetura Atomic Design**: Componentes organizados hierarquicamente (atoms → molecules → organisms → templates)
-- **Animações Avançadas**: GSAP para animações complexas e Framer Motion para micro-interações
-- **Glassmorphism**: Cards com efeito glassmorphism 3D e backdrop blur
-- **Acessibilidade WCAG 2.2 AA**: Navegação por teclado, ARIA labels, contraste adequado
-- **Performance Otimizada**: Imagens WebP, lazy loading, Core Web Vitals otimizados
+Este projeto foi desenvolvido com uma filosofia inspirada na **Clean Architecture**, mesmo sendo um monorepo. O objetivo é manter uma separação clara entre as responsabilidades do back-end (lógica de negócio, acesso a dados) e do front-end (interface do usuário, estado da UI), garantindo um código organizado, manutenível e escalável.
 
-### 🌐 Internacionalização
-- **Sistema i18n Completo**: Suporte para português e inglês
-- **Context API**: Gerenciamento de estado de idioma com React Context
-- **Persistência Local**: Preferência de idioma salva no localStorage
-- **Traduções Dinâmicas**: Sistema de chaves aninhadas para traduções flexíveis
+---
 
-### 📝 Sistema de Artigos
-- **Blog Integrado**: Seção de artigos técnicos com roteamento dinâmico
-- **Markdown Support**: Artigos escritos em Markdown com syntax highlighting
-- **Sistema de Tags**: Categorização e filtros por tags
-- **Artigos em Destaque**: Funcionalidade para destacar artigos importantes
+## Arquitetura e Conceitos Aplicados
 
-## 🛠️ Stack Tecnológica
+A estrutura do projeto segue uma abordagem de componentização e separação de responsabilidades, dividindo o código em camadas lógicas:
 
-### Frontend
-- **React 19** com TypeScript
-- **Next.js 15** com App Router e Turbopack
-- **Tailwind CSS 4** com design tokens customizados
-- **GSAP 3.13** para animações complexas
-- **Framer Motion 12.19** para micro-animações
-- **Lucide React** para ícones vetoriais
+- **`src/app`**: Contém as páginas da aplicação (rotas) e a lógica de UI do lado do cliente (`"use client"`), seguindo o padrão do App Router do Next.js.
+- **`src/app/api`**: Endpoints da API, que servem como a camada de entrada para o back-end. Eles recebem as requisições HTTP e as delegam para os serviços da aplicação.
+- **`src/core`**: O coração do back-end.
+    - **`models`**: Define as entidades de negócio da aplicação (Pessoa, Projeto, Atividade).
+    - **`ports`**: Define as interfaces (contratos) para os repositórios, garantindo a inversão de dependência. O core não sabe qual banco de dados está sendo usado.
+    - **`services`**: Contém a lógica de negócio da aplicação (casos de uso), como `CriarAtividade` ou `BuscarAlocacaoSemana`.
+- **`src/infrastructure`**: Implementação das interfaces definidas no `core`.
+    - **`repositories`**: Implementações concretas dos repositórios (ex: `MongoDbPessoaRepository`) que interagem com o banco de dados.
+    - **`factories`**: Fábricas de dependência para instanciar os serviços com suas implementações concretas.
+- **`src/components`**: Componentes React reutilizáveis, divididos entre `features` (específicos de uma funcionalidade) e `ui` (genéricos).
+- **`src/config`**: Configurações da aplicação, incluindo a conexão com o banco de dados e o inovador serviço de configuração.
 
-### Ferramentas de Desenvolvimento
-- **ESLint** com configuração Next.js
-- **TypeScript 5** para type safety
-- **PostCSS** com Tailwind CSS
-- **Vercel Analytics** para métricas de performance
+### Principais Conceitos Implementados
 
-## 📁 Arquitetura do Projeto
+- **Clean Architecture (Adaptada)**: Separação clara entre a lógica de negócio (core) e os detalhes de infraestrutura (framework, banco de dados), promovendo baixo acoplamento e alta testabilidade.
+- **Inversão de Dependência**: O `core` define as interfaces (`ports`) e a `infrastructure` as implementa. Isso permite trocar o banco de dados ou qualquer outra dependência externa com o mínimo de impacto na lógica de negócio.
+- **Service Layer**: A lógica de negócio é encapsulada em serviços, tornando os casos de uso explícitos e reutilizáveis.
+- **API Endpoints como Controladores**: Os `route.ts` do Next.js agem como controladores, orquestrando o fluxo da requisição para a camada de serviço.
+- **Componentização e Hooks**: O front-end é construído com componentes React e utiliza hooks customizados (`useDragAndDrop`) para isolar lógicas complexas.
 
-```
-src/app/
-├── atoms/              # Componentes básicos (Button, Heading, CodeBlock)
-├── molecules/          # Componentes compostos (SkillCard, TimelineItem)
-├── organisms/          # Seções completas (AboutSection, SkillsSection, etc.)
-├── templates/          # Templates de página (HeroSection)
-├── articles/           # Sistema de artigos/blog
-│   ├── cloudflare/     # Artigo específico
-│   ├── config.ts       # Configuração de artigos
-│   └── page.tsx        # Lista de artigos
-├── i18n/               # Sistema de internacionalização
-│   ├── context.tsx     # Context API para i18n
-│   └── locales/        # Arquivos de tradução
-│       ├── en.json     # Traduções em inglês
-│       └── pt.json     # Traduções em português
-├── globals.css         # Estilos globais e design tokens
-├── layout.tsx          # Layout principal com providers
-└── page.tsx            # Página inicial
-```
+---
 
-## 🎨 Design System
+## Principais Bibliotecas e Ferramentas
 
-### Cores (Paleta WCAG 2.2 AA)
-```css
---bg: #0A192F          /* Fundo principal */
---accent: #64FFDA       /* Cor de destaque */
---text-light: #CCD6F6   /* Texto claro */
---overlay: #00000080    /* Overlay para modais */
-```
+- **Framework**: [Next.js](https://nextjs.org/) (com App Router e Turbopack)
+- **Linguagem**: [TypeScript](https://www.typescriptlang.org/)
+- **Banco de Dados**: [MongoDB](https://www.mongodb.com/)
+- **UI & Estilização**: [Tailwind CSS](https://tailwindcss.com/)
+- **Drag and Drop**: [@dnd-kit](https://dndkit.com/)
+- **Ícones**: [Lucide React](https://lucide.dev/)
+- **Validação de Código**: [ESLint](https://eslint.org/)
+- **Documentação da API**: [@scalar/api-reference-react](https://github.com/scalar/scalar)
 
-### Tipografia
-- **Fonte Principal**: Inter Variable Font
-- **Fonte Secundária**: Geist Sans
-- **Fonte Mono**: Geist Mono (para código)
-- **Escala Modular**: 1.125 (golden ratio)
+---
 
-### Grid System
-- **12 Colunas Fluidas**: Grid responsivo com breakpoints
-- **Espaçamento Modular**: Baseado na escala 1.125
-- **Container Fluido**: Adaptação automática ao viewport
+## Documentação da API
 
-## 🌐 Sistema de Internacionalização
+O projeto inclui uma documentação de API interativa gerada automaticamente. Para acessá-la, com o projeto rodando, navegue para:
 
-### Estrutura de Traduções
-```typescript
-// Exemplo de uso
-const { t, locale, changeLocale } = useI18n();
-const title = t('hero.title');
+[http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+
+---
+
+## Configuração e Gerenciamento de Ambientes
+
+O `Allocation Team` utiliza um sistema de configuração flexível que se adapta a diferentes ambientes (desenvolvimento e produção).
+
+### `ConfigService`
+
+O `src/config/config.service.ts` é responsável por carregar as variáveis de ambiente.
+
+- **Em Desenvolvimento (`NODE_ENV=development`)**: As configurações são lidas do arquivo `.env.yml` na raiz do projeto.
+- **Em Produção**: As configurações são buscadas de um **Config Server**, cuja URL deve ser definida na variável de ambiente `CONFIG_SERVER_URL`.
+
+### Arquivo `.env.yml`
+
+Para rodar em ambiente de desenvolvimento, crie um arquivo `.env.yml` na raiz do projeto com a seguinte estrutura:
+
+```yaml
+config:
+  database:
+    mongodb:
+      uri: "mongodb://admin:password123@localhost:27017"
+      db_name: "allocation_team"
+  # Outras configurações podem ser adicionadas aqui
 ```
 
-### Funcionalidades
-- **Mudança Dinâmica**: Troca de idioma em tempo real
-- **Persistência**: Preferência salva no localStorage
-- **Fallback**: Retorna a chave se tradução não encontrada
-- **Chaves Aninhadas**: Suporte para `hero.title.subtitle`
+**Importante**: Este arquivo **não deve** ser versionado no Git. Ele contém informações sensíveis.
 
-## 📝 Sistema de Artigos
+---
 
-### Configuração
-```typescript
-interface Article {
-  slug: string;
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-  featured?: boolean;
-}
-```
+## Rodando Localmente com Docker (Recomendado)
 
-### Funcionalidades
-- **Roteamento Dinâmico**: `/articles/[slug]`
-- **Sistema de Tags**: Filtros por categoria
-- **Artigos em Destaque**: Funcionalidade para destacar conteúdo
-- **Markdown Support**: Renderização de conteúdo rico
-
-## 🚀 Como Executar
+A maneira mais simples de configurar o ambiente de desenvolvimento é usando Docker.
 
 ### Pré-requisitos
-- Node.js 18+ 
-- npm ou yarn
 
-### Instalação
-```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/tech-portfolio.git
-cd tech-portfolio
+- [Docker](https://www.docker.com/get-started)
+- [Node.js](https://nodejs.org/) (v20 ou superior)
 
-# Instale as dependências
-npm install
-```
+### Passos
 
-### Desenvolvimento
-```bash
-# Execute em modo desenvolvimento com Turbopack
-npm run dev
+1.  **Clone o repositório:**
+    ```bash
+    git clone <URL_DO_REPOSITORIO>
+    cd allocation-team
+    ```
 
-# Acesse: http://localhost:3000
-```
+2.  **Crie o arquivo de configuração `.env.yml`:**
+    Crie o arquivo na raiz do projeto, como descrito na seção anterior.
 
-### Produção
-```bash
-# Build para produção
-npm run build
+3.  **Suba os contêineres do Docker:**
+    Este comando irá iniciar o MongoDB e o Mongo Express.
+    ```bash
+    docker-compose up -d
+    ```
 
-# Execute em produção
-npm start
-```
+4.  **Instale as dependências do projeto:**
+    ```bash
+    npm install
+    ```
 
-## 📝 Personalização
+5.  **Rode a aplicação em modo de desenvolvimento:**
+    ```bash
+    npm run dev
+    ```
 
-### 1. Conteúdo e Dados
-- **Seções**: Edite os dados em cada organismo (AboutSection, SkillsSection, etc.)
-- **Informações Pessoais**: Substitua "Maike Naysinger Borges" pelos seus dados
-- **Redes Sociais**: Atualize links em `SocialLinks.tsx`
-- **Contato**: Modifique informações em `ContactSection.tsx`
-
-### 2. Traduções
-- **Arquivos de Idioma**: Edite `src/app/i18n/locales/`
-- **Novos Idiomas**: Adicione novos arquivos de tradução
-- **Chaves**: Use sistema de chaves aninhadas para organização
-
-### 3. Artigos
-- **Novos Artigos**: Adicione em `src/app/articles/config.ts`
-- **Conteúdo**: Crie pastas para cada artigo em `src/app/articles/`
-- **Tags**: Organize com sistema de tags para categorização
-
-### 4. Design Tokens
-- **Cores**: Modifique variáveis CSS em `src/app/globals.css`
-- **Tipografia**: Ajuste fontes em `tailwind.config.mjs`
-- **Espaçamentos**: Configure escala modular no Tailwind
-
-### 5. Animações
-- **GSAP**: Ajuste animações nos componentes
-- **Framer Motion**: Modifique micro-animações
-- **Timing**: Configure durações e easing functions
-
-## 📱 Responsividade
-
-### Breakpoints
-- **Mobile**: < 768px (design mobile-first)
-- **Tablet**: 768px - 1024px
-- **Desktop**: > 1024px
-- **Large Desktop**: > 1440px
-
-### Grid Adaptativo
-- **Mobile**: 1 coluna
-- **Tablet**: 6 colunas
-- **Desktop**: 12 colunas
-
-## ♿ Acessibilidade
-
-### Implementações
-- **Navegação por Teclado**: Suporte completo
-- **ARIA Labels**: Todos os elementos interativos
-- **Contraste WCAG 2.2 AA**: Cores testadas e aprovadas
-- **Foco Visível**: Indicadores de foco em todos os elementos
-- **Semântica HTML**: Estrutura semântica adequada
-
-### Testes Recomendados
-- Teste com leitores de tela
-- Verificação de contraste
-- Navegação apenas com teclado
-- Teste com diferentes tamanhos de fonte
-
-## 🚀 Deploy
-
-### Vercel (Recomendado)
-```bash
-# Deploy automático com Vercel
-vercel --prod
-```
-
-### Outras Plataformas
-```bash
-# Build estático
-npm run build
-
-# Servidor Node.js
-npm start
-```
-
-## 📊 Performance
-
-### Otimizações Implementadas
-- **Turbopack**: Compilação mais rápida em desenvolvimento
-- **Lazy Loading**: Imagens e componentes carregados sob demanda
-- **Code Splitting**: Separação automática de chunks
-- **Image Optimization**: Otimização automática de imagens
-- **Analytics**: Métricas de performance com Vercel Analytics
-
-### Core Web Vitals
-- **LCP**: < 2.5s
-- **FID**: < 100ms
-- **CLS**: < 0.1
-
-## 🔧 Scripts Disponíveis
-
-```bash
-npm run dev      # Desenvolvimento com Turbopack
-npm run build    # Build para produção
-npm run start    # Servidor de produção
-npm run lint     # Verificação de código
-```
-
-## 📄 Licença
-
-MIT License - veja o arquivo LICENSE para detalhes.
-
-## 🤝 Contribuição
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-### Padrões de Contribuição
-- Siga o Atomic Design para novos componentes
-- Mantenha acessibilidade em mente
-- Teste em diferentes dispositivos
-- Documente mudanças significativas
+-   Sua aplicação estará disponível em [http://localhost:3000](http://localhost:3000).
+-   Você pode gerenciar o banco de dados visualmente através do Mongo Express em [http://localhost:8081](http://localhost:8081).
 
 ---
 
-## 🎯 Roadmap
+## Scripts Disponíveis
 
-### Próximas Funcionalidades
-- [ ] Sistema de comentários nos artigos
-- [ ] Dark/Light mode toggle
-- [ ] Integração com CMS headless
-- [ ] Sistema de busca nos artigos
+-   `npm run dev`: Inicia o servidor de desenvolvimento com Turbopack.
+-   `npm run build`: Compila a aplicação para produção.
+-   `npm run start`: Inicia o servidor de produção.
+-   `npm run lint`: Executa o linter para verificar a qualidade do código.
 
 ---
 
-Desenvolvido por Maike Naysinger Borges usando Next.js, TypeScript e Atomic Design
+## Débitos Técnicos
+
+-   **Melhorar Divisão do Domínio**: Aprimorar a organização de models, ENUMs e outros objetos na camada de domínio (`core/models`).
+-   **Criar Entidades**: Implementar `entities` para segregar as responsabilidades das variáveis entre as camadas de domínio e infraestrutura.
+-   **Segurança**: Implementar uma tela de login e aplicar regras de segurança nos endpoints da API.
+-   **Autenticação Centralizada**: Integrar o [Keycloak](https://www.keycloak.org/) para gerenciamento de identidade e acesso.
+
+## Próximas Features (Roadmap)
+
+-   **Autoavaliação Semanal**: Implementar um campo para que cada usuário possa registrar impeditivos, justificativas e uma revisão da semana, planejando a semana seguinte.
+-   **Atividades Colaborativas**: Permitir a criação de um "card" para uma pessoa existente ao marcar uma atividade como sendo em conjunto.
+-   **Gerenciamento de Skills**: Adicionar a funcionalidade de gerenciar as habilidades (skills) de cada pessoa.
+-   **Gerenciamento de Pessoas**: Desenvolver uma tela dedicada para gerenciar (CRUD) as pessoas, superando a necessidade de alterações diretas no banco de dados.
+-   **Gerenciamento de Projetos**: Criar uma tela para o gerenciamento completo de projetos.
+-   **Indicadores de Gestão**: Desenvolver um painel com indicadores de alocação, previsibilidade de recursos e um gráfico de Gantt.
+
+---
+Este `README.md` é um documento vivo. Sinta-se à vontade para atualizá-lo conforme o projeto evolui.

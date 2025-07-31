@@ -10,7 +10,6 @@ import ModalAdicionarPessoa from "@/components/features/modals/ModalAdicionarPes
 import ModalAdicionarProjeto from "@/components/features/modals/ModalAdicionarProjeto";
 import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionarAtividade";
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
-import FirebaseDebugger from "@/components/ui/FirebaseDebugger";
 import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade } from "@/core/models";
 
 interface AllocationClientViewProps {
@@ -42,7 +41,6 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   const [modalAdicionarProjeto, setModalAdicionarProjeto] = useState(false);
   const [modalAdicionarAtividade, setModalAdicionarAtividade] = useState(false);
   const [modalEditarAtividade, setModalEditarAtividade] = useState(false);
-  const [modalFirebaseDebugger, setModalFirebaseDebugger] = useState(false);
   const [dataSelecionada, setDataSelecionada] = useState('');
   const [pessoaSelecionada, setPessoaSelecionada] = useState<Pessoa | null>(null);
   const [atividadeSelecionada, setAtividadeSelecionada] = useState<AtividadeCompleta | null>(null);
@@ -78,7 +76,6 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       }
       
       setModalAdicionarPessoa(false);
-      // Recarrega os dados da página para refletir a adição
       router.refresh(); 
 
     } catch (error) {
@@ -140,10 +137,10 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   const handleEditarAtividade = async (atividadeId: string, dados: Partial<DadosAtividade>) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/v1/atividades/atualizar`, { // Rota atualizada
-        method: 'POST', // Método atualizado
+      const response = await fetch(`/api/v1/atividades/atualizar`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: atividadeId, ...dados }), // ID adicionado ao corpo
+        body: JSON.stringify({ id: atividadeId, ...dados }),
       });
 
       if (!response.ok) {
@@ -195,7 +192,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       const response = await fetch(`/api/v1/clone-atividade`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: atividadeId }), // Envia o ID no corpo
+        body: JSON.stringify({ id: atividadeId }),
       });
 
       if (!response.ok) {
@@ -205,7 +202,6 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       
       const atividadeClonada = await response.json();
     
-      // ✅ Adiciona apenas a nova atividade ao estado existente
       setAtividades(prev => [...prev, atividadeClonada]);
     } catch (error) {
       console.error(error);
@@ -217,10 +213,10 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   const handleMoveAtividade = async (atividadeId: string, novaData: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/v1/atividades/atualizar`, { // Rota atualizada
-        method: 'POST', // Método atualizado
+      const response = await fetch(`/api/v1/atividades/atualizar`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: atividadeId, data: novaData }), // ID adicionado ao corpo
+        body: JSON.stringify({ id: atividadeId, data: novaData }),
       });
 
       if (!response.ok) {
@@ -268,7 +264,6 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         onNextWeek={() => navigateWeek('next')}
         onAddPerson={() => setModalAdicionarPessoa(true)}
         onAddProject={() => setModalAdicionarProjeto(true)}
-        onOpenFirebaseDebugger={() => setModalFirebaseDebugger(true)}
       />
 
       <div className="p-4 md:p-8 space-y-6 md:space-y-8">
@@ -331,13 +326,6 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         projetos={projetos}
         loading={loading}
       />
-
-      {process.env.NODE_ENV === 'development' && (
-        <FirebaseDebugger
-          isOpen={modalFirebaseDebugger}
-          onClose={() => setModalFirebaseDebugger(false)}
-        />
-      )}
     </>
   );
 };

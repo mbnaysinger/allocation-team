@@ -1,6 +1,6 @@
 import React from "react";
 import Button from "@/components/ui/Button";
-import { ChevronLeft, ChevronRight, Plus, Database } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
 interface AllocationControlsProps {
   weekStart: Date;
@@ -10,7 +10,6 @@ interface AllocationControlsProps {
   onAddPerson: () => void;
   onAddProject: () => void;
   onOpenLogs?: () => void;
-  onOpenFirebaseDebugger?: () => void;
 }
 
 const AllocationControls: React.FC<AllocationControlsProps> = ({
@@ -20,7 +19,6 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   onNextWeek,
   onAddPerson,
   onAddProject,
-  onOpenFirebaseDebugger,
 }) => {
   const formatDateRange = (start: Date, end: Date) => {
     const startStr = start.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -78,17 +76,6 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
             <Plus size={16} />
             Adicionar Projeto
           </Button>
-          {process.env.NODE_ENV === 'development' && onOpenFirebaseDebugger && (
-            <Button
-              onClick={onOpenFirebaseDebugger}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <Database size={16} />
-              Firebase
-            </Button>
-          )}
         </div>
       </div>
     </div>
