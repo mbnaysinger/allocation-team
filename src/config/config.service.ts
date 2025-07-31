@@ -3,7 +3,6 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 // Aumenta o namespace global do Node.js para incluir nossa instância de serviço.
-// Esta é a forma mais segura e robusta de fazer isso em TypeScript.
 declare global {
   var configServiceInstance: ConfigService | undefined;
 }
@@ -11,15 +10,16 @@ declare global {
 class ConfigService {
   private config: Record<string, any> = {};
 
-  // O construtor permanece privado para garantir que seja um singleton.
   constructor() {
     console.log('[ConfigService] Inicializando...');
-    const isProduction = process.env.NODE_ENV === 'production';
+    // Usaremos NODE_ENV para decidir a estratégia de carregamento.
+    // 'development' usará o arquivo local. 'production' (ou qualquer outro) usará o Config Server.
+    const isDevelopment = process.env.NODE_ENV === 'development';
 
-    if (isProduction) {
-      this.loadFromConfigServer();
-    } else {
+    if (isDevelopment) {
       this.loadFromYmlFile();
+    } else {
+      this.loadFromConfigServer();
     }
   }
 
@@ -37,24 +37,24 @@ class ConfigService {
   }
 
   private loadFromConfigServer() {
-    console.log('[ConfigService] Carregando configurações das variáveis de ambiente para produção.');
-    
-    this.config = {
-      database: {
-        mongodb: {
-          uri: process.env.DATABASE_MONGODB_URI,
-          db_name: process.env.DATABASE_MONGODB_DB_NAME,
-        },
-        firebase: {
-          api_key: process.env.DATABASE_FIREBASE_API_KEY,
-        }
-      }
-    };
-
-    if (!this.config.database?.mongodb?.uri) {
-      console.warn('⚠️  A variável de ambiente DATABASE_MONGODB_URI não está definida para produção.');
+    const configServerUrl = process.env.CONFIG_SERVER_URL;
+    if (!configServerUrl) {
+      console.error('❌ ERRO CRÍTICO: NODE_ENV não é "development" e CONFIG_SERVER_URL não está definida.');
+      throw new Error('CONFIG_SERVER_URL não definida para este ambiente.');
     }
-     console.log('✔ Configurações de produção carregadas com sucesso.');
+
+    console.log(`[ConfigService] Carregando configurações do Config Server: ${configServerUrl}`);
+    try {
+      // Usamos require aqui, dentro do método, para garantir que ele só seja
+      // executado no lado do servidor e quando necessário.
+      const request = require('sync-request');
+      const response = request('GET', configServerUrl);
+      this.config = yaml.parse(response.getBody('utf8'));
+      console.log('✔ Configurações carregadas do Config Server com sucesso.');
+    } catch (error: any) {
+      console.error('❌ Falha ao carregar configurações do Config Server:', error.message);
+      throw new Error('Não foi possível carregar configurações do Config Server');
+    }
   }
 
   public get<T = any>(key: string, defaultValue?: T): T {
@@ -73,11 +73,8 @@ class ConfigService {
 }
 
 // --- Lógica de Instanciação HMR-Safe ---
-
-// Se a instância ainda não existir no objeto global, crie uma nova e armazene-a lá.
 if (!global.configServiceInstance) {
   global.configServiceInstance = new ConfigService();
 }
 
-// Exporta a instância única, seja ela nova ou do cache global.
 export const configService = global.configServiceInstance;

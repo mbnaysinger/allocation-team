@@ -12,7 +12,7 @@ async function getAlocacaoData(dataInicio: string, dataFim: string) {
     const buscarAlocacaoSemana = dependencyFactory.createBuscarAlocacaoSemana();
     // Chama o serviço diretamente em vez de fazer um fetch
     return await buscarAlocacaoSemana.execute({ dataInicio, dataFim });
-  } catch (error) {
+    } catch (error) {
     console.error("Falha ao buscar dados de alocação diretamente do serviço:", error);
     // Retornar um estado vazio em caso de falha
     return { pessoas: [], projetos: [], atividades: [] };
