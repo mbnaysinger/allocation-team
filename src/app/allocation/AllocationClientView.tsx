@@ -140,10 +140,10 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   const handleEditarAtividade = async (atividadeId: string, dados: Partial<DadosAtividade>) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/v1/atividades/${atividadeId}`, {
-        method: 'PUT',
+      const response = await fetch(`/api/v1/atividades/atualizar`, { // Rota atualizada
+        method: 'POST', // Método atualizado
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados),
+        body: JSON.stringify({ id: atividadeId, ...dados }), // ID adicionado ao corpo
       });
 
       if (!response.ok) {
@@ -217,10 +217,10 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   const handleMoveAtividade = async (atividadeId: string, novaData: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/v1/atividades/${atividadeId}`, {
-        method: 'PUT',
+      const response = await fetch(`/api/v1/atividades/atualizar`, { // Rota atualizada
+        method: 'POST', // Método atualizado
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: novaData }), // Envia apenas a nova data
+        body: JSON.stringify({ id: atividadeId, data: novaData }), // ID adicionado ao corpo
       });
 
       if (!response.ok) {

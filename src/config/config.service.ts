@@ -2,17 +2,18 @@ import * as yaml from 'yaml';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-// 1. Declarar um tipo global para armazenar nossa instância
+// Aumenta o namespace global do Node.js para incluir nossa instância de serviço.
+// Esta é a forma mais segura e robusta de fazer isso em TypeScript.
 declare global {
-  var configServiceInstance: ConfigService;
+  var configServiceInstance: ConfigService | undefined;
 }
 
 class ConfigService {
-  // A instância local é apenas para referência dentro da classe
-  private static instance: ConfigService;
   private config: Record<string, any> = {};
 
-  private constructor() {
+  // O construtor permanece privado para garantir que seja um singleton.
+  constructor() {
+    console.log('[ConfigService] Inicializando...');
     const isProduction = process.env.NODE_ENV === 'production';
 
     if (isProduction) {
@@ -56,21 +57,6 @@ class ConfigService {
      console.log('✔ Configurações de produção carregadas com sucesso.');
   }
 
-  // 2. Modificar o getInstance para usar o cache global
-  public static getInstance(): ConfigService {
-    // Se a instância já existe no cache global, retorne-a
-    if (global.configServiceInstance) {
-      return global.configServiceInstance;
-    }
-    
-    // Se não, crie uma nova, armazene no global e retorne
-    if (!ConfigService.instance) {
-      ConfigService.instance = new ConfigService();
-    }
-    global.configServiceInstance = ConfigService.instance;
-    return ConfigService.instance;
-  }
-  
   public get<T = any>(key: string, defaultValue?: T): T {
     const keys = key.split('.');
     let result: any = this.config;
@@ -86,4 +72,12 @@ class ConfigService {
   }
 }
 
-export const configService = ConfigService.getInstance();
+// --- Lógica de Instanciação HMR-Safe ---
+
+// Se a instância ainda não existir no objeto global, crie uma nova e armazene-a lá.
+if (!global.configServiceInstance) {
+  global.configServiceInstance = new ConfigService();
+}
+
+// Exporta a instância única, seja ela nova ou do cache global.
+export const configService = global.configServiceInstance;

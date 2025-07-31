@@ -1,6 +1,6 @@
 // src/infrastructure/database/mongodb.ts
 import { MongoClient, Db } from 'mongodb';
-import { configService } from '@/config/ConfigService';
+import { configService } from '@/config/config.service';
 
 // 1. Obter configurações do nosso ConfigService
 const MONGODB_URI = configService.get<string>('config.database.mongodb.uri');
