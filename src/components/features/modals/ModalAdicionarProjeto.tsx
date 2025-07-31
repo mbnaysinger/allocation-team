@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@/components/ui/Button';
-import ContadorCaracteres from '@/components/ui/ContadorCaracteres';
+
 import { X } from 'lucide-react';
 import { DadosProjeto, ENTIDADES, Entidade } from '@/core/models';
 

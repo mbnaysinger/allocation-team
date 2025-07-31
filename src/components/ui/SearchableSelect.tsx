@@ -8,11 +8,7 @@ export interface SelectOption {
 }
 
 // Estender as props do react-select para adicionar nossas customizações, se necessário
-interface SearchableSelectProps extends SelectProps<SelectOption, false> {
-  // no-op por enquanto, mas podemos adicionar props customizadas aqui
-}
-
-const SearchableSelect: React.FC<SearchableSelectProps> = (props) => {
+const SearchableSelect: React.FC<SelectProps<SelectOption, false>> = (props) => {
   return (
     <Select<SelectOption, false>
       {...props}

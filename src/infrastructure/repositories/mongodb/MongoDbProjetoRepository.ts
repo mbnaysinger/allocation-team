@@ -4,6 +4,7 @@ import { IProjetoRepository } from '../../../core/ports/IProjetoRepository';
 import { Projeto, DadosProjeto } from '../../../core/models';
 
 const fromDocument = (doc: Document): Projeto => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { _id, ...data } = doc;
   return {
     id: data.id,

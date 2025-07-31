@@ -4,6 +4,7 @@ import { IAtividadeRepository } from '../../../core/ports/IAtividadeRepository';
 import { Atividade, DadosAtividade } from '../../../core/models';
 
 const fromDocument = (doc: Document): Atividade => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { _id, ...data } = doc;
   return {
     id: data.id,

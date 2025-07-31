@@ -5,6 +5,7 @@ import { Pessoa, DadosPessoa } from '../../../core/models';
 
 // Helper to convert MongoDB document to a Pessoa object
 const fromDocument = (doc: Document): Pessoa => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { _id, ...data } = doc;
   return {
     id: data.id,
@@ -51,7 +52,7 @@ export class MongoDbPessoaRepository implements IPessoaRepository {
       updatedAt: now,
     };
     
-    const result = await collection.insertOne(novaPessoa);
+    await collection.insertOne(novaPessoa);
 
     return {
       id: novaPessoa.id!,

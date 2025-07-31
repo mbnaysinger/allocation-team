@@ -2,24 +2,26 @@ import * as yaml from 'yaml';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-// Aumenta o namespace global do Node.js para incluir nossa instância de serviço.
 declare global {
   var configServiceInstance: ConfigService | undefined;
 }
 
 class ConfigService {
-  private config: Record<string, any> = {};
+  private config: Record<string, unknown> = {};
+  private initializationPromise: Promise<void>;
 
   constructor() {
     console.log('[ConfigService] Inicializando...');
-    // Usaremos NODE_ENV para decidir a estratégia de carregamento.
-    // 'development' usará o arquivo local. 'production' (ou qualquer outro) usará o Config Server.
+    this.initializationPromise = this.initialize();
+  }
+  
+  private async initialize(): Promise<void> {
     const isDevelopment = process.env.NODE_ENV === 'development';
 
     if (isDevelopment) {
       this.loadFromYmlFile();
     } else {
-      this.loadFromConfigServer();
+      await this.loadFromConfigServer();
     }
   }
 
@@ -28,15 +30,24 @@ class ConfigService {
       const configPath = join(process.cwd(), '.env.yml');
       console.log(`[ConfigService] Carregando configurações de: ${configPath}`);
       const yamlFile = readFileSync(configPath, 'utf8');
-      this.config = yaml.parse(yamlFile);
+      const parsedConfig = yaml.parse(yamlFile);
+      if (typeof parsedConfig === 'object' && parsedConfig !== null) {
+        this.config = parsedConfig as Record<string, unknown>;
+      } else {
+        throw new Error('Arquivo .env.yml não é um objeto válido.');
+      }
       console.log('✔ Configurações locais (.env.yml) carregadas com sucesso.');
-    } catch (error: any) {
-      console.error('❌ Falha ao carregar configurações do .env.yml:', error.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('❌ Falha ao carregar configurações do .env.yml:', error.message);
+      } else {
+        console.error('❌ Falha ao carregar configurações do .env.yml:', error);
+      }
       throw new Error('Não foi possível carregar configurações do arquivo .env.yml');
     }
   }
 
-  private loadFromConfigServer() {
+  private async loadFromConfigServer() {
     const configServerUrl = process.env.CONFIG_SERVER_URL;
     if (!configServerUrl) {
       console.error('❌ ERRO CRÍTICO: NODE_ENV não é "development" e CONFIG_SERVER_URL não está definida.');
@@ -45,25 +56,40 @@ class ConfigService {
 
     console.log(`[ConfigService] Carregando configurações do Config Server: ${configServerUrl}`);
     try {
-      // Usamos require aqui, dentro do método, para garantir que ele só seja
-      // executado no lado do servidor e quando necessário.
-      const request = require('sync-request');
+      // Importação dinâmica para 'sync-request'
+      const { default: request } = await import('sync-request');
       const response = request('GET', configServerUrl);
-      this.config = yaml.parse(response.getBody('utf8'));
+      const parsedConfig = yaml.parse(response.getBody('utf8'));
+       if (typeof parsedConfig === 'object' && parsedConfig !== null) {
+        this.config = parsedConfig as Record<string, unknown>;
+      } else {
+        throw new Error('Resposta do Config Server não é um objeto válido.');
+      }
       console.log('✔ Configurações carregadas do Config Server com sucesso.');
-    } catch (error: any) {
-      console.error('❌ Falha ao carregar configurações do Config Server:', error.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('❌ Falha ao carregar configurações do Config Server:', error.message);
+      } else {
+        console.error('❌ Falha ao carregar configurações do Config Server:', error);
+      }
       throw new Error('Não foi possível carregar configurações do Config Server');
     }
   }
+  
+  private async ensureInitialized(): Promise<void> {
+    await this.initializationPromise;
+  }
 
-  public get<T = any>(key: string, defaultValue?: T): T {
+  public async get<T>(key: string, defaultValue?: T): Promise<T> {
+    await this.ensureInitialized();
+    
     const keys = key.split('.');
-    let result: any = this.config;
+    let result: unknown = this.config;
 
     for (const k of keys) {
-      result = result ? result[k] : undefined;
-      if (result === undefined) {
+      if (typeof result === 'object' && result !== null && k in result) {
+        result = (result as Record<string, unknown>)[k];
+      } else {
         return defaultValue as T;
       }
     }

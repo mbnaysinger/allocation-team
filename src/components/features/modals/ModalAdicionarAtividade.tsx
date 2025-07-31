@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Button from '@/components/ui/Button';
 import ContadorCaracteres from '@/components/ui/ContadorCaracteres';
 import SearchableSelect, { SelectOption } from '@/components/ui/SearchableSelect'; // Importar o novo componente

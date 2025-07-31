@@ -4,7 +4,7 @@ import { ApiReferenceReact } from '@scalar/api-reference-react';
 import type { ComponentProps } from 'react';
 
 interface ApiDocsClientProps {
-  spec: any; 
+  spec: object | string; 
 }
 
 export default function ApiDocsClient({ spec }: ApiDocsClientProps) {
