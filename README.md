@@ -66,6 +66,22 @@ O `src/config/config.service.ts` é responsável por carregar as variáveis de a
 - **Em Desenvolvimento (`NODE_ENV=development`)**: As configurações são lidas do arquivo `.env.yml` na raiz do projeto.
 - **Em Produção**: As configurações são buscadas de um **Config Server**, cuja URL deve ser definida na variável de ambiente `CONFIG_SERVER_URL`.
 
+### Configuração para Vercel
+
+Para deploy na Vercel, você pode definir as variáveis de ambiente diretamente na plataforma (via dashboard ou Vercel CLI). O `ConfigService` foi projetado para, caso a `CONFIG_SERVER_URL` não esteja definida, automaticamente buscar as configurações diretamente do `process.env` da aplicação.
+
+Você deve configurar as seguintes variáveis de ambiente na Vercel, utilizando a convenção de nomes em **MAIÚSCULAS e com underscores** (`_`) no lugar dos pontos (`.`):
+
+-   `CONFIG_DATABASE_MONGODB_URI`: URI de conexão com o MongoDB (ex: `mongodb://user:pass@host:port/db_name`)
+-   `CONFIG_DATABASE_MONGODB_DB_NAME`: Nome do banco de dados MongoDB (ex: `allocation_team`)
+
+Exemplo de como seria a configuração de variáveis de ambiente na Vercel:
+
+```
+CONFIG_DATABASE_MONGODB_URI=mongodb://user:pass@your-mongo-host:27017/allocation_team
+CONFIG_DATABASE_MONGODB_DB_NAME=allocation_team
+```
+
 ### Arquivo `.env.yml`
 
 Para rodar em ambiente de desenvolvimento, crie um arquivo `.env.yml` na raiz do projeto com a seguinte estrutura:
@@ -95,7 +111,7 @@ A maneira mais simples de configurar o ambiente de desenvolvimento é usando Doc
 ### Passos
 
 1.  **Clone o repositório:**
-    ```bash
+```bash
     git clone <URL_DO_REPOSITORIO>
     cd allocation-team
     ```
@@ -105,17 +121,17 @@ A maneira mais simples de configurar o ambiente de desenvolvimento é usando Doc
 
 3.  **Suba os contêineres do Docker:**
     Este comando irá iniciar o MongoDB e o Mongo Express.
-    ```bash
+```bash
     docker-compose up -d
-    ```
+```
 
 4.  **Instale as dependências do projeto:**
-    ```bash
+```bash
     npm install
     ```
 
 5.  **Rode a aplicação em modo de desenvolvimento:**
-    ```bash
+```bash
     npm run dev
     ```
 

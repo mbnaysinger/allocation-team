@@ -50,8 +50,8 @@ class ConfigService {
   private async loadFromConfigServer() {
     const configServerUrl = process.env.CONFIG_SERVER_URL;
     if (!configServerUrl) {
-      console.error('❌ ERRO CRÍTICO: NODE_ENV não é "development" e CONFIG_SERVER_URL não está definida.');
-      throw new Error('CONFIG_SERVER_URL não definida para este ambiente.');
+      console.warn('⚠️ CONFIG_SERVER_URL não definida. As configurações serão buscadas diretamente das variáveis de ambiente do sistema.');
+      return; // Não lança erro, permite fallback para process.env no método get
     }
 
     console.log(`[ConfigService] Carregando configurações do Config Server: ${configServerUrl}`);
@@ -83,6 +83,7 @@ class ConfigService {
   public async get<T>(key: string, defaultValue?: T): Promise<T> {
     await this.ensureInitialized();
     
+    // Tenta buscar da configuração carregada (yml ou config server)
     const keys = key.split('.');
     let result: unknown = this.config;
 
@@ -90,11 +91,22 @@ class ConfigService {
       if (typeof result === 'object' && result !== null && k in result) {
         result = (result as Record<string, unknown>)[k];
       } else {
-        return defaultValue as T;
+        result = undefined; // Não encontrado na configuração carregada
+        break;
       }
     }
 
-    return result as T;
+    // Se não encontrado na configuração carregada, tenta buscar do process.env
+    if (result === undefined) {
+      const envVarName = key.toUpperCase().replace(/\./g, '_');
+      const envValue = process.env[envVarName];
+      if (envValue !== undefined) {
+        return envValue as T;
+      }
+    }
+
+    // Retorna o valor encontrado ou o defaultValue
+    return (result !== undefined ? result : defaultValue) as T;
   }
 }
 
