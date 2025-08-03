@@ -19,15 +19,15 @@ async function connectToDatabase(): Promise<{ client: MongoClient; db: Db }> {
   }
 
   if (!cached!.promise) {
-    const MONGODB_URI = await configService.get<string>('config.database.mongodb.uri');
-    const MONGODB_DB = await configService.get<string>('config.database.mongodb.db_name');
+    const MONGODB_URI = configService.get<string>('CONFIG.DATABASE.MONGODB.URI');
+    const MONGODB_DB = configService.get<string>('CONFIG.DATABASE.MONGODB.DB_NAME');
 
     if (!MONGODB_URI) {
-      throw new Error('URI do MongoDB não encontrada. Verifique seu .env.yml ou as variáveis de ambiente de produção.');
+      throw new Error('A variável de ambiente CONFIG_DATABASE_MONGODB_URI não está definida.');
     }
 
     if (!MONGODB_DB) {
-      throw new Error('Nome do banco de dados MongoDB não encontrado. Verifique seu .env.yml ou as variáveis de ambiente de produção.');
+      throw new Error('A variável de ambiente CONFIG_DATABASE_MONGODB_DB_NAME não está definida.');
     }
     
     cached!.promise = MongoClient.connect(MONGODB_URI).then((client: MongoClient) => {
