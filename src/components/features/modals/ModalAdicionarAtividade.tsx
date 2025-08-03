@@ -49,7 +49,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validação
     const newErrors: Record<string, string> = {};
     if (!formData.titulo.trim()) {
@@ -73,12 +73,12 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
     if (!formData.horas || formData.horas <= 0) {
       newErrors.horas = 'Horas deve ser um número positivo';
     }
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    
+
     try {
       const dadosParaSubmit: DadosAtividade = {
         ...formData,
@@ -167,9 +167,8 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
                 setFormData(prev => ({ ...prev, titulo: e.target.value }));
                 clearError('titulo');
               }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light placeholder-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.titulo ? 'border-red-500' : 'border-accent/20'
-              }`}
+              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light placeholder-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${errors.titulo ? 'border-red-500' : 'border-accent/20'
+                }`}
               placeholder="Título da atividade"
             />
             {errors.titulo && (
@@ -190,36 +189,53 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
                 setFormData(prev => ({ ...prev, data: e.target.value }));
                 clearError('data');
               }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.data ? 'border-red-500' : 'border-accent/20'
-              }`}
+              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${errors.data ? 'border-red-500' : 'border-accent/20'
+                }`}
             />
             {errors.data && (
-                          <p className="text-red-500 text-sm mt-1">{errors.data}</p>
-          )}
-        </div>
+              <p className="text-red-500 text-sm mt-1">{errors.data}</p>
+            )}
+          </div>
 
-        {/* Colaboradores */}
-        <div>
-          <label htmlFor="colaboradores" className="block text-sm font-medium text-text-light mb-2">
-            Colaboradores (Opcional)
-          </label>
-          <SearchableSelect
-            id="colaboradores"
-            instanceId="add-activity-colaboradores-select"
-            isMulti
-            options={colaboradorOptions}
-            value={colaboradores}
-            onChange={(options) => setColaboradores([...options])}
+          {/* Colaboradores */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label htmlFor="colaboradores" className="block text-sm font-medium text-text-light">
+                Colaboradores (Opcional)
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  if (colaboradores.length === colaboradorOptions.length) {
+                    // Se todos estão selecionados, limpar
+                    setColaboradores([])
+                  } else {
+                    // Selecionar todos
+                    setColaboradores([...colaboradorOptions])
+                  }
+                }}
+                className="text-xs text-blue-600 hover:text-blue-800 underline"
+              >
+                {colaboradores.length === colaboradorOptions.length ? 'Limpar Todos' : 'Selecionar Todos'}
+              </button>
+            </div>
+            <SearchableSelect
+              id="colaboradores"
+              instanceId="add-activity-colaboradores-select"
+              isMulti
+              options={colaboradorOptions}
+              value={colaboradores}
+              placeholder="Digite ou selecione..."
+              onChange={(options) => setColaboradores([...options])}
+            />
+          </div>
+
+          {/* Pessoa - Hidden field */}
+          <input
+            type="hidden"
+            id="pessoaId"
+            value={formData.pessoaId}
           />
-        </div>
-        
-        {/* Pessoa - Hidden field */}
-        <input
-          type="hidden"
-          id="pessoaId"
-          value={formData.pessoaId}
-        />
           {errors.pessoaId && (
             <p className="text-red-500 text-sm mt-1">{errors.pessoaId}</p>
           )}
@@ -233,17 +249,16 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
               id="tipo"
               value={formData.tipo}
               onChange={(e) => {
-                setFormData(prev => ({ 
-                  ...prev, 
+                setFormData(prev => ({
+                  ...prev,
                   tipo: e.target.value as TipoAtividade,
                   projetoId: e.target.value === 'Projeto' ? prev.projetoId : ''
                 }));
                 clearError('tipo');
                 clearError('projetoId');
               }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.tipo ? 'border-red-500' : 'border-accent/20'
-              }`}
+              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${errors.tipo ? 'border-red-500' : 'border-accent/20'
+                }`}
             >
               {TIPOS_ATIVIDADE.map((tipo) => (
                 <option key={tipo} value={tipo}>
@@ -267,6 +282,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
                 instanceId="add-activity-project-select"
                 options={projectOptions}
                 value={selectedProject}
+                placeholder="Digite ou selecione..."
                 onChange={(option) => {
                   setFormData(prev => ({ ...prev, projetoId: option?.value || '' }));
                   clearError('projetoId');
@@ -294,9 +310,8 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
               }}
               rows={2}
               maxLength={100}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light placeholder-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all resize-none ${
-                errors.descricaoJira ? 'border-red-500' : 'border-accent/20'
-              }`}
+              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light placeholder-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all resize-none ${errors.descricaoJira ? 'border-red-500' : 'border-accent/20'
+                }`}
               placeholder="Descrição ou link do Jira"
             />
             <div className="flex justify-between items-center mt-1">
@@ -322,9 +337,8 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
                 setFormData(prev => ({ ...prev, horas: parseInt(e.target.value) || 0 }));
                 clearError('horas');
               }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.horas ? 'border-red-500' : 'border-accent/20'
-              }`}
+              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${errors.horas ? 'border-red-500' : 'border-accent/20'
+                }`}
             />
             {errors.horas && (
               <p className="text-red-500 text-sm mt-1">{errors.horas}</p>

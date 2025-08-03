@@ -306,6 +306,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
                 instanceId="edit-activity-project-select"
                 options={projectOptions}
                 value={selectedProject}
+                placeholder="Digite ou selecione..."
                 onChange={(option) => {
                   setFormData((prev: DadosAtividade) => ({ ...prev, projetoId: option?.value || '' }));
                   clearError('projetoId');
