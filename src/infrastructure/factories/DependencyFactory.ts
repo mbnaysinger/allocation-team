@@ -12,6 +12,7 @@ import { DeletarAtividade } from '../../core/services/DeletarAtividade';
 import { ClonarAtividade } from '../../core/services/ClonarAtividade';
 import { CriarProjeto } from '../../core/services/CriarProjeto';
 import { CriarPessoa } from '../../core/services/CriarPessoa';
+import { BuscarPessoas } from '../../core/services/BuscarPessoas';
 // ... outros serviços
 
 // Esta classe centraliza a criação de todas as dependências.
@@ -57,6 +58,11 @@ class DependencyFactory {
   public createClonarAtividade(): ClonarAtividade {
     return new ClonarAtividade(this.createAtividadeRepository());
   }
+
+  public createBuscarPessoas(): BuscarPessoas {
+    return new BuscarPessoas(this.createPessoaRepository());
+  }
+  
   
   public createCriarPessoa(): CriarPessoa {
     return new CriarPessoa(this.createPessoaRepository());

@@ -1,6 +1,22 @@
+// src/app/api/v1/pessoas/route.ts
 import { NextResponse } from 'next/server';
 import { dependencyFactory } from '../../../../infrastructure/factories/DependencyFactory';
 import { DadosPessoa } from '../../../../core/models';
+
+export async function GET() {
+  try {
+    const buscarPessoas = dependencyFactory.createBuscarPessoas();
+    const pessoas = await buscarPessoas.execute();
+    return NextResponse.json(pessoas);
+  } catch (error) {
+    const err = error as Error;
+    console.error('Erro na API ao buscar pessoas:', err);
+    return NextResponse.json(
+      { message: 'Erro ao buscar pessoas', details: err.message },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: Request) {
   try {

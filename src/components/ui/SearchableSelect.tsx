@@ -8,9 +8,11 @@ export interface SelectOption {
 }
 
 // Estender as props do react-select para adicionar nossas customizações, se necessário
-const SearchableSelect: React.FC<SelectProps<SelectOption, false>> = (props) => {
+const SearchableSelect = <IsMulti extends boolean = false>(
+  props: SelectProps<SelectOption, IsMulti>
+) => {
   return (
-    <Select<SelectOption, false>
+    <Select<SelectOption, IsMulti>
       {...props}
       placeholder="Pesquisar ou selecionar..."
       noOptionsMessage={() => 'Nenhuma opção encontrada'}

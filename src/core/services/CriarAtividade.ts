@@ -22,14 +22,34 @@ const validarDadosAtividade = (dados: DadosAtividade): void => {
 export class CriarAtividade {
   constructor(private atividadeRepository: IAtividadeRepository) {}
 
-  async execute(dados: DadosAtividade): Promise<Atividade> {
+  async execute(dados: DadosAtividade): Promise<Atividade[]> {
     try {
       validarDadosAtividade(dados);
-      const novaAtividade = await this.atividadeRepository.criar(dados);
-      return novaAtividade;
+      
+      const atividadesCriadas: Atividade[] = [];
+
+      // 1. Criar a atividade principal
+      const atividadePrincipal = await this.atividadeRepository.criar(dados);
+      atividadesCriadas.push(atividadePrincipal);
+
+      // 2. Criar atividades para colaboradores
+      if (dados.colaboradoresIds && dados.colaboradoresIds.length > 0) {
+        for (const colaboradorId of dados.colaboradoresIds) {
+          const dadosColaborador: DadosAtividade = {
+            ...dados,
+            pessoaId: colaboradorId,
+            colaboradoresIds: [] // Evitar loop infinito
+          };
+          validarDadosAtividade(dadosColaborador);
+          const atividadeColaborador = await this.atividadeRepository.criar(dadosColaborador);
+          atividadesCriadas.push(atividadeColaborador);
+        }
+      }
+
+      return atividadesCriadas;
     } catch (error) {
-      console.error("Erro ao criar atividade:", error);
-      throw new Error(`Falha ao criar atividade: ${(error as Error).message}`);
+      console.error("Erro ao criar atividades:", error);
+      throw new Error(`Falha ao criar atividades: ${(error as Error).message}`);
     }
   }
 } 

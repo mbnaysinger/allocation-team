@@ -20,6 +20,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  pessoas,
   projetos,
   dataSelecionada,
   pessoaSelecionada,
@@ -35,6 +36,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
     horas: 8
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [colaboradores, setColaboradores] = useState<SelectOption[]>([]);
 
   // Atualizar formData quando dataSelecionada ou pessoaSelecionada mudarem
   React.useEffect(() => {
@@ -78,7 +80,11 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
     }
     
     try {
-      await onSubmit(formData);
+      const dadosParaSubmit: DadosAtividade = {
+        ...formData,
+        colaboradoresIds: colaboradores.map(c => c.value),
+      };
+      await onSubmit(dadosParaSubmit);
       handleClose();
     } catch {
       // Erro será tratado pelo componente pai
@@ -96,6 +102,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
       horas: 8
     });
     setErrors({});
+    setColaboradores([]);
     onClose();
   };
 
@@ -118,6 +125,14 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
   }));
 
   const selectedProject = projectOptions.find(p => p.value === formData.projetoId) || null;
+
+  const colaboradorOptions: SelectOption[] = pessoas
+    .filter(p => p.id !== pessoaSelecionada?.id)
+    .map(p => ({
+      value: p.id,
+      label: p.nome,
+    }));
+
 
   return (
     <div className="fixed inset-0 bg-overlay/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -180,16 +195,31 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
               }`}
             />
             {errors.data && (
-              <p className="text-red-500 text-sm mt-1">{errors.data}</p>
-            )}
-          </div>
+                          <p className="text-red-500 text-sm mt-1">{errors.data}</p>
+          )}
+        </div>
 
-          {/* Pessoa - Hidden field */}
-          <input
-            type="hidden"
-            id="pessoaId"
-            value={formData.pessoaId}
+        {/* Colaboradores */}
+        <div>
+          <label htmlFor="colaboradores" className="block text-sm font-medium text-text-light mb-2">
+            Colaboradores (Opcional)
+          </label>
+          <SearchableSelect
+            id="colaboradores"
+            instanceId="add-activity-colaboradores-select"
+            isMulti
+            options={colaboradorOptions}
+            value={colaboradores}
+            onChange={(options) => setColaboradores([...options])}
           />
+        </div>
+        
+        {/* Pessoa - Hidden field */}
+        <input
+          type="hidden"
+          id="pessoaId"
+          value={formData.pessoaId}
+        />
           {errors.pessoaId && (
             <p className="text-red-500 text-sm mt-1">{errors.pessoaId}</p>
           )}

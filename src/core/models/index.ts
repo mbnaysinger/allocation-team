@@ -62,6 +62,7 @@ export interface DadosAtividade {
   projetoId?: string;
   descricaoJira?: string;
   horas: number;
+  colaboradoresIds?: string[];
 }
 
 // Enums para uso em componentes
