@@ -124,8 +124,8 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       }
       
       setModalAdicionarAtividade(false);
-      const novaAtividade = await response.json();
-      setAtividades(prev => [...prev, novaAtividade]);
+      const novasAtividades = await response.json();
+      setAtividades(prev => [...prev, ...novasAtividades]);
 
     } catch (error) {
       console.error(error);

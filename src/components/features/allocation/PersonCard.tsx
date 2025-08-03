@@ -114,7 +114,6 @@ const PersonCard: React.FC<PersonCardProps> = ({
         <div className="grid grid-cols-5 gap-2 md:gap-4">
           {days.map((day, index) => {
             const data = getDayDate(index);
-            const dataFormatada = new Date(data + 1);
             const atividadesDoDia = getAtividadesDoDia(data);
             const totalHoras = horasPorDia[data] || 0;
             const isDragOver = dragOverData === data;
