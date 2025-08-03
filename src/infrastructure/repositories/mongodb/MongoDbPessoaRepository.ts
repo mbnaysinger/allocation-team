@@ -30,7 +30,9 @@ export class MongoDbPessoaRepository implements IPessoaRepository {
 
   async buscarAtivos(): Promise<Pessoa[]> {
     const collection = await this.getPessoasCollection();
-    const documents = await collection.find({ ativo: true }).toArray();
+    const documents = await collection.find({ ativo: true })
+    .sort({ nome: 1 })
+    .toArray();
     return documents.map(fromDocument);
   }
 
