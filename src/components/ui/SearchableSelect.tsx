@@ -14,7 +14,7 @@ const SearchableSelect = <IsMulti extends boolean = false>(
   return (
     <Select<SelectOption, IsMulti>
       {...props}
-      placeholder="Pesquisar ou selecionar..."
+      //placeholder="Pesquisar ou selecionar..."
       noOptionsMessage={() => 'Nenhuma opção encontrada'}
       classNames={{
         control: (state) => `

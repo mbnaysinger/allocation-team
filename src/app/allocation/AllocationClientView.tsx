@@ -30,6 +30,8 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   const [pessoas, setPessoas] = useState(initialData.pessoas);
   const [projetos, setProjetos] = useState(initialData.projetos);
   const [atividades, setAtividades] = useState(initialData.atividades);
+  const [pessoasFiltradas, setPessoasFiltradas] = useState<Pessoa[]>([]);
+  const [projetosFiltrados, setProjetosFiltrados] = useState<Projeto[]>([]);
   
   useEffect(() => {
     setPessoas(initialData.pessoas);
@@ -45,6 +47,29 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   const [pessoaSelecionada, setPessoaSelecionada] = useState<Pessoa | null>(null);
   const [atividadeSelecionada, setAtividadeSelecionada] = useState<AtividadeCompleta | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const pessoasExibidas = React.useMemo(() => {
+    // 1. Define a lista base de pessoas (filtrada ou todas)
+    let basePessoas = pessoasFiltradas.length > 0 ? pessoasFiltradas : pessoas;
+
+    // 2. Se houver projetos filtrados, refine a lista de pessoas
+    if (projetosFiltrados.length > 0) {
+      const projetosFiltradosIds = new Set(projetosFiltrados.map(p => p.id));
+      
+      // Encontra os IDs das pessoas que têm atividades nos projetos selecionados
+      const pessoasComAtividadesNosProjetos = new Set(
+        atividades
+          .filter(a => a.projetoId && projetosFiltradosIds.has(a.projetoId))
+          .map(a => a.pessoaId)
+      );
+
+      // Filtra a lista base para incluir apenas essas pessoas
+      basePessoas = basePessoas.filter(p => pessoasComAtividadesNosProjetos.has(p.id));
+    }
+
+    return basePessoas;
+  }, [pessoas, pessoasFiltradas, projetosFiltrados, atividades]);
+
 
   const navigateWeek = (direction: 'prev' | 'next') => {
     const newStartDate = new Date(week.start);
@@ -264,10 +289,14 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         onNextWeek={() => navigateWeek('next')}
         onAddPerson={() => setModalAdicionarPessoa(true)}
         onAddProject={() => setModalAdicionarProjeto(true)}
+        pessoas={pessoas}
+        projetos={projetos}
+        onFiltroPessoasChange={setPessoasFiltradas}
+        onFiltroProjetosChange={setProjetosFiltrados}
       />
 
       <div className="p-4 md:p-8 space-y-6 md:space-y-8">
-        {pessoas.map((pessoa: Pessoa) => (
+        {pessoasExibidas.map((pessoa: Pessoa) => (
           <PersonCard
             key={pessoa.id}
             person={pessoa}
