@@ -1,9 +1,6 @@
-import AllocationPage from "./allocation/page";
+// src/app/page.tsx
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <main className="bg-bg text-text-light">
-      <AllocationPage />
-    </main>
-  );
+  redirect('/allocation');
 }
