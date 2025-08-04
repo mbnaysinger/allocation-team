@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     }
 
     // Validar se o status é um dos valores permitidos
-    const validStatus: StatusAtividade[] = ['planejado', 'concluido', 'nao_realizado'];
+    const validStatus: StatusAtividade[] = ['planejada', 'concluida', 'nao_realizada'];
     if (!validStatus.includes(status)) {
       return NextResponse.json({ message: 'Status inválido.' }, { status: 400 });
     }
