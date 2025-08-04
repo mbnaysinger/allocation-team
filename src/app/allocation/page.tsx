@@ -10,12 +10,23 @@ interface AllocationPageProps {
 async function getAlocacaoData(dataInicio: string, dataFim: string) {
   try {
     const buscarAlocacaoSemana = dependencyFactory.createBuscarAlocacaoSemana();
-    // Chama o serviço diretamente em vez de fazer um fetch
-    return await buscarAlocacaoSemana.execute({ dataInicio, dataFim });
+    const buscarResumosSemanais = dependencyFactory.createBuscarResumosSemanais();
+
+    // Busca os dados primários
+    const alocacaoData = await buscarAlocacaoSemana.execute({ dataInicio, dataFim });
+    
+    // Extrai os IDs das pessoas para buscar os resumos
+    const pessoaIds = alocacaoData.pessoas.map(p => p.id);
+
+    // Busca os resumos para as pessoas e a semana
+    const resumosSemanais = await buscarResumosSemanais.execute(pessoaIds, dataInicio);
+
+    return { ...alocacaoData, resumosSemanais };
+
     } catch (error) {
     console.error("Falha ao buscar dados de alocação diretamente do serviço:", error);
     // Retornar um estado vazio em caso de falha
-    return { pessoas: [], projetos: [], atividades: [] };
+    return { pessoas: [], projetos: [], atividades: [], resumosSemanais: [] };
   }
 }
 
@@ -29,7 +40,7 @@ export default async function AllocationPage({
 
   const week = getWeekDates(baseDate);
 
-  // Busca os dados no servidor
+  // Busca os dados no servidor, agora incluindo os resumos
   const initialData = await getAlocacaoData(formatDate(week.start), formatDate(week.end));
 
   return (

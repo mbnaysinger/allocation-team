@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
 import DroppableDayColumn from "@/components/ui/DroppableDayColumn";
-import { Pessoa, AtividadeCompleta, StatusAtividade } from "@/core/models";
+import { Pessoa, AtividadeCompleta, StatusAtividade, ResumoSemanal } from "@/core/models";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 
 interface PersonCardProps {
   person: Pessoa;
   weekStart: Date;
   atividades: AtividadeCompleta[];
+  resumoDaSemana?: ResumoSemanal;
   onAddAllocation: (day: string, pessoa: Pessoa) => void;
   onEditAllocation: (atividadeId: string) => void;
   onCloneAllocation: (atividadeId: string) => void;
   onMoveAtividade: (atividadeId: string, novaData: string) => Promise<void>;
   onUpdateStatus: (id: string, newStatus: StatusAtividade) => void;
+  onOpenResumoModal: (pessoa: Pessoa) => void;
   calcularHorasDia: (pessoaId: string, data: string) => number;
 }
 
@@ -24,6 +26,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
   onCloneAllocation,
   onMoveAtividade,
   onUpdateStatus,
+  onOpenResumoModal,
   calcularHorasDia,
 }) => {
   const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
@@ -94,9 +97,17 @@ const PersonCard: React.FC<PersonCardProps> = ({
               {person.cargo}
             </div>
           </div>
-          <div className="text-right">
-            <div className="text-2xl md:text-3xl font-bold text-accent">{getTotalHours()}h</div>
-            <div className="text-accent/60 text-sm">Total Semana</div>
+          <button 
+              onClick={() => onOpenResumoModal(person)}
+              className="px-4 py-2 text-md font-semibold rounded-full border border-accent/50 text-accent hover:text-white hover:bg-accent hover:text-bg transition-colors"
+            >
+              Revisão da Semana
+            </button>
+          <div className="flex flex-col items-end gap-2">
+            <div className="text-right">
+              <div className="text-2xl md:text-3xl font-bold text-accent">{getTotalHours()}h</div>
+              <div className="text-accent/60 text-sm">Total Semana</div>
+            </div>
           </div>
         </div>
       </div>

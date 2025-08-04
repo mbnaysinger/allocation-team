@@ -43,6 +43,15 @@ export interface AtividadeCompleta extends Atividade {
   projeto?: Projeto;
 }
 
+export interface ResumoSemanal {
+  id: string;
+  pessoaId: string;
+  semana_inicio: string; // YYYY-MM-DD
+  comentario: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface DadosPessoa {
   nome: string;
   cargo: Cargo;

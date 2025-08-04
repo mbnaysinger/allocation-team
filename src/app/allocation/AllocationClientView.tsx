@@ -10,13 +10,15 @@ import ModalAdicionarPessoa from "@/components/features/modals/ModalAdicionarPes
 import ModalAdicionarProjeto from "@/components/features/modals/ModalAdicionarProjeto";
 import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionarAtividade";
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
-import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade } from "@/core/models";
+import ModalResumoSemanal from "@/components/features/modals/ModalResumoSemanal";
+import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/core/models";
 
 interface AllocationClientViewProps {
   initialData: {
     pessoas: Pessoa[];
     projetos: Projeto[];
     atividades: AtividadeCompleta[];
+    resumosSemanais: ResumoSemanal[];
   };
   week: {
     start: Date;
@@ -30,6 +32,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   const [pessoas, setPessoas] = useState(initialData.pessoas);
   const [projetos, setProjetos] = useState(initialData.projetos);
   const [atividades, setAtividades] = useState(initialData.atividades);
+  const [resumos, setResumos] = useState(initialData.resumosSemanais);
   const [pessoasFiltradas, setPessoasFiltradas] = useState<Pessoa[]>([]);
   const [projetosFiltrados, setProjetosFiltrados] = useState<Projeto[]>([]);
   
@@ -37,12 +40,15 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     setPessoas(initialData.pessoas);
     setProjetos(initialData.projetos);
     setAtividades(initialData.atividades);
+    setResumos(initialData.resumosSemanais);
   }, [initialData]);
 
   const [modalAdicionarPessoa, setModalAdicionarPessoa] = useState(false);
   const [modalAdicionarProjeto, setModalAdicionarProjeto] = useState(false);
   const [modalAdicionarAtividade, setModalAdicionarAtividade] = useState(false);
   const [modalEditarAtividade, setModalEditarAtividade] = useState(false);
+  const [isResumoModalOpen, setIsResumoModalOpen] = useState(false);
+  const [pessoaParaResumo, setPessoaParaResumo] = useState<Pessoa | null>(null);
   const [dataSelecionada, setDataSelecionada] = useState('');
   const [pessoaSelecionada, setPessoaSelecionada] = useState<Pessoa | null>(null);
   const [atividadeSelecionada, setAtividadeSelecionada] = useState<AtividadeCompleta | null>(null);
@@ -278,6 +284,11 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     }
   };
 
+  const handleOpenResumoModal = (pessoa: Pessoa) => {
+    setPessoaParaResumo(pessoa);
+    setIsResumoModalOpen(true);
+  };
+
   const handleUpdateStatus = async (id: string, newStatus: StatusAtividade) => {
     const originalAtividades = [...atividades];
     
@@ -310,6 +321,49 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     }
   };
 
+  const handleSalvarResumo = async (comentario: string) => {
+    if (!pessoaParaResumo) return;
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/v1/resumo-semanal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          pessoaId: pessoaParaResumo.id,
+          semana_inicio: week.start.toISOString().split('T')[0],
+          comentario,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao salvar o resumo no servidor.');
+      }
+      
+      const resumoSalvo = await response.json();
+      
+      // Atualiza o estado local com o resumo salvo
+      setResumos(prev => {
+        const index = prev.findIndex(r => r.id === resumoSalvo.id);
+        if (index > -1) {
+          const newResumos = [...prev];
+          newResumos[index] = resumoSalvo;
+          return newResumos;
+        } else {
+          return [...prev, resumoSalvo];
+        }
+      });
+      
+      setIsResumoModalOpen(false);
+
+    } catch (error) {
+      console.error("Erro ao salvar resumo:", error);
+      // TODO: Mostrar um toast/notificação de erro para o usuário
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <AllocationHeader />
@@ -339,7 +393,9 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
             onCloneAllocation={handleClonarAtividade}
             onMoveAtividade={handleMoveAtividade}
             onUpdateStatus={handleUpdateStatus}
+            onOpenResumoModal={handleOpenResumoModal}
             calcularHorasDia={calcularHorasDia}
+            resumoDaSemana={resumos.find(r => r.pessoaId === pessoa.id)}
           />
         ))}
       </div>
@@ -386,6 +442,15 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         atividade={atividadeSelecionada}
         pessoas={pessoas}
         projetos={projetos}
+        loading={loading}
+      />
+
+      <ModalResumoSemanal
+        isOpen={isResumoModalOpen}
+        onClose={() => setIsResumoModalOpen(false)}
+        onSubmit={handleSalvarResumo}
+        pessoa={pessoaParaResumo}
+        resumo={resumos.find(r => r.pessoaId === pessoaParaResumo?.id)}
         loading={loading}
       />
     </>

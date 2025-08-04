@@ -1,9 +1,11 @@
 import { IAtividadeRepository } from '../../core/ports/IAtividadeRepository';
+import { IResumoSemanalRepository } from '../../core/ports/IResumoSemanalRepository';
 import { IPessoaRepository } from '../../core/ports/IPessoaRepository';
 import { IProjetoRepository } from '../../core/ports/IProjetoRepository';
 import { MongoDbAtividadeRepository } from '../repositories/mongodb/MongoDbAtividadeRepository';
 import { MongoDbPessoaRepository } from '../repositories/mongodb/MongoDbPessoaRepository';
 import { MongoDbProjetoRepository } from '../repositories/mongodb/MongoDbProjetoRepository';
+import { MongoDbResumoSemanalRepository } from '../repositories/mongodb/MongoDbResumoSemanalRepository';
 
 import { BuscarAlocacaoSemana } from '../../core/services/BuscarAlocacaoSemana';
 import { CriarAtividade } from '../../core/services/CriarAtividade';
@@ -13,7 +15,9 @@ import { ClonarAtividade } from '../../core/services/ClonarAtividade';
 import { CriarProjeto } from '../../core/services/CriarProjeto';
 import { CriarPessoa } from '../../core/services/CriarPessoa';
 import { BuscarPessoas } from '../../core/services/BuscarPessoas';
-// ... outros serviços
+import { SalvarResumoSemanal } from '../../core/services/SalvarResumoSemanal';
+import { BuscarResumosSemanais } from '../../core/services/BuscarResumosSemanais';
+
 
 // Esta classe centraliza a criação de todas as dependências.
 class DependencyFactory {
@@ -30,6 +34,10 @@ class DependencyFactory {
   
   private createProjetoRepository(): IProjetoRepository {
     return new MongoDbProjetoRepository();
+  }
+
+  private createResumoSemanalRepository(): IResumoSemanalRepository {
+    return new MongoDbResumoSemanalRepository();
   }
 
   // --- Serviços ---
@@ -57,6 +65,14 @@ class DependencyFactory {
 
   public createClonarAtividade(): ClonarAtividade {
     return new ClonarAtividade(this.createAtividadeRepository());
+  }
+
+  public createSalvarResumoSemanal(): SalvarResumoSemanal {
+    return new SalvarResumoSemanal(this.createResumoSemanalRepository());
+  }
+
+  public createBuscarResumosSemanais(): BuscarResumosSemanais {
+    return new BuscarResumosSemanais(this.createResumoSemanalRepository());
   }
 
   public createBuscarPessoas(): BuscarPessoas {
