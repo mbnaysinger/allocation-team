@@ -1,5 +1,5 @@
 import { IAtividadeRepository } from '../ports/IAtividadeRepository';
-import { Atividade } from '../models';
+import { Atividade, STATUS_ATIVIDADE } from '../models';
 
 export class ClonarAtividade {
   constructor(private atividadeRepository: IAtividadeRepository) {}
@@ -20,6 +20,7 @@ export class ClonarAtividade {
         tipo: atividadeOriginal.tipo,
         projetoId: atividadeOriginal.projetoId,
         descricaoJira: atividadeOriginal.descricaoJira,
+        status: STATUS_ATIVIDADE[0],  // Planejada
         horas: atividadeOriginal.horas,
       };
 
