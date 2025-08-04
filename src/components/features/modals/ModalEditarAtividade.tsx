@@ -32,6 +32,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
     tipo: 'Projeto',
     projetoId: '',
     descricaoJira: '',
+    status: 'planejada',
     horas: 8
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -47,7 +48,8 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
         tipo: atividade.tipo,
         projetoId: atividade.projetoId || '',
         descricaoJira: atividade.descricaoJira || '',
-        horas: atividade.horas
+        horas: atividade.horas,
+        status: atividade.status
       });
       setErrors({});
     }
@@ -121,6 +123,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
       tipo: 'Projeto',
       projetoId: '',
       descricaoJira: '',
+      status: 'planejada',
       horas: 8
     });
     setErrors({});
