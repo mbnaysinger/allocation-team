@@ -33,7 +33,8 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
     tipo: 'Melhoria',
     projetoId: '',
     descricaoJira: '',
-    horas: 8
+    horas: 8,
+    status: 'planejada'
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [colaboradores, setColaboradores] = useState<SelectOption[]>([]);
@@ -99,7 +100,8 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
       tipo: 'Melhoria',
       projetoId: '',
       descricaoJira: '',
-      horas: 8
+      horas: 8,
+      status: 'planejada'
     });
     setErrors({});
     setColaboradores([]);
