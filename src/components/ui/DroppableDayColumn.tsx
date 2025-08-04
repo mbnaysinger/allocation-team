@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import Button from './Button';
 import TarjaHoras from './TarjaHoras';
 import DraggableActivityCard from './DraggableActivityCard';
-import { AtividadeCompleta } from '@/core/models';
+import { AtividadeCompleta, StatusAtividade } from '@/core/models';
 
 interface DroppableDayColumnProps {
   data: string;
@@ -12,6 +12,7 @@ interface DroppableDayColumnProps {
   onAddAllocation: (data: string) => void;
   onEditAllocation: (atividadeId: string) => void;
   onCloneAllocation: (atividadeId: string) => void;
+  onUpdateStatus: (id: string, newStatus: StatusAtividade) => void;
   onDrop: (data: string) => void;
   onDragOver?: (data: string) => void;
   onDragLeave?: () => void;
@@ -26,6 +27,7 @@ const DroppableDayColumn: React.FC<DroppableDayColumnProps> = ({
   onAddAllocation,
   onEditAllocation,
   onCloneAllocation,
+  onUpdateStatus,
   onDrop,
   onDragOver,
   onDragLeave,
@@ -83,6 +85,7 @@ const DroppableDayColumn: React.FC<DroppableDayColumnProps> = ({
           atividade={atividade}
           onEdit={onEditAllocation}
           onClone={onCloneAllocation}
+          onUpdateStatus={onUpdateStatus}
           onDragStart={onDragStart}
         />
       ))}

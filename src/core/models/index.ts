@@ -1,6 +1,7 @@
 export type Cargo = 'Analista de TI' | 'Analista de Negócios';
 export type TipoAtividade = 'Projeto' | 'Melhoria' | 'Sustentação';
 export type Entidade = 'SESI' | 'SENAI' | 'IEL' | 'CIERGS' | 'GINFO' | 'SISTEMA FIERGS';
+export type StatusAtividade = 'planejado' | 'concluido' | 'nao_realizado';
 
 export interface Pessoa {
   id: string;
@@ -32,6 +33,7 @@ export interface Atividade {
   projetoId?: string; // Obrigatório se tipo === "Projeto"
   descricaoJira?: string; // Máximo 100 caracteres
   horas: number;
+  status?: StatusAtividade;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -63,6 +65,7 @@ export interface DadosAtividade {
   descricaoJira?: string;
   horas: number;
   colaboradoresIds?: string[];
+  status: 'planejada' | 'concluida' | 'nao_realizada';
 }
 
 // Enums para uso em componentes

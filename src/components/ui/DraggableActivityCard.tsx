@@ -1,12 +1,13 @@
 import React from 'react';
-import { Copy } from 'lucide-react';
-import { AtividadeCompleta } from '@/core/models';
+import { Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { AtividadeCompleta, StatusAtividade } from '@/core/models';
 import { Tooltip } from 'react-tooltip';
 
 interface DraggableActivityCardProps {
   atividade: AtividadeCompleta;
   onEdit: (atividadeId: string) => void;
   onClone: (atividadeId: string) => void;
+  onUpdateStatus: (id: string, newStatus: StatusAtividade) => void;
   onDragStart?: (atividade: AtividadeCompleta) => void;
   isDragging?: boolean;
 }
@@ -15,49 +16,59 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
   atividade,
   onEdit,
   onClone,
+  onUpdateStatus,
   onDragStart,
   isDragging = false
 }) => {
-  const getTypeClasses = (tipo: string) => {
-    switch (tipo) {
-      case 'Projeto':
-        return 'bg-gray-300 from-accent to-accent/80 text-bg';
-      case 'Melhoria':
-        return 'bg-gray-300 from-accent to-accent/80 text-bg';
-      case 'Sustentação':
-        return 'bg-gray-300 from-accent to-accent/80 text-bg';
+  const { status = 'planejado' } = atividade; // Garante um status padrão
+
+  const getStatusClasses = () => {
+    switch (status) {
+      case 'concluido':
+        return 'bg-gray-200 border-l-5 border-green-500 opacity-90';
+      case 'nao_realizado':
+        return 'bg-gray-200 border-l-5 border-red-500 opacity-60';
       default:
-        return 'bg-gray-300 from-accent to-accent/80 text-bg';
+        return 'bg-gray-200 border-l-5 border-accent';
     }
   };
-
+  
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', atividade.id);
     onDragStart?.(atividade);
   };
 
+  const handleStatusClick = (e: React.MouseEvent, newStatus: StatusAtividade) => {
+    e.stopPropagation();
+    // Se o novo status for o mesmo que o atual, reverte para 'planejado'
+    const finalStatus = newStatus === status ? 'planejado' : newStatus;
+    onUpdateStatus(atividade.id, finalStatus);
+  };
+
   return (
     <div
       draggable
       className={`
-        ${getTypeClasses(atividade.tipo)} 
-        p-2 md:p-3 
+        bg-gradient-to-r from-bg/80 to-bg/60
+        p-2 md:p-3
         rounded-lg 
         mb-2 
         cursor-pointer 
         hover:scale-105 
-        transition-transform 
+        transition-all 
         text-xs md:text-sm 
         relative 
         group
+        shadow-glass
+        ${getStatusClasses()}
         ${isDragging ? 'opacity-50 scale-95' : ''}
       `}
       onClick={() => onEdit(atividade.id)}
       onDragStart={handleDragStart}
     >
-      <div className="font-bold text-base md:text-md truncate">{atividade.titulo}</div>
-      <div className="text-xs md:text-sm opacity-90 truncate">
+      <div className="font-bold text-sm md:text-base truncate">{atividade.titulo}</div>
+      <div className="text-xs opacity-90 truncate">
         {atividade.horas}h
       </div>
       {atividade.projeto && (
@@ -65,25 +76,44 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
           {atividade.projeto.abreviatura}
         </div>
       )}
-      <div className="font-bold text-xs md:text-sm opacity-90 truncate">
+      <div className="font-bold text-xs opacity-90 truncate">
         {atividade.tipo}
       </div>
       
-      {/* Ícone de clonar no canto inferior direito */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onClone(atividade.id);
-        }}
-        className="absolute bottom-1 right-1 p-1 bg-white/80 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm font-bold"
-        data-tooltip-id="clone-tooltip"
-        data-tooltip-content="Clonar"
-      >
-        <Copy size={12} className="text-accent" />
-        <Tooltip id="clone-tooltip" />
-      </button>
+      <div className="absolute bottom-1 right-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <button
+          onClick={(e) => handleStatusClick(e, 'concluido')}
+          className={`p-1 rounded-full ${status === 'concluido' ? 'bg-green-500/80 text-white' : 'bg-white/70 hover:bg-white'}`}
+          data-tooltip-id="status-tooltip"
+          data-tooltip-content="Concluído"
+        >
+          <ThumbsUp size={16} />
+          <Tooltip id="status-tooltip" />
+        </button>
+        <button
+          onClick={(e) => handleStatusClick(e, 'nao_realizado')}
+          className={`p-1 rounded-full ${status === 'nao_realizado' ? 'bg-red-500/80 text-white' : 'bg-white/70 hover:bg-white'}`}
+          data-tooltip-id="status-tooltip"
+          data-tooltip-content="Não Realizado"
+        >
+          <ThumbsDown size={16} />
+          <Tooltip id="status-tooltip" />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClone(atividade.id);
+          }}
+          className="p-1 bg-white/70 hover:bg-white rounded-full shadow-sm"
+          data-tooltip-id="clone-tooltip"
+          data-tooltip-content="Clonar"
+        >
+          <Copy size={16} className="text-accent"/>
+          <Tooltip id="clone-tooltip" />
+        </button>
+      </div>
     </div>
   );
 };
 
-export default DraggableActivityCard; 
+export default DraggableActivityCard;

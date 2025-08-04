@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DroppableDayColumn from "@/components/ui/DroppableDayColumn";
-import { Pessoa, AtividadeCompleta } from "@/core/models";
+import { Pessoa, AtividadeCompleta, StatusAtividade } from "@/core/models";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 
 interface PersonCardProps {
@@ -11,6 +11,7 @@ interface PersonCardProps {
   onEditAllocation: (atividadeId: string) => void;
   onCloneAllocation: (atividadeId: string) => void;
   onMoveAtividade: (atividadeId: string, novaData: string) => Promise<void>;
+  onUpdateStatus: (id: string, newStatus: StatusAtividade) => void;
   calcularHorasDia: (pessoaId: string, data: string) => number;
 }
 
@@ -22,6 +23,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
   onEditAllocation,
   onCloneAllocation,
   onMoveAtividade,
+  onUpdateStatus,
   calcularHorasDia,
 }) => {
   const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
@@ -127,6 +129,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
                 onAddAllocation={(data) => onAddAllocation(data, person)}
                 onEditAllocation={onEditAllocation}
                 onCloneAllocation={onCloneAllocation}
+                onUpdateStatus={onUpdateStatus}
                 onDrop={(dropData) => {
                   handleDragEnd(dropData);
                   setDragOverData(null);

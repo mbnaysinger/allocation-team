@@ -74,6 +74,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
           <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
             <div className="w-full lg:w-60">
               <SearchableSelect
+                instanceId="filtro-pessoas-select"
                 isMulti
                 options={pessoaOptions}
                 onChange={handleFiltroPessoaChange}
@@ -82,6 +83,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
             </div>
             <div className="w-full lg:w-60">
               <SearchableSelect
+                instanceId="filtro-projetos-select"
                 isMulti
                 options={projetoOptions}
                 onChange={handleFiltroProjetoChange}

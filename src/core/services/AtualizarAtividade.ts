@@ -1,5 +1,5 @@
 import { IAtividadeRepository } from '../ports/IAtividadeRepository';
-import { Atividade, DadosAtividade } from '../models';
+import { Atividade, DadosAtividade, StatusAtividade } from '../models';
 
 // Reutilizamos a mesma validação da criação, mas a adaptamos se necessário no futuro
 const validarDadosAtividade = (dados: Partial<DadosAtividade>): void => {
@@ -31,5 +31,13 @@ export class AtualizarAtividade {
       console.error("Erro ao atualizar atividade:", error);
       throw new Error(`Falha ao atualizar atividade: ${(error as Error).message}`);
     }
+  }
+
+  async updateStatus(id: string, status: StatusAtividade): Promise<Atividade> {
+    const atividadeAtualizada = await this.atividadeRepository.updateStatus(id, status);
+    if (!atividadeAtualizada) {
+      throw new Error('Atividade não encontrada ou não pôde ser atualizada.');
+    }
+    return atividadeAtualizada;
   }
 }

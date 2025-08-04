@@ -1,7 +1,7 @@
 import { Collection, Document } from 'mongodb';
 import { getCollection } from '../../../config/databases/mongodb';
 import { IAtividadeRepository } from '../../../core/ports/IAtividadeRepository';
-import { Atividade, DadosAtividade } from '../../../core/models';
+import { Atividade, DadosAtividade, StatusAtividade } from '../../../core/models';
 
 const fromDocument = (doc: Document): Atividade => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -15,6 +15,7 @@ const fromDocument = (doc: Document): Atividade => {
     projetoId: data.projetoId,
     descricaoJira: data.descricaoJira,
     horas: data.horas,
+    status: data.status,
     createdAt: new Date(data.createdAt),
     updatedAt: new Date(data.updatedAt),
   } as Atividade;
@@ -49,6 +50,7 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
     const novaAtividade: Omit<Atividade, 'id'> & { id?: string } = {
       ...dados,
       id: `ativ_${Date.now()}`,
+      status: 'planejado',
       createdAt: now,
       updatedAt: now,
     };
@@ -86,5 +88,21 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
     const collection = await this.getAtividadesCollection();
     const document = await collection.findOne({ id });
     return document ? fromDocument(document) : null;
+  }
+
+  async updateStatus(id: string, status: StatusAtividade): Promise<Atividade | null> {
+    const collection = await this.getAtividadesCollection();
+
+    const result = await collection.findOneAndUpdate(
+      { id },
+      { $set: { status, updatedAt: new Date() } },
+      { returnDocument: 'after' }
+    );
+    
+    if (result && result.value) {
+      return fromDocument(result.value as Document);
+    }
+    
+    return null;
   }
 }

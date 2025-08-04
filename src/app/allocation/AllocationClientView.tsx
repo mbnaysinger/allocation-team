@@ -10,7 +10,7 @@ import ModalAdicionarPessoa from "@/components/features/modals/ModalAdicionarPes
 import ModalAdicionarProjeto from "@/components/features/modals/ModalAdicionarProjeto";
 import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionarAtividade";
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
-import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade } from "@/core/models";
+import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade } from "@/core/models";
 
 interface AllocationClientViewProps {
   initialData: {
@@ -278,6 +278,38 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     }
   };
 
+  const handleUpdateStatus = async (id: string, newStatus: StatusAtividade) => {
+    const originalAtividades = [...atividades];
+    
+    // Atualização Otimista
+    const updatedActivities = atividades.map(a => 
+      a.id === id ? { ...a, status: newStatus } : a
+    );
+    setAtividades(updatedActivities);
+
+    try {
+      const response = await fetch('/api/v1/atividades/update-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao atualizar o status no servidor.');
+      }
+      
+      // Opcional: pode-se atualizar o estado com a resposta do servidor para garantir consistência
+      const atividadeAtualizada = await response.json();
+      setAtividades(prev => prev.map(a => a.id === id ? atividadeAtualizada : a));
+
+    } catch (error) {
+      console.error("Erro ao atualizar status, revertendo:", error);
+      // Reverter em caso de erro
+      setAtividades(originalAtividades);
+      // TODO: Mostrar um toast/notificação de erro para o usuário
+    }
+  };
+
   return (
     <>
       <AllocationHeader />
@@ -306,6 +338,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
             onEditAllocation={handleEditAllocation}
             onCloneAllocation={handleClonarAtividade}
             onMoveAtividade={handleMoveAtividade}
+            onUpdateStatus={handleUpdateStatus}
             calcularHorasDia={calcularHorasDia}
           />
         ))}
