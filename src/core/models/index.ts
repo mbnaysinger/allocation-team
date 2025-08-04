@@ -1,5 +1,5 @@
 export type Cargo = 'Analista de TI' | 'Analista de Negócios';
-export type TipoAtividade = 'Projeto' | 'Melhoria' | 'Sustentação';
+export type TipoAtividade = 'Projeto' | 'Melhoria' | 'Sustentação' | 'Backoffice';
 export type Entidade = 'SESI' | 'SENAI' | 'IEL' | 'CIERGS' | 'GINFO' | 'SISTEMA FIERGS';
 export type StatusAtividade = 'planejada' | 'concluida' | 'nao_realizada';
 
@@ -86,7 +86,8 @@ export const CARGOS: Cargo[] = [
 export const TIPOS_ATIVIDADE: TipoAtividade[] = [
   'Melhoria',
   'Projeto',
-  'Sustentação'
+  'Sustentação',
+  'Backoffice'
 ];
 
 export const ENTIDADES: Entidade[] = [
