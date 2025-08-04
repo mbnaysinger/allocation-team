@@ -20,13 +20,13 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
   onDragStart,
   isDragging = false
 }) => {
-  const { status = 'planejado' } = atividade; // Garante um status padrão
+  const { status = 'planejada' } = atividade; // Garante um status padrão
 
   const getStatusClasses = () => {
     switch (status) {
-      case 'concluido':
+      case 'concluida':
         return 'bg-gray-200 border-l-5 border-green-500 opacity-90';
-      case 'nao_realizado':
+      case 'nao_realizada':
         return 'bg-gray-200 border-l-5 border-red-500 opacity-60';
       default:
         return 'bg-gray-200 border-l-5 border-accent';
@@ -41,8 +41,8 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
 
   const handleStatusClick = (e: React.MouseEvent, newStatus: StatusAtividade) => {
     e.stopPropagation();
-    // Se o novo status for o mesmo que o atual, reverte para 'planejado'
-    const finalStatus = newStatus === status ? 'planejado' : newStatus;
+    // Se o novo status for o mesmo que o atual, reverte para 'planejada'
+    const finalStatus = newStatus === status ? 'planejada' : newStatus;
     onUpdateStatus(atividade.id, finalStatus);
   };
 
@@ -82,8 +82,8 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
       
       <div className="absolute bottom-1 right-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <button
-          onClick={(e) => handleStatusClick(e, 'concluido')}
-          className={`p-1 rounded-full ${status === 'concluido' ? 'bg-green-500/80 text-white' : 'bg-white/70 hover:bg-white'}`}
+          onClick={(e) => handleStatusClick(e, 'concluida')}
+          className={`p-1 rounded-full ${status === 'concluida' ? 'bg-green-500/80 text-white' : 'bg-white/70 hover:bg-white'}`}
           data-tooltip-id="status-tooltip"
           data-tooltip-content="Concluído"
         >
@@ -91,8 +91,8 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
           <Tooltip id="status-tooltip" />
         </button>
         <button
-          onClick={(e) => handleStatusClick(e, 'nao_realizado')}
-          className={`p-1 rounded-full ${status === 'nao_realizado' ? 'bg-red-500/80 text-white' : 'bg-white/70 hover:bg-white'}`}
+          onClick={(e) => handleStatusClick(e, 'nao_realizada')}
+          className={`p-1 rounded-full ${status === 'nao_realizada' ? 'bg-red-500/80 text-white' : 'bg-white/70 hover:bg-white'}`}
           data-tooltip-id="status-tooltip"
           data-tooltip-content="Não Realizado"
         >

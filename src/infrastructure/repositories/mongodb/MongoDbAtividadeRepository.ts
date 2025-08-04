@@ -50,7 +50,6 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
     const novaAtividade: Omit<Atividade, 'id'> & { id?: string } = {
       ...dados,
       id: `ativ_${Date.now()}`,
-      status: 'planejado',
       createdAt: now,
       updatedAt: now,
     };
