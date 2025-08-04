@@ -71,14 +71,15 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
       <div className="text-xs opacity-90 truncate">
         {atividade.horas}h
       </div>
-      {atividade.projeto && (
-        <div className="text-xs opacity-90 truncate">
-          {atividade.projeto.abreviatura}
-        </div>
-      )}
       <div className="font-bold text-xs opacity-90 truncate">
         {atividade.tipo}
       </div>
+      {atividade.projeto && (
+        <div className="text-xs opacity-90 truncate max-w-25" data-tooltip-id="projeto-tooltip" data-tooltip-content={atividade.projeto.nome} data-tooltip-place="bottom" >
+          {atividade.projeto.abreviatura}
+          <Tooltip id="projeto-tooltip" />
+        </div>
+      )}
       
       <div className="absolute bottom-1 right-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <button
