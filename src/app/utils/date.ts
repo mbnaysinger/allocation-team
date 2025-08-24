@@ -25,3 +25,13 @@ export const formatDate = (date: Date): string => {
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
+
+/**
+ * Formata um objeto Date para o formato DD/MM/YYYY para exibição, usando UTC.
+ */
+export const formatDateForDisplay = (date: Date): string => {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${day}/${month}/${year}`;
+};
