@@ -49,12 +49,12 @@ let db: Db;
  * @param collectionName O nome da coleção a ser retornada.
  * @returns Uma Promise que resolve para uma instância da Collection.
  */
-export async function getCollection(collectionName: string): Promise<Collection> {
+export async function getCollection<T>(collectionName: string): Promise<Collection<T>> {
   if (db) {
-    return db.collection(collectionName);
+    return db.collection<T>(collectionName);
   }
   
   const mongoClient = await clientPromise;
   db = mongoClient.db(MONGODB_DB);
-  return db.collection(collectionName);
+  return db.collection<T>(collectionName);
 }
