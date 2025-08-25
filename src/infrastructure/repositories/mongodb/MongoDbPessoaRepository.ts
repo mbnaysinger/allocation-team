@@ -71,8 +71,8 @@ export class MongoDbPessoaRepository implements IPessoaRepository {
       { returnDocument: 'after' }
     );
 
-    if (result && result.value) {
-      return fromDocument(result.value as Document);
+    if (result) {
+      return fromDocument(result);
     }
     
     return null;
@@ -87,8 +87,8 @@ export class MongoDbPessoaRepository implements IPessoaRepository {
       { returnDocument: 'after' }
     );
 
-    if (result && result.value) {
-      return fromDocument(result.value as Document);
+    if (result) {
+      return fromDocument(result);
     }
     
     return null;
