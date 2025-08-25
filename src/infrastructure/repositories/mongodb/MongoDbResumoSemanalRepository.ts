@@ -48,8 +48,8 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
       }
     );
 
-    if (result && result.value) {
-      return fromDocument(result.value as Document);
+    if (result) {
+      return fromDocument(result);
     }
     
     // Este fallback pode ser necessário se o upsert não retornar o documento em alguns casos raros

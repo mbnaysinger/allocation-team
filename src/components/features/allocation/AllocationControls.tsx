@@ -3,6 +3,7 @@ import Button from "@/components/ui/Button";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
 import { Pessoa, Projeto } from "@/core/models";
+import { formatDateForDisplay } from "@/app/utils/date";
 
 interface AllocationControlsProps {
   weekStart: Date;
@@ -30,11 +31,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   onFiltroPessoasChange,
   onFiltroProjetosChange,
 }) => {
-  const formatDateRange = (start: Date, end: Date) => {
-    const startStr = start.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const endStr = end.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    return `${startStr} - ${endStr}`;
-  };
+  const dateRange = `${formatDateForDisplay(weekStart)} - ${formatDateForDisplay(weekEnd)}`;
 
   const pessoaOptions: SelectOption[] = pessoas.map(p => ({ value: p.id, label: p.nome }));
   const projetoOptions: SelectOption[] = projetos.map(p => ({ value: p.id, label: p.nome }));
@@ -62,7 +59,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
               <span className="hidden sm:inline">Semana Anterior</span>
             </Button>
             <span className="font-semibold text-text-black text-sm md:text-base text-center">
-              {formatDateRange(weekStart, weekEnd)}
+              {dateRange}
             </span>
             <Button onClick={onNextWeek} variant="outline" size="sm" className="flex items-center gap-2">
               <span className="hidden sm:inline">Próxima Semana</span>

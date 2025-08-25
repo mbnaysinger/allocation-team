@@ -18,12 +18,13 @@ export async function POST(request: Request) {
     }
 
     const atualizarStatusAtividade = dependencyFactory.createAtualizarAtividade();
-    const atividadeAtualizada = await atualizarStatusAtividade.updateStatus(id, status);
+    await atualizarStatusAtividade.updateStatus(id, status);
 
-    return NextResponse.json(atividadeAtualizada, { status: 200 });
+    return new NextResponse(null, { status: 204 });
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro inesperado.';
     return NextResponse.json({ message: 'Erro ao atualizar o status da atividade.', error: errorMessage }, { status: 500 });
   }
 }
+

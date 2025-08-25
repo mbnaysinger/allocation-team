@@ -6,6 +6,8 @@ import { MongoDbAtividadeRepository } from '../repositories/mongodb/MongoDbAtivi
 import { MongoDbPessoaRepository } from '../repositories/mongodb/MongoDbPessoaRepository';
 import { MongoDbProjetoRepository } from '../repositories/mongodb/MongoDbProjetoRepository';
 import { MongoDbResumoSemanalRepository } from '../repositories/mongodb/MongoDbResumoSemanalRepository';
+import { IUserRepository } from '../../core/ports/IUserRepository';
+import { MongoDbUserRepository } from '../repositories/mongodb/MongoDbUserRepository';
 
 import { BuscarAlocacaoSemana } from '../../core/services/BuscarAlocacaoSemana';
 import { CriarAtividade } from '../../core/services/CriarAtividade';
@@ -17,6 +19,7 @@ import { CriarPessoa } from '../../core/services/CriarPessoa';
 import { BuscarPessoas } from '../../core/services/BuscarPessoas';
 import { SalvarResumoSemanal } from '../../core/services/SalvarResumoSemanal';
 import { BuscarResumosSemanais } from '../../core/services/BuscarResumosSemanais';
+import { CriarUsuario } from '../../core/services/CriarUsuario';
 
 
 // Esta classe centraliza a criação de todas as dependências.
@@ -38,6 +41,10 @@ class DependencyFactory {
 
   private createResumoSemanalRepository(): IResumoSemanalRepository {
     return new MongoDbResumoSemanalRepository();
+  }
+
+  public async createUserRepository(): Promise<IUserRepository> {
+    return new MongoDbUserRepository();
   }
 
   // --- Serviços ---
@@ -86,6 +93,11 @@ class DependencyFactory {
 
   public createCriarProjeto(): CriarProjeto {
     return new CriarProjeto(this.createProjetoRepository());
+  }
+
+  public async createCriarUsuario(): Promise<CriarUsuario> {
+    const userRepository = await this.createUserRepository();
+    return new CriarUsuario(userRepository);
   }
 }
 

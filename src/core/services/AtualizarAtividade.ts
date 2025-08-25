@@ -33,11 +33,10 @@ export class AtualizarAtividade {
     }
   }
 
-  async updateStatus(id: string, status: StatusAtividade): Promise<Atividade> {
+  async updateStatus(id: string, status: StatusAtividade): Promise<void> {
     const atividadeAtualizada = await this.atividadeRepository.updateStatus(id, status);
     if (!atividadeAtualizada) {
       throw new Error('Atividade não encontrada ou não pôde ser atualizada.');
     }
-    return atividadeAtualizada;
   }
 }

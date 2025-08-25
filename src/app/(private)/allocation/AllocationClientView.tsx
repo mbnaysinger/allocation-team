@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
+import { signOut } from "next-auth/react"; // Importar signOut
 import AllocationHeader from "@/components/features/allocation/AllocationHeader";
 import AllocationControls from "@/components/features/allocation/AllocationControls";
 import PersonCard from "@/components/features/allocation/PersonCard";
@@ -308,10 +309,6 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       if (!response.ok) {
         throw new Error('Falha ao atualizar o status no servidor.');
       }
-      
-      // Opcional: pode-se atualizar o estado com a resposta do servidor para garantir consistência
-      const atividadeAtualizada = await response.json();
-      setAtividades(prev => prev.map(a => a.id === id ? atividadeAtualizada : a));
 
     } catch (error) {
       console.error("Erro ao atualizar status, revertendo:", error);
@@ -368,6 +365,13 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     <>
       <AllocationHeader />
       
+      <button 
+        onClick={() => signOut({ callbackUrl: '/login' })} 
+        className="ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+      >
+        Logout
+      </button>
+
       <AllocationControls
         weekStart={week.start}
         weekEnd={week.end}
