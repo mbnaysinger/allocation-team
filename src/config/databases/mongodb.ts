@@ -1,4 +1,4 @@
-import { MongoClient, Db, Collection } from 'mongodb';
+import { MongoClient, Db, Collection, Document } from 'mongodb';
 import { configService } from '@/config/config.service';
 
 const MONGODB_URI = configService.get<string>('CONFIG.DATABASE.MONGODB.URI');
@@ -49,7 +49,7 @@ let db: Db;
  * @param collectionName O nome da coleção a ser retornada.
  * @returns Uma Promise que resolve para uma instância da Collection.
  */
-export async function getCollection<T>(collectionName: string): Promise<Collection<T>> {
+export async function getCollection<T extends Document>(collectionName: string): Promise<Collection<T>> {
   if (db) {
     return db.collection<T>(collectionName);
   }

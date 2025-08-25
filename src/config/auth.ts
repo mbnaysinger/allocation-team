@@ -3,6 +3,7 @@ import { dependencyFactory } from "@/infrastructure/factories/DependencyFactory"
 import bcrypt from 'bcryptjs';
 import { JWT } from 'next-auth/jwt';
 import { Session, User } from 'next-auth';
+import NextAuth from "next-auth"; // Importar NextAuth
 
 export const authOptions = {
   providers: [
@@ -57,3 +58,7 @@ export const authOptions = {
     signIn: '/login',
   },
 };
+
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
