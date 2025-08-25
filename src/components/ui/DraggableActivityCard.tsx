@@ -2,6 +2,7 @@ import React from 'react';
 import { Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { AtividadeCompleta, StatusAtividade } from '@/core/models';
 import { Tooltip } from 'react-tooltip';
+import { TooltipWrapper } from './TooltipWrapper';
 
 interface DraggableActivityCardProps {
   atividade: AtividadeCompleta;
@@ -32,7 +33,7 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
         return 'bg-gray-200 border-l-5 border-accent';
     }
   };
-  
+
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', atividade.id);
@@ -75,12 +76,15 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
         {atividade.tipo}
       </div>
       {atividade.projeto && (
-        <div className="text-xs opacity-90 truncate max-w-25" data-tooltip-id="projeto-tooltip" data-tooltip-content={atividade.projeto.nome} data-tooltip-place="bottom" >
+        <TooltipWrapper
+          content={atividade.projeto.nome}
+          className="text-xs opacity-90 truncate max-w-25"
+          place="top"
+        >
           {atividade.projeto.abreviatura}
-          <Tooltip id="projeto-tooltip" />
-        </div>
+        </TooltipWrapper>
       )}
-      
+
       <div className="absolute bottom-1 right-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <button
           onClick={(e) => handleStatusClick(e, 'concluida')}
@@ -109,7 +113,7 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
           data-tooltip-id="clone-tooltip"
           data-tooltip-content="Clonar"
         >
-          <Copy size={16} className="text-accent"/>
+          <Copy size={16} className="text-accent" />
           <Tooltip id="clone-tooltip" />
         </button>
       </div>

@@ -32,8 +32,12 @@ export default function LoginPage() {
       } else {
         setMessage(data.message || 'Erro no registro.');
       }
-    } catch (error: any) {
-      setMessage(error.message || 'Erro ao conectar com o servidor.');
+    } catch (error: unknown) {
+      let errorMessage = 'Erro ao conectar com o servidor.';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      setMessage(errorMessage);
       console.error(error);
     }
   };
@@ -54,8 +58,12 @@ export default function LoginPage() {
         setMessage('Login bem-sucedido!');
         router.push('/'); // Redireciona para a página inicial
       }
-    } catch (error: any) {
-      setMessage(error.message || 'Erro ao conectar com o servidor.');
+    } catch (error: unknown) {
+      let errorMessage = 'Erro ao conectar com o servidor.';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      setMessage(errorMessage);
       console.error(error);
     }
   };

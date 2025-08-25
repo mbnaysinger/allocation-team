@@ -15,11 +15,17 @@ export async function POST(req: NextRequest) {
     // Retorne apenas informações seguras do usuário, sem a senha.
     const userWithoutPassword = { id: newUser.id, name: newUser.name, email: newUser.email };
     return NextResponse.json(userWithoutPassword, { status: 201 });
-  } catch (error: any) {
-    if (error.message === 'Um usuário com este e-mail já existe.') {
-      return NextResponse.json({ message: error.message }, { status: 409 });
+  } catch (error: unknown) {
+    let errorMessage = 'Erro interno do servidor.';
+    let statusCode = 500;
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      if (error.message === 'Um usuário com este e-mail já existe.') {
+        statusCode = 409;
+      }
     }
     console.error("Erro ao registrar usuário:", error);
-    return NextResponse.json({ message: 'Erro interno do servidor.' }, { status: 500 });
+    return NextResponse.json({ message: errorMessage }, { status: statusCode });
   }
 }

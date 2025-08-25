@@ -8,8 +8,6 @@ import { MongoDbProjetoRepository } from '../repositories/mongodb/MongoDbProjeto
 import { MongoDbResumoSemanalRepository } from '../repositories/mongodb/MongoDbResumoSemanalRepository';
 import { IUserRepository } from '../../core/ports/IUserRepository';
 import { MongoDbUserRepository } from '../repositories/mongodb/MongoDbUserRepository';
-import { getCollection } from '../../config/databases/mongodb';
-import { User } from '../../core/models/User';
 
 import { BuscarAlocacaoSemana } from '../../core/services/BuscarAlocacaoSemana';
 import { CriarAtividade } from '../../core/services/CriarAtividade';

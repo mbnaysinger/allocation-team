@@ -4,7 +4,6 @@ import { User } from "../../../core/models/User";
 import { getCollection } from '../../../config/databases/mongodb';
 
 const fromDocument = (doc: Document): User => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { _id, ...data } = doc;
   return {
     id: _id?.toHexString(),
