@@ -1,4 +1,4 @@
-import { Collection, Document, ObjectId } from 'mongodb';
+import { Collection, Document } from 'mongodb';
 import { getCollection } from '../../../config/databases/mongodb';
 import { IPessoaRepository } from '../../../core/ports/IPessoaRepository';
 import { Pessoa, DadosPessoa } from '../../../core/models';
