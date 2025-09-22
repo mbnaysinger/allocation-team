@@ -12,6 +12,7 @@ interface AllocationControlsProps {
   onNextWeek: () => void;
   onAddPerson: () => void;
   onAddProject: () => void;
+  onManageProjects: () => void;
   pessoas: Pessoa[];
   projetos: Projeto[];
   onFiltroPessoasChange: (pessoas: Pessoa[]) => void;
@@ -26,6 +27,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   onNextWeek,
   onAddPerson,
   onAddProject,
+  onManageProjects,
   pessoas,
   projetos,
   onFiltroPessoasChange,
@@ -99,6 +101,9 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
           <Button onClick={onAddProject} variant="outline" size="sm" className="flex items-center gap-2">
             <Plus size={16} />
             Adicionar Projeto
+          </Button>
+          <Button onClick={onManageProjects} variant="outline" size="sm" className="flex items-center gap-2">
+            Gerenciar Projetos
           </Button>
         </div>
       </div>
