@@ -2,24 +2,40 @@ import React from "react";
 import AllocationClientView from "./AllocationClientView";
 import { getWeekDates, formatDate } from "@/app/utils/date";
 import { dependencyFactory } from "@/infrastructure/factories/DependencyFactory";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/config/auth";
+import { UserRole } from "@/core/models/UserRole";
 
 interface AllocationPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 async function getAlocacaoData(dataInicio: string, dataFim: string) {
+  const session = await getServerSession(authOptions);
+  const userRole = session?.user?.role;
+  const personIds = session?.user?.personIds;
+
   try {
     const buscarAlocacaoSemana = dependencyFactory.createBuscarAlocacaoSemana();
     const buscarResumosSemanais = dependencyFactory.createBuscarResumosSemanais();
 
-    // Busca os dados primários
-    const alocacaoData = await buscarAlocacaoSemana.execute({ dataInicio, dataFim });
+    // Se o usuário for USER e não tiver pessoas associadas, retorna vazio.
+    if (userRole === UserRole.USER && (!personIds || personIds.length === 0)) {
+      return { pessoas: [], projetos: [], atividades: [], resumosSemanais: [] };
+    }
+
+    // Passa os personIds para o serviço se o usuário não for ADMIN
+    const alocacaoData = await buscarAlocacaoSemana.execute({
+      dataInicio,
+      dataFim,
+      personIds: userRole === UserRole.ADMIN ? undefined : personIds,
+    });
     
     // Extrai os IDs das pessoas para buscar os resumos
-    const pessoaIds = alocacaoData.pessoas.map(p => p.id);
+    const pessoaIdsParaResumo = alocacaoData.pessoas.map(p => p.id);
 
     // Busca os resumos para as pessoas e a semana
-    const resumosSemanais = await buscarResumosSemanais.execute(pessoaIds, dataInicio);
+    const resumosSemanais = await buscarResumosSemanais.execute(pessoaIdsParaResumo, dataInicio);
 
     return { ...alocacaoData, resumosSemanais };
 

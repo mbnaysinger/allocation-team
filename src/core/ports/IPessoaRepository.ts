@@ -2,6 +2,7 @@ import { Pessoa, DadosPessoa } from '../models';
 
 export interface IPessoaRepository {
   buscarTodos(): Promise<Pessoa[]>;
+  findByIds(ids: string[]): Promise<Pessoa[]>;
   buscarAtivos(): Promise<Pessoa[]>;
   buscarPorId(id: string): Promise<Pessoa | null>;
   criar(dados: DadosPessoa): Promise<Pessoa>;

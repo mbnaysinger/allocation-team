@@ -23,12 +23,12 @@ export const authOptions = {
         const user = await userRepository.findByEmail(credentials.email as string);
 
         if (user && user.password && await bcrypt.compare(credentials.password as string, user.password)) {
-          // Adiciona o role ao objeto que será passado para o callback jwt
+          // Adiciona o role e personIds ao objeto que será passado para o callback jwt
           return {
             id: user.id as string,
-            name: user.name,
             email: user.email,
             role: user.role || UserRole.USER, // Garante um role padrão
+            personIds: user.personIds || [],
           };
         }
         return null;
@@ -43,6 +43,7 @@ export const authOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.personIds = user.personIds;
       }
       return token;
     },
@@ -50,6 +51,7 @@ export const authOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as UserRole;
+        session.user.personIds = token.personIds as string[];
       }
       return session;
     },

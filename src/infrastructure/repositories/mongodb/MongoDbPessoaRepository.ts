@@ -1,4 +1,4 @@
-import { Collection, Document } from 'mongodb';
+import { Collection, Document, ObjectId } from 'mongodb';
 import { getCollection } from '../../../config/databases/mongodb';
 import { IPessoaRepository } from '../../../core/ports/IPessoaRepository';
 import { Pessoa, DadosPessoa } from '../../../core/models';
@@ -25,6 +25,12 @@ export class MongoDbPessoaRepository implements IPessoaRepository {
   async buscarTodos(): Promise<Pessoa[]> {
     const collection = await this.getPessoasCollection();
     const documents = await collection.find({}).toArray();
+    return documents.map(fromDocument);
+  }
+
+  async findByIds(ids: string[]): Promise<Pessoa[]> {
+    const collection = await this.getPessoasCollection();
+    const documents = await collection.find({ id: { $in: ids } }).toArray();
     return documents.map(fromDocument);
   }
 
