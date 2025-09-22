@@ -5,8 +5,8 @@ import { UserRole } from './core/models/UserRole';
 
 // Mapeamento de rotas e os papéis necessários para acessá-las
 const routePermissions: Record<string, UserRole[]> = {
-  '/projetos': [UserRole.ADMIN],
-  '/api/v1/projetos': [UserRole.ADMIN],
+  '/projetos': [UserRole.ADMIN, UserRole.USER],
+  '/api/v1/projetos': [UserRole.ADMIN, UserRole.USER],
   // A rota de alocação pode ser acessada por ADMIN e USER
   '/allocation': [UserRole.ADMIN, UserRole.USER],
 };
@@ -16,9 +16,10 @@ export async function middleware(request: NextRequest) {
 
   // Obter o token da requisição
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  console.log(token);
 
   // Rotas públicas que não exigem autenticação
-  const publicRoutes = ['/login', '/api/auth'];
+  const publicRoutes = ['/login', '/api/auth', '/api/register'];
   if (publicRoutes.some(path => pathname.startsWith(path))) {
     return NextResponse.next();
   }

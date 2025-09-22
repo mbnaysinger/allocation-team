@@ -10,6 +10,7 @@ const fromDocument = (doc: Document): User => {
     email: data.email,
     name: data.name,
     password: data.password, // Atenção: password não deve ser retornado para o frontend
+    role: data.role,
   } as User;
 };
 

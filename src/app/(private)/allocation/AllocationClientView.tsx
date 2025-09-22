@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
+import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react"; // Importar signOut
 import AllocationHeader from "@/components/features/allocation/AllocationHeader";
 import AllocationControls from "@/components/features/allocation/AllocationControls";
@@ -29,6 +30,10 @@ interface AllocationClientViewProps {
 
 const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData, week }) => {
   const router = useRouter();
+  const { data: session } = useSession();
+  const userRole = session?.user?.role;
+
+  console.log('Sessão do Cliente:', session);
 
   const [pessoas, setPessoas] = useState(initialData.pessoas);
   const [projetos, setProjetos] = useState(initialData.projetos);
@@ -384,6 +389,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         projetos={projetos}
         onFiltroPessoasChange={setPessoasFiltradas}
         onFiltroProjetosChange={setProjetosFiltrados}
+        userRole={userRole}
       />
 
       <div className="p-4 md:p-8 space-y-6 md:space-y-8">
