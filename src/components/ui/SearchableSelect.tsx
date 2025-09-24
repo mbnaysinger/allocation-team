@@ -1,11 +1,94 @@
 import React from 'react';
-import Select, { Props as SelectProps } from 'react-select';
+import Select, { Props as SelectProps, StylesConfig } from 'react-select';
 
 // Definir uma interface para as opções para garantir consistência
 export interface SelectOption {
   value: string;
   label: string;
 }
+
+// Estilos customizados usando a API styles do react-select
+const customStyles: StylesConfig<SelectOption, boolean> = {
+  control: (provided, state) => ({
+    ...provided,
+    backgroundColor: '#1e293b', // slate-800
+    borderColor: state.isFocused ? '#06b6d4' : '#475569', // cyan-500 : slate-600
+    borderWidth: '2px',
+    borderRadius: '0.5rem',
+    boxShadow: state.isFocused ? '0 0 0 2px rgba(6, 182, 212, 0.2)' : 'none',
+    minHeight: '40px',
+    '&:hover': {
+      borderColor: '#64748b', // slate-500
+    },
+  }),
+  input: (provided) => ({
+    ...provided,
+    color: '#ffffff',
+  }),
+  placeholder: (provided) => ({
+    ...provided,
+    color: '#9ca3af', // gray-400
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: '#ffffff',
+  }),
+  multiValue: (provided) => ({
+    ...provided,
+    backgroundColor: '#06b6d4', // cyan-500
+    borderRadius: '0.375rem',
+  }),
+  multiValueLabel: (provided) => ({
+    ...provided,
+    color: '#ffffff',
+  }),
+  multiValueRemove: (provided) => ({
+    ...provided,
+    color: '#ffffff',
+    '&:hover': {
+      backgroundColor: '#0891b2', // cyan-600
+      color: '#ffffff',
+    },
+  }),
+  menu: (provided) => ({
+    ...provided,
+    backgroundColor: '#1e293b', // slate-800
+    border: '2px solid #475569', // slate-600
+    borderRadius: '0.5rem',
+    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    zIndex: 50,
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isSelected 
+      ? '#06b6d4' // cyan-500
+      : state.isFocused 
+        ? '#475569' // slate-600
+        : 'transparent',
+    color: '#ffffff',
+    cursor: 'pointer',
+    padding: '8px 16px',
+    '&:hover': {
+      backgroundColor: state.isSelected ? '#06b6d4' : '#475569',
+    },
+  }),
+  indicatorSeparator: (provided) => ({
+    ...provided,
+    backgroundColor: '#475569', // slate-600
+  }),
+  dropdownIndicator: (provided) => ({
+    ...provided,
+    color: '#9ca3af', // gray-400
+    '&:hover': {
+      color: '#22d3ee', // cyan-400
+    },
+  }),
+  noOptionsMessage: (provided) => ({
+    ...provided,
+    color: '#9ca3af', // gray-400
+    padding: '16px',
+  }),
+};
 
 // Estender as props do react-select para adicionar nossas customizações, se necessário
 const SearchableSelect = <IsMulti extends boolean = false>(
@@ -14,31 +97,10 @@ const SearchableSelect = <IsMulti extends boolean = false>(
   return (
     <Select<SelectOption, IsMulti>
       {...props}
-      //placeholder="Pesquisar ou selecionar..."
+      styles={customStyles}
       noOptionsMessage={() => 'Nenhuma opção encontrada'}
-      classNames={{
-        control: (state) => `
-          w-full px-3 py-2 bg-slate-700 border-2 border-slate-600 rounded-lg text-white  
-          focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 
-          transition-all duration-200 hover:border-slate-500
-          ${state.isFocused ? 'ring-2 ring-cyan-500 border-cyan-500' : 'border-slate-600'}
-        `,
-        input: () => 'text-white',
-        menu: () => 'bg-slate-800 rounded-lg mt-1 border-2 border-slate-600 shadow-2xl z-50',
-        option: (state) => `
-          px-4 py-2 cursor-pointer text-white transition-colors
-          ${state.isSelected ? 'bg-cyan-500 text-white' : ''}
-          ${state.isFocused ? 'bg-slate-600 text-white' : 'hover:bg-slate-600'}
-        `,
-        singleValue: () => 'text-white',
-        placeholder: () => 'text-gray-400',
-        noOptionsMessage: () => 'text-gray-400 p-4',
-        indicatorSeparator: () => 'bg-slate-600',
-        dropdownIndicator: () => 'text-gray-400 hover:text-cyan-400 transition-colors',
-        multiValue: () => 'bg-cyan-500 text-white rounded-md',
-        multiValueLabel: () => 'text-white',
-        multiValueRemove: () => 'text-white hover:bg-cyan-600',
-      }}
+      className="react-select-container"
+      classNamePrefix="react-select"
     />
   );
 };

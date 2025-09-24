@@ -17,7 +17,7 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         login: "bg-gradient-to-r from-cyan-400 to-cyan-600 text-white hover:shadow-lg hover:scale-[1.02] transition-all duration-300 font-medium shadow-cyan-500/25",
         confirm: "bg-gradient-to-r from-cyan-400 to-cyan-600 text-white hover:shadow-lg hover:scale-[1.02] transition-all duration-300 font-medium shadow-cyan-500/25",
-        cancel: "bg-slate-700 border-slate-600 text-white hover:bg-red-600 hover:border-red-500"
+        cancel: "bg-slate-700 border-slate-600 text-white hover:bg-red-500 hover:border-red-500"
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -62,7 +62,21 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setMessage(result.error);
+        // Personalizar mensagens de erro
+        let errorMessage = result.error;
+        
+        switch (result.error) {
+          case 'CredentialsSignin':
+            errorMessage = 'Credenciais inválidas ou inexistentes.';
+            break;
+          case 'Credenciais inválidas ou inexistentes':
+            errorMessage = 'Credenciais inválidas ou inexistentes.';
+            break;
+          default:
+            errorMessage = 'Erro de autenticação. Tente novamente.';
+        }
+        
+        setMessage(errorMessage);
       } else {
         setMessage('Login bem-sucedido!');
         router.push('/'); // Redireciona para a página inicial

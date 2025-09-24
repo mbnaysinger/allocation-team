@@ -16,22 +16,37 @@ export const authOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null;
+          throw new Error("Email e senha são obrigatórios");
         }
 
-        const userRepository = await dependencyFactory.createUserRepository();
-        const user = await userRepository.findByEmail(credentials.email as string);
+        try {
+          const userRepository = await dependencyFactory.createUserRepository();
+          const user = await userRepository.findByEmail(credentials.email as string);
 
-        if (user && user.password && await bcrypt.compare(credentials.password as string, user.password)) {
-          // Adiciona o role e personIds ao objeto que será passado para o callback jwt
+          if (!user) {
+            throw new Error("Credenciais inválidas ou inexistentes");
+          }
+
+          if (!user.password) {
+            throw new Error("Credenciais inválidas ou inexistentes");
+          }
+
+          const isValidPassword = await bcrypt.compare(credentials.password as string, user.password);
+          
+          if (!isValidPassword) {
+            throw new Error("Credenciais inválidas ou inexistentes");
+          }
+
           return {
             id: user.id as string,
             email: user.email,
-            role: user.role || UserRole.USER, // Garante um role padrão
+            role: user.role || UserRole.USER,
             personIds: user.personIds || [],
           };
+        } catch (error) {
+          // Re-throw o erro para que o NextAuth possa capturar
+          throw error;
         }
-        return null;
       },
     }),
   ],
