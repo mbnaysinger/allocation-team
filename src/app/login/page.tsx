@@ -78,36 +78,36 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-slate-900 relative overflow-hidden">
       {/* Overlay gradient */}
-      <div className="absolute inset-0 bg-gradient-dark opacity-90" />
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 opacity-90" />
       
       {/* Floating elements for visual appeal */}
-      <div className="absolute top-1/4 left-1/4 w-32 h-32 rounded-full bg-primary/10 blur-3xl animate-pulse animate-float" />
-      <div className="absolute bottom-1/3 right-1/4 w-48 h-48 rounded-full bg-primary-glow/10 blur-3xl animate-pulse animate-float delay-1000" />
+      <div className="absolute top-1/4 left-1/4 w-32 h-32 rounded-full bg-cyan-500/10 blur-3xl animate-pulse animate-float" />
+      <div className="absolute bottom-1/3 right-1/4 w-48 h-48 rounded-full bg-cyan-400/10 blur-3xl animate-pulse animate-float delay-1000" />
       
       {/* Main login container */}
       <div className="relative z-10 w-full max-w-md mx-4">
         {/* Login card */}
-        <div className="bg-gradient-card backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-card-dark">
+        <div className="bg-slate-800 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-8 shadow-2xl">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-primary rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-glow">
-              <Lock className="w-8 h-8 text-primary-foreground" />
+            <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-cyan-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg shadow-cyan-500/25">
+              <Lock className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Bem-vindo</h1>
-            <p className="text-muted-foreground">Entre na sua conta para continuar</p>
+            <h1 className="text-3xl font-bold text-white mb-2">Bem-vindo</h1>
+            <p className="text-gray-400">Entre na sua conta para continuar</p>
           </div>
 
           {/* Toggle between login and register */}
-          <div className="flex mb-6 bg-muted rounded-lg p-1">
+          <div className="flex mb-6 bg-slate-700 rounded-lg p-1">
             <button
               type="button"
               onClick={() => setIsLoginMode(true)}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
                 isLoginMode 
-                  ? 'bg-primary text-primary-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-cyan-500 text-white shadow-sm' 
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               Login
@@ -117,8 +117,8 @@ export default function LoginPage() {
               onClick={() => setIsLoginMode(false)}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
                 !isLoginMode 
-                  ? 'bg-primary text-primary-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-cyan-500 text-white shadow-sm' 
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               Registrar
@@ -129,11 +129,11 @@ export default function LoginPage() {
           {isLoginMode ? (
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="login-email" className="text-foreground font-medium">
+                <Label htmlFor="login-email" className="text-white font-medium">
                   Email
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
                     id="login-email"
                     type="email"
@@ -147,11 +147,11 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="login-password" className="text-foreground font-medium">
+                <Label htmlFor="login-password" className="text-white font-medium">
                   Senha
                 </Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
                     id="login-password"
                     type={showPassword ? "text" : "password"}
@@ -164,7 +164,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />
@@ -185,14 +185,14 @@ export default function LoginPage() {
                   />
                   <Label 
                     htmlFor="remember" 
-                    className="text-sm text-muted-foreground cursor-pointer"
+                    className="text-sm text-gray-400 cursor-pointer"
                   >
                     Lembrar-me
                   </Label>
                 </div>
                 <a 
                   href="#" 
-                  className="text-sm text-primary hover:text-primary-glow transition-colors"
+                  className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
                 >
                   Esqueci minha senha
                 </a>
@@ -211,7 +211,7 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleRegister} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-foreground font-medium">
+                <Label htmlFor="name" className="text-white font-medium">
                   Nome
                 </Label>
                 <Input
@@ -225,11 +225,11 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="register-email" className="text-foreground font-medium">
+                <Label htmlFor="register-email" className="text-white font-medium">
                   Email
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
                     id="register-email"
                     type="email"
@@ -243,11 +243,11 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="register-password" className="text-foreground font-medium">
+                <Label htmlFor="register-password" className="text-white font-medium">
                   Senha
                 </Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
                     id="register-password"
                     type={showPassword ? "text" : "password"}
@@ -260,7 +260,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />
@@ -284,14 +284,14 @@ export default function LoginPage() {
           )}
 
           {/* Footer */}
-          <div className="mt-8 pt-6 border-t border-border/50 text-center">
-            <p className="text-sm text-muted-foreground">
+          <div className="mt-8 pt-6 border-t border-slate-700/50 text-center">
+            <p className="text-sm text-gray-400">
               {isLoginMode ? (
                 <>
                   Não tem uma conta?{" "}
                   <button 
                     onClick={() => setIsLoginMode(false)}
-                    className="text-primary hover:text-primary-glow font-medium transition-colors"
+                    className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
                   >
                     Criar conta
                   </button>
@@ -301,7 +301,7 @@ export default function LoginPage() {
                   Já tem uma conta?{" "}
                   <button 
                     onClick={() => setIsLoginMode(true)}
-                    className="text-primary hover:text-primary-glow font-medium transition-colors"
+                    className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
                   >
                     Fazer login
                   </button>
