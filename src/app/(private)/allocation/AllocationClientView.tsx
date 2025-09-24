@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
+import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react"; // Importar signOut
 import AllocationHeader from "@/components/features/allocation/AllocationHeader";
 import AllocationControls from "@/components/features/allocation/AllocationControls";
@@ -29,19 +30,36 @@ interface AllocationClientViewProps {
 
 const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData, week }) => {
   const router = useRouter();
-
+  const { data: session } = useSession();
+  const userRole = session?.user?.role;
   const [pessoas, setPessoas] = useState(initialData.pessoas);
   const [projetos, setProjetos] = useState(initialData.projetos);
   const [atividades, setAtividades] = useState(initialData.atividades);
   const [resumos, setResumos] = useState(initialData.resumosSemanais);
   const [pessoasFiltradas, setPessoasFiltradas] = useState<Pessoa[]>([]);
   const [projetosFiltrados, setProjetosFiltrados] = useState<Projeto[]>([]);
+  const [colaboradoresOptions, setColaboradoresOptions] = useState<Pessoa[]>([]);
   
   useEffect(() => {
     setPessoas(initialData.pessoas);
     setProjetos(initialData.projetos);
     setAtividades(initialData.atividades);
     setResumos(initialData.resumosSemanais);
+
+    // Busca a lista completa de pessoas para os modais
+    const fetchPessoasParaModal = async () => {
+      try {
+        const response = await fetch('/api/v1/pessoas');
+        if (!response.ok) throw new Error('Falha ao buscar pessoas');
+        const data = await response.json();
+        setColaboradoresOptions(data);
+      } catch (error) {
+        console.error("Erro ao carregar lista de colaboradores:", error);
+        setColaboradoresOptions([]); // Garante que não quebre se a API falhar
+      }
+    };
+
+    fetchPessoasParaModal();
   }, [initialData]);
 
   const [modalAdicionarPessoa, setModalAdicionarPessoa] = useState(false);
@@ -379,10 +397,12 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         onNextWeek={() => navigateWeek('next')}
         onAddPerson={() => setModalAdicionarPessoa(true)}
         onAddProject={() => setModalAdicionarProjeto(true)}
+        onManageProjects={() => router.push('/projetos')}
         pessoas={pessoas}
         projetos={projetos}
         onFiltroPessoasChange={setPessoasFiltradas}
         onFiltroProjetosChange={setProjetosFiltrados}
+        userRole={userRole}
       />
 
       <div className="p-4 md:p-8 space-y-6 md:space-y-8">
@@ -428,7 +448,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
           setPessoaSelecionada(null);
         }}
         onSubmit={handleAdicionarAtividade}
-        pessoas={pessoas}
+        pessoas={colaboradoresOptions}
         projetos={projetos}
         dataSelecionada={dataSelecionada}
         pessoaSelecionada={pessoaSelecionada}

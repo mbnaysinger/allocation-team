@@ -8,8 +8,9 @@ const fromDocument = (doc: Document): User => {
   return {
     id: _id?.toHexString(),
     email: data.email,
-    name: data.name,
     password: data.password, // Atenção: password não deve ser retornado para o frontend
+    role: data.role,
+    personIds: data.personIds || [],
   } as User;
 };
 

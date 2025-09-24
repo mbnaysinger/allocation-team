@@ -28,6 +28,12 @@ export class MongoDbPessoaRepository implements IPessoaRepository {
     return documents.map(fromDocument);
   }
 
+  async findByIds(ids: string[]): Promise<Pessoa[]> {
+    const collection = await this.getPessoasCollection();
+    const documents = await collection.find({ id: { $in: ids } }).toArray();
+    return documents.map(fromDocument);
+  }
+
   async buscarAtivos(): Promise<Pessoa[]> {
     const collection = await this.getPessoasCollection();
     const documents = await collection.find({ ativo: true })

@@ -19,6 +19,7 @@ import { CriarPessoa } from '../../core/services/CriarPessoa';
 import { BuscarPessoas } from '../../core/services/BuscarPessoas';
 import { SalvarResumoSemanal } from '../../core/services/SalvarResumoSemanal';
 import { BuscarResumosSemanais } from '../../core/services/BuscarResumosSemanais';
+import { BuscarProjetos } from '../../core/services/BuscarProjetos';
 import { CriarUsuario } from '../../core/services/CriarUsuario';
 
 
@@ -84,6 +85,10 @@ class DependencyFactory {
 
   public createBuscarPessoas(): BuscarPessoas {
     return new BuscarPessoas(this.createPessoaRepository());
+  }
+
+  public createBuscarProjetos(): BuscarProjetos {
+    return new BuscarProjetos(this.createProjetoRepository());
   }
   
   

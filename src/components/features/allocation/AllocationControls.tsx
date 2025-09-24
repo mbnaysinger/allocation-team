@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
 import { Pessoa, Projeto } from "@/core/models";
 import { formatDateForDisplay } from "@/app/utils/date";
+import { UserRole } from "@/core/models/UserRole";
 
 interface AllocationControlsProps {
   weekStart: Date;
@@ -12,11 +13,13 @@ interface AllocationControlsProps {
   onNextWeek: () => void;
   onAddPerson: () => void;
   onAddProject: () => void;
+  onManageProjects: () => void;
   pessoas: Pessoa[];
   projetos: Projeto[];
   onFiltroPessoasChange: (pessoas: Pessoa[]) => void;
   onFiltroProjetosChange: (projetos: Projeto[]) => void;
   onOpenLogs?: () => void;
+  userRole?: UserRole;
 }
 
 const AllocationControls: React.FC<AllocationControlsProps> = ({
@@ -26,10 +29,12 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   onNextWeek,
   onAddPerson,
   onAddProject,
+  onManageProjects,
   pessoas,
   projetos,
   onFiltroPessoasChange,
   onFiltroProjetosChange,
+  userRole,
 }) => {
   const dateRange = `${formatDateForDisplay(weekStart)} - ${formatDateForDisplay(weekEnd)}`;
 
@@ -96,10 +101,17 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
             <Plus size={16} />
             Adicionar Pessoa
           </Button>
-          <Button onClick={onAddProject} variant="outline" size="sm" className="flex items-center gap-2">
-            <Plus size={16} />
-            Adicionar Projeto
-          </Button>
+          {userRole === UserRole.ADMIN && (
+            <>
+              <Button onClick={onAddProject} variant="outline" size="sm" className="flex items-center gap-2">
+                <Plus size={16} />
+                Adicionar Projeto
+              </Button>
+              <Button onClick={onManageProjects} variant="outline" size="sm" className="flex items-center gap-2">
+                Gerenciar Projetos
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
