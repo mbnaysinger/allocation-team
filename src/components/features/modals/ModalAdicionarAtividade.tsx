@@ -360,7 +360,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
             </Button>
             <Button
               type="submit"
-              variant="default"
+              variant="login"
               className="flex-1"
               disabled={loading}
             >

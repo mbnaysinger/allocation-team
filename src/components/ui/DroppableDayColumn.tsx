@@ -63,8 +63,8 @@ const DroppableDayColumn: React.FC<DroppableDayColumnProps> = ({
         transition-all
         duration-200
         ${isDragOver 
-          ? 'border-cyan-500 bg-cyan-500/10 scale-105 shadow-lg shadow-cyan-500/20' 
-          : 'border-slate-600/50 hover:border-slate-500'
+          ? 'border-cyan-500 bg-cyan-500/10 scale-105 shadow-md shadow-cyan-500/60' 
+          : 'border-slate-500 hover:border-slate-500'
         }
       `}
       onDragOver={handleDragOver}

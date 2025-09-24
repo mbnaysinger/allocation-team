@@ -164,6 +164,31 @@ html {
   border-color: hsl(var(--border));
 }
 
+/* Override border colors for specific components */
+.border-white {
+  border-color: white !important;
+}
+
+.border-slate-500 {
+  border-color: rgb(100 116 139) !important;
+}
+
+.border-slate-600 {
+  border-color: rgb(71 85 105) !important;
+}
+
+.border-cyan-500 {
+  border-color: rgb(6 182 212) !important;
+}
+
+.border-green-500 {
+  border-color: rgb(34 197 94) !important;
+}
+
+.border-red-500 {
+  border-color: rgb(239 68 68) !important;
+}
+
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));

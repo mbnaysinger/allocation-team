@@ -26,11 +26,11 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
   const getStatusClasses = () => {
     switch (status) {
       case 'concluida':
-        return 'bg-slate-700 border-l-4 border-green-500 opacity-90 text-white';
+        return 'bg-slate-700 border-l-5 border-green-500 opacity-80 text-white';
       case 'nao_realizada':
-        return 'bg-slate-800 border-l-4 border-red-500 opacity-60 text-gray-400';
+        return 'bg-slate-800 border-l-5 border-red-500 opacity-60 text-gray-400';
       default:
-        return 'bg-slate-600 border-l-4 border-cyan-500 text-white';
+        return 'bg-slate-600 border-l-5 border-cyan-500 text-white';
     }
   };
 

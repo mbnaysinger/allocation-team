@@ -118,7 +118,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
         <div className="grid grid-cols-5 gap-2 md:gap-4 mb-4 md:mb-6">
           {dayNames.map((dayName, index) => (
             <div key={index} className="text-center">
-              <div className="font-semibold text-white text-xs md:text-sm border border-slate-600/40 rounded-md p-2 mb-0">{dayName}</div>
+              <div className="font-semibold text-white text-xs md:text-sm border border-slate-500 rounded-md p-2 mb-0">{dayName}</div>
             </div>
           ))}
         </div>
