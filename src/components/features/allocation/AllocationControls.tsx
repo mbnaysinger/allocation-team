@@ -2,9 +2,9 @@ import React from "react";
 import { Button } from "@/components/ui/Button";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
-import { Pessoa, Projeto } from "@/core/models";
+import { Pessoa, Projeto } from "@/backend/core/models";
 import { formatDateForDisplay } from "@/app/utils/date";
-import { UserRole } from "@/core/models/UserRole";
+import { UserRole } from "@/backend/core/models/UserRole";
 
 interface AllocationControlsProps {
   weekStart: Date;

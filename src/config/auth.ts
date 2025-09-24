@@ -1,10 +1,10 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import { dependencyFactory } from "@/infrastructure/factories/DependencyFactory";
+import { dependencyFactory } from "@/backend/infrastructure/factories/DependencyFactory";
 import bcrypt from 'bcryptjs';
 import { JWT } from 'next-auth/jwt';
 import { Session, User } from 'next-auth';
 import NextAuth from "next-auth"; // Importar NextAuth
-import { UserRole } from "@/core/models/UserRole";
+import { UserRole } from "@/backend/core/models/UserRole";
 
 export const authOptions = {
   providers: [

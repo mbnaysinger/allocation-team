@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Pessoa, ResumoSemanal } from '@/core/models';
+import { Pessoa, ResumoSemanal } from '@/backend/core/models';
 import { Button } from '@/components/ui/Button';
 
 interface ModalResumoSemanalProps {

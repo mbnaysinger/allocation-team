@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/Button';
 import ContadorCaracteres from '@/components/ui/ContadorCaracteres';
 import SearchableSelect, { SelectOption } from '@/components/ui/SearchableSelect'; // Importar o novo componente
 import { X } from 'lucide-react';
-import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto, TipoAtividade } from '@/core/models';
+import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto, TipoAtividade } from '@/backend/core/models';
 
 interface ModalAdicionarAtividadeProps {
   isOpen: boolean;

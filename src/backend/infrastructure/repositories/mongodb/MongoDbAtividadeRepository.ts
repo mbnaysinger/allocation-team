@@ -1,5 +1,5 @@
 import { Collection, Document } from 'mongodb';
-import { getCollection } from '../../../config/databases/mongodb';
+import { getCollection } from '../../../../config/databases/mongodb';
 import { IAtividadeRepository } from '../../../core/ports/IAtividadeRepository';
 import { Atividade, DadosAtividade, StatusAtividade } from '../../../core/models';
 

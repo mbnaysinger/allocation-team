@@ -1,7 +1,7 @@
 import React from 'react';
 import ProjetosClientView from './ProjetosClientView';
-import { dependencyFactory } from '@/infrastructure/factories/DependencyFactory';
-import { Projeto } from '@/core/models';
+import { dependencyFactory } from '@/backend/infrastructure/factories/DependencyFactory';
+import { Projeto } from '@/backend/core/models';
 
 async function getProjetosData(): Promise<Projeto[]> {
   try {

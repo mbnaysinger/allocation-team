@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/Button';
 import ContadorCaracteres from '@/components/ui/ContadorCaracteres';
 import SearchableSelect, { SelectOption } from '@/components/ui/SearchableSelect';
 import { X, Trash2 } from 'lucide-react';
-import { AtividadeCompleta, DadosAtividade, Pessoa, Projeto, TipoAtividade, TIPOS_ATIVIDADE } from '@/core/models';
+import { AtividadeCompleta, DadosAtividade, Pessoa, Projeto, TipoAtividade, TIPOS_ATIVIDADE } from '@/backend/core/models';
 
 interface ModalEditarAtividadeProps {
   isOpen: boolean;

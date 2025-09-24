@@ -1,6 +1,6 @@
 // src/app/api/v1/atividades/atualizar/route.ts
 import { NextResponse } from 'next/server';
-import { dependencyFactory } from '../../../../../infrastructure/factories/DependencyFactory';
+import { dependencyFactory } from '../../../../../backend/infrastructure/factories/DependencyFactory';
 import { DadosAtividade } from '../../../../../core/models';
 
 interface UpdatePayload extends Partial<DadosAtividade> {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DroppableDayColumn from "@/components/ui/DroppableDayColumn";
-import { Pessoa, AtividadeCompleta, StatusAtividade, ResumoSemanal } from "@/core/models";
+import { Pessoa, AtividadeCompleta, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 
 interface PersonCardProps {

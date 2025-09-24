@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 
 import { X } from 'lucide-react';
-import { DadosPessoa, CARGOS, Cargo } from '@/core/models';
+import { DadosPessoa, CARGOS, Cargo } from '@/backend/core/models';
 
 interface ModalAdicionarPessoaProps {
   isOpen: boolean;

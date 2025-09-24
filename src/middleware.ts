@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import { UserRole } from './core/models/UserRole';
+import { UserRole } from './backend/core/models/UserRole';
 
 // Mapeamento de rotas e os papéis necessários para acessá-las
 const routePermissions: Record<string, UserRole[]> = {

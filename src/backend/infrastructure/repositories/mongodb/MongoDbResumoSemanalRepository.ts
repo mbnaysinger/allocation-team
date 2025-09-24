@@ -1,5 +1,5 @@
 import { Collection, Document } from 'mongodb';
-import { getCollection } from '../../../config/databases/mongodb';
+import { getCollection } from '../../../../config/databases/mongodb';
 import { IResumoSemanalRepository } from '../../../core/ports/IResumoSemanalRepository';
 import { ResumoSemanal } from '../../../core/models';
 

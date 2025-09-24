@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 
 import { X } from 'lucide-react';
-import { DadosProjeto, ENTIDADES, Entidade } from '@/core/models';
+import { DadosProjeto, ENTIDADES, Entidade } from '@/backend/core/models';
 
 interface ModalAdicionarProjetoProps {
   isOpen: boolean;

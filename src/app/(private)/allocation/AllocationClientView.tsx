@@ -13,7 +13,7 @@ import ModalAdicionarProjeto from "@/components/features/modals/ModalAdicionarPr
 import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionarAtividade";
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
 import ModalResumoSemanal from "@/components/features/modals/ModalResumoSemanal";
-import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/core/models";
+import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
 
 interface AllocationClientViewProps {
   initialData: {
