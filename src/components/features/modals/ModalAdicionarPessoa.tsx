@@ -66,7 +66,7 @@ const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
           </h2>
           <Button
             onClick={handleClose}
-            variant="outline"
+            variant="cancel"
             size="sm"
             className="p-2"
           >
@@ -139,7 +139,7 @@ const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
             <Button
               type="button"
               onClick={handleClose}
-              variant="outline"
+              variant="cancel"
               className="flex-1"
               disabled={loading}
             >

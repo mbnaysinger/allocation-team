@@ -99,7 +99,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
           </div>
           <button 
               onClick={() => onOpenResumoModal(person)}
-              className="px-4 py-2 text-md font-semibold rounded-full border border-cyan-500/50 text-cyan-400 hover:text-white hover:bg-cyan-500 transition-colors"
+              className="px-4 py-2 text-md font-semibold rounded-full border border-cyan-500 text-cyan-400 hover:text-white hover:bg-cyan-500 transition-colors"
             >
               Revisão da Semana
             </button>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/Button";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
 import { Pessoa, Projeto } from "@/backend/core/models";
 import { formatDateForDisplay } from "@/app/utils/date";
@@ -11,8 +11,7 @@ interface AllocationControlsProps {
   weekEnd: Date;
   onPreviousWeek: () => void;
   onNextWeek: () => void;
-  onAddPerson: () => void;
-  onAddProject: () => void;
+  onCurrentWeek: () => void;
   onManageProjects: () => void;
   pessoas: Pessoa[];
   projetos: Projeto[];
@@ -27,8 +26,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   weekEnd,
   onPreviousWeek,
   onNextWeek,
-  onAddPerson,
-  onAddProject,
+  onCurrentWeek,
   onManageProjects,
   pessoas,
   projetos,
@@ -59,29 +57,55 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
         <div className="flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto">
           {/* Controles de Navegação da Semana */}
           <div className="flex items-center gap-2 md:gap-4">
-            <Button onClick={onPreviousWeek} variant="outline" size="sm" className="flex items-center gap-2">
+            <Button 
+              onClick={onPreviousWeek} 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-2 bg-slate-700 border-slate-600 text-white hover:bg-slate-600 hover:border-slate-500"
+            >
               <ChevronLeft size={16} />
               <span className="hidden sm:inline">Semana Anterior</span>
             </Button>
-            <span className="font-semibold text-white text-sm md:text-base text-center">
+            
+            <Button 
+              onClick={onCurrentWeek} 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-2 bg-slate-800 border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-white px-3"
+            >
+              <Calendar size={14} />
+              <span className="text-xs">Atual</span>
+            </Button>
+            
+            <span className="font-semibold text-white text-sm md:text-base text-center min-w-[140px]">
               {dateRange}
             </span>
-            <Button onClick={onNextWeek} variant="outline" size="sm" className="flex items-center gap-2">
+            
+            <Button 
+              onClick={onNextWeek} 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-2 bg-slate-700 border-slate-600 text-white hover:bg-slate-600 hover:border-slate-500"
+            >
               <span className="hidden sm:inline">Próxima Semana</span>
               <ChevronRight size={16} />
             </Button>
           </div>
-          
           {/* Filtros */}
+
           <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
             <div className="w-full lg:w-60">
-              <SearchableSelect
-                instanceId="filtro-pessoas-select"
-                isMulti
-                options={pessoaOptions}
-                onChange={handleFiltroPessoaChange}
-                placeholder="Filtrar por pessoa..."
-              />
+            {userRole === UserRole.ADMIN && (
+              <>
+                <SearchableSelect
+                  instanceId="filtro-pessoas-select"
+                  isMulti
+                  options={pessoaOptions}
+                  onChange={handleFiltroPessoaChange}
+                  placeholder="Filtrar por pessoa..."
+                />
+              </>
+              )}
             </div>
             <div className="w-full lg:w-60">
               <SearchableSelect
@@ -97,16 +121,8 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
         
         {/* Botões de Adicionar */}
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <Button onClick={onAddPerson} variant="login" size="sm" className="flex items-center gap-2">
-            <Plus size={16} />
-            Adicionar Pessoa
-          </Button>
           {userRole === UserRole.ADMIN && (
             <>
-              <Button onClick={onAddProject} variant="login" size="sm" className="flex items-center gap-2">
-                <Plus size={16} />
-                Adicionar Projeto
-              </Button>
               <Button onClick={onManageProjects} variant="outline" size="sm" className="flex items-center gap-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-white">
                 Gerenciar Projetos
               </Button>

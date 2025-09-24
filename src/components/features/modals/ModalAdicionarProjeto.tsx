@@ -88,7 +88,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
           </h2>
           <Button
             onClick={handleClose}
-            variant="outline"
+            variant="cancel"
             size="sm"
             className="p-2"
           >
@@ -214,7 +214,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
             <Button
               type="button"
               onClick={handleClose}
-              variant="outline"
+              variant="cancel"
               className="flex-1"
               disabled={loading}
             >

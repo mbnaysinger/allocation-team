@@ -170,7 +170,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
             </Button>
             <Button
               onClick={handleClose}
-              variant="outline"
+              variant="cancel"
               size="sm"
               className="p-2"
             >
@@ -379,7 +379,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
             <Button
               type="button"
               onClick={handleClose}
-              variant="outline"
+              variant="cancel"
               className="flex-1"
               disabled={loading || deleteLoading}
             >

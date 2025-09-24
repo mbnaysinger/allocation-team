@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { useSession } from "next-auth/react";
-import { signOut } from "next-auth/react"; // Importar signOut
 import AllocationHeader from "@/components/features/allocation/AllocationHeader";
 import AllocationControls from "@/components/features/allocation/AllocationControls";
 import PersonCard from "@/components/features/allocation/PersonCard";
@@ -102,6 +101,13 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     
     // Format YYYY-MM-DD
     const isoDate = newStartDate.toISOString().split('T')[0];
+    router.push(`/allocation?data=${isoDate}`);
+  };
+
+  const navigateToCurrentWeek = () => {
+    // Get current date and navigate to current week
+    const today = new Date();
+    const isoDate = today.toISOString().split('T')[0];
     router.push(`/allocation?data=${isoDate}`);
   };
   
@@ -388,8 +394,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         weekEnd={week.end}
         onPreviousWeek={() => navigateWeek('prev')}
         onNextWeek={() => navigateWeek('next')}
-        onAddPerson={() => setModalAdicionarPessoa(true)}
-        onAddProject={() => setModalAdicionarProjeto(true)}
+        onCurrentWeek={navigateToCurrentWeek}
         onManageProjects={() => router.push('/projetos')}
         pessoas={pessoas}
         projetos={projetos}
