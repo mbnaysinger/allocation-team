@@ -1,8 +1,28 @@
 // src/app/utils/colors.ts
 export const getCoresHoras = (totalHoras: number) => {
-  if (totalHoras === 0) return { cor: '#f3f4f6', texto: '#000000' }; // Cinza claro
-  if (totalHoras <= 4) return { cor: '#f7fc6d', texto: '#000000' };   // Amarelo claro
-  if (totalHoras <= 8) return { cor: '#6af27a', texto: '#000000' };   // Verde claro
-  if (totalHoras > 8) return { cor: '#f53b3b', texto: '#FFFFFF' };    // Vermelho claro
-  return { cor: '#f3f4f6', texto: '#000000' };
+  if (totalHoras === 0) return { 
+    cor: '#374151', // Slate-700 para tema dark
+    texto: '#FFFFFF',
+    borda: '#6B7280' // Slate-500 para borda sutil
+  };
+  if (totalHoras <= 4) return { 
+    cor: '#FCD34D', // Amarelo mais vibrante
+    texto: '#1F2937', // Cinza escuro para contraste
+    borda: '#F59E0B' // Amarelo mais escuro para borda
+  };
+  if (totalHoras <= 8) return { 
+    cor: '#10B981', // Verde mais vibrante
+    texto: '#FFFFFF',
+    borda: '#059669' // Verde mais escuro para borda
+  };
+  if (totalHoras > 8) return { 
+    cor: '#EF4444', // Vermelho mais vibrante
+    texto: '#FFFFFF',
+    borda: '#DC2626' // Vermelho mais escuro para borda
+  };
+  return { 
+    cor: '#374151', 
+    texto: '#FFFFFF',
+    borda: '#6B7280'
+  };
 };
