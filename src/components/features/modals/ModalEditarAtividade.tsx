@@ -152,10 +152,10 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
 
   return (
     <div className="fixed inset-0 bg-overlay/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-100/95 backdrop-blur-md rounded-xl border border-accent/20 shadow-glass max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-slate-800/95 backdrop-blur-md rounded-xl border border-slate-600 shadow-glass max-w-lg w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-accent/20">
-          <h2 className="text-xl font-semibold text-text-light">
+        <div className="flex items-center justify-between p-6 border-b border-slate-600">
+          <h2 className="text-xl font-semibold text-white">
             Editar Atividade
           </h2>
           <div className="flex items-center gap-2">
@@ -183,7 +183,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Título */}
           <div>
-            <label htmlFor="titulo" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="titulo" className="block text-sm font-medium text-white mb-2">
               Título *
             </label>
             <input
@@ -194,8 +194,8 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
                 setFormData((prev: DadosAtividade) => ({ ...prev, titulo: e.target.value }));
                 clearError('titulo');
               }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light placeholder-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.titulo ? 'border-red-500' : 'border-accent/20'
+              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
+                errors.titulo ? 'border-red-500' : 'border-slate-600'
               }`}
               placeholder="Título da atividade"
             />
@@ -206,7 +206,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
 
           {/* Data */}
           <div>
-            <label htmlFor="data" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="data" className="block text-sm font-medium text-white mb-2">
               Data *
             </label>
             <input
@@ -217,8 +217,8 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
                 setFormData((prev: DadosAtividade) => ({ ...prev, data: e.target.value }));
                 clearError('data');
               }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.data ? 'border-red-500' : 'border-accent/20'
+              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
+                errors.data ? 'border-red-500' : 'border-slate-600'
               }`}
             />
             {errors.data && (
@@ -238,7 +238,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
 
           {/* Pessoa
           <div>
-            <label htmlFor="pessoaId" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="pessoaId" className="block text-sm font-medium text-white mb-2">
               Pessoa *
             </label>
             <select
@@ -248,8 +248,8 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
                 setFormData(prev => ({ ...prev, pessoaId: e.target.value }));
                 clearError('pessoaId');
               }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.pessoaId ? 'border-red-500' : 'border-accent/20'
+              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
+                errors.pessoaId ? 'border-red-500' : 'border-slate-600'
               }`}
             >
               <option value="">Selecione uma pessoa</option>
@@ -267,7 +267,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
 
           {/* Tipo */}
           <div>
-            <label htmlFor="tipo" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="tipo" className="block text-sm font-medium text-white mb-2">
               Tipo *
             </label>
             <select
@@ -283,8 +283,8 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
                 clearError('tipo');
                 clearError('projetoId');
               }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.tipo ? 'border-red-500' : 'border-accent/20'
+              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
+                errors.tipo ? 'border-red-500' : 'border-slate-600'
               }`}
             >
               {TIPOS_ATIVIDADE.map((tipo: TipoAtividade) => (
@@ -301,7 +301,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
           {/* Projeto (condicional) */}
           {formData.tipo === 'Projeto' && (
             <div>
-              <label htmlFor="projetoId" className="block text-sm font-medium text-text-light mb-2">
+              <label htmlFor="projetoId" className="block text-sm font-medium text-white mb-2">
                 Projeto *
               </label>
               <SearchableSelect
@@ -325,7 +325,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
 
           {/* Descrição Jira */}
           <div>
-            <label htmlFor="descricaoJira" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="descricaoJira" className="block text-sm font-medium text-white mb-2">
               Descrição/Link Jira (Opcional)
             </label>
             <textarea
@@ -337,8 +337,8 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               }}
               rows={2}
               maxLength={100}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light placeholder-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all resize-none ${
-                errors.descricaoJira ? 'border-red-500' : 'border-accent/20'
+              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all resize-none ${
+                errors.descricaoJira ? 'border-red-500' : 'border-slate-600'
               }`}
               placeholder="Descrição ou link do Jira"
             />
@@ -352,7 +352,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
 
           {/* Horas */}
           <div>
-            <label htmlFor="horas" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="horas" className="block text-sm font-medium text-white mb-2">
               Horas *
             </label>
             <input
@@ -365,8 +365,8 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
                 setFormData((prev: DadosAtividade) => ({ ...prev, horas: parseInt(e.target.value) || 0 }));
                 clearError('horas');
               }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.horas ? 'border-red-500' : 'border-accent/20'
+              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
+                errors.horas ? 'border-red-500' : 'border-slate-600'
               }`}
             />
             {errors.horas && (

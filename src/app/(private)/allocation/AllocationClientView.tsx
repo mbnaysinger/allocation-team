@@ -380,16 +380,9 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-slate-900">
       <AllocationHeader />
       
-      <button 
-        onClick={() => signOut({ callbackUrl: '/login' })} 
-        className="ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-      >
-        Logout
-      </button>
-
       <AllocationControls
         weekStart={week.start}
         weekEnd={week.end}
@@ -405,7 +398,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         userRole={userRole}
       />
 
-      <div className="p-4 md:p-8 space-y-6 md:space-y-8">
+      <div className="p-4 md:p-8 space-y-6 md:space-y-8 bg-slate-900">
         {pessoasExibidas.map((pessoa: Pessoa) => (
           <PersonCard
             key={pessoa.id}
@@ -477,7 +470,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         resumo={resumos.find(r => r.pessoaId === pessoaParaResumo?.id)}
         loading={loading}
       />
-    </>
+    </div>
   );
 };
 

@@ -57,11 +57,11 @@ const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-overlay/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-100/95 backdrop-blur-md rounded-xl border border-accent/20 shadow-glass max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-slate-800/95 backdrop-blur-md rounded-xl border border-slate-700/50 shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-accent/20">
-          <h2 className="text-xl font-semibold text-text-light">
+        <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+          <h2 className="text-xl font-semibold text-white">
             Adicionar Pessoa
           </h2>
           <Button
@@ -78,7 +78,7 @@ const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Nome */}
           <div>
-            <label htmlFor="nome" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="nome" className="block text-sm font-medium text-white mb-2">
               Nome *
             </label>
             <input
@@ -93,8 +93,8 @@ const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
                     return newErrors;
                   });
                 }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light placeholder-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.nome ? 'border-red-500' : 'border-accent/20'
+              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
+                errors.nome ? 'border-red-500' : 'border-slate-600'
               }`}
               placeholder="Digite o nome completo"
             />
@@ -105,7 +105,7 @@ const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
 
           {/* Cargo */}
           <div>
-            <label htmlFor="cargo" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="cargo" className="block text-sm font-medium text-white mb-2">
               Cargo *
             </label>
             <select
@@ -119,8 +119,8 @@ const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
                   return newErrors;
                 });
               }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.cargo ? 'border-red-500' : 'border-accent/20'
+              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
+                errors.cargo ? 'border-red-500' : 'border-slate-600'
               }`}
             >
               {CARGOS.map((cargo) => (
@@ -147,7 +147,7 @@ const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
             </Button>
             <Button
               type="submit"
-              variant="default"
+              variant="login"
               className="flex-1"
               disabled={loading}
             >

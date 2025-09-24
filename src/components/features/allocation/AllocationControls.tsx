@@ -54,7 +54,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   };
 
   return (
-    <div className="bg-bg/50 border-b border-accent/20 p-4 md:p-6">
+    <div className="bg-slate-800/50 border-b border-slate-700/50 p-4 md:p-6">
       <div className="max-w-8xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
         <div className="flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto">
           {/* Controles de Navegação da Semana */}
@@ -63,7 +63,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
               <ChevronLeft size={16} />
               <span className="hidden sm:inline">Semana Anterior</span>
             </Button>
-            <span className="font-semibold text-text-black text-sm md:text-base text-center">
+            <span className="font-semibold text-white text-sm md:text-base text-center">
               {dateRange}
             </span>
             <Button onClick={onNextWeek} variant="outline" size="sm" className="flex items-center gap-2">
@@ -97,17 +97,17 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
         
         {/* Botões de Adicionar */}
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <Button onClick={onAddPerson} variant="default" size="sm" className="flex items-center gap-2">
+          <Button onClick={onAddPerson} variant="login" size="sm" className="flex items-center gap-2">
             <Plus size={16} />
             Adicionar Pessoa
           </Button>
           {userRole === UserRole.ADMIN && (
             <>
-              <Button onClick={onAddProject} variant="outline" size="sm" className="flex items-center gap-2">
+              <Button onClick={onAddProject} variant="login" size="sm" className="flex items-center gap-2">
                 <Plus size={16} />
                 Adicionar Projeto
               </Button>
-              <Button onClick={onManageProjects} variant="outline" size="sm" className="flex items-center gap-2">
+              <Button onClick={onManageProjects} variant="outline" size="sm" className="flex items-center gap-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-white">
                 Gerenciar Projetos
               </Button>
             </>

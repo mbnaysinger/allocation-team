@@ -39,7 +39,7 @@ const ModalResumoSemanal: React.FC<ModalResumoSemanalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-overlay/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-100 rounded-xl shadow-lg w-full max-w-4xl border border-accent/20">
+      <div className="bg-gray-100 rounded-xl shadow-lg w-full max-w-4xl border border-slate-600">
         <form onSubmit={handleSubmit}>
           <div className="p-6">
             <h2 className="text-xl font-semibold mb-2">
@@ -52,7 +52,7 @@ const ModalResumoSemanal: React.FC<ModalResumoSemanalProps> = ({
               value={comentario}
               onChange={(e) => setComentario(e.target.value)}
               placeholder="Descreva aqui os destaques, impedimentos e o progresso geral da semana..."
-              className="w-full h-48 p-3 bg-bg/50 border border-accent/30 rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 transition-colors"
+              className="w-full h-48 p-3 bg-slate-700 border border-accent/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-accent/50 transition-colors"
               required
             />
           </div>

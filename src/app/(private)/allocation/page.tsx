@@ -60,7 +60,7 @@ export default async function AllocationPage({
   const initialData = await getAlocacaoData(formatDate(week.start), formatDate(week.end));
 
   return (
-    <main className="min-h-screen bg-bg text-text-light">
+    <main className="min-h-screen bg-slate-900 text-white">
       <div className="max-w-8xl mx-auto">
         <AllocationClientView initialData={initialData} week={week} />
       </div>

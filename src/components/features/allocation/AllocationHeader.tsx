@@ -2,11 +2,11 @@ import React from "react";
 
 const AllocationHeader = () => {
   return (
-    <div className="bg-bg text-text-light p-8 text-center border-b border-accent/20">
-      <h1 className="text-4xl md:text-5xl font-bold mb-4 text-text-light">
+    <div className="bg-slate-800 text-white p-8 text-center border-b border-slate-700/50 shadow-lg">
+      <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">
         Painel de Alocação Semanal
       </h1>
-      <div className="text-lg text-accent/80">
+      <div className="text-lg text-cyan-400">
         Time de Soluções
       </div>
     </div>
