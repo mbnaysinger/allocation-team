@@ -19,22 +19,22 @@ const TarjaHoras: React.FC<TarjaHorasProps> = ({ totalHoras, data, className = '
 
   return (
     <div 
-      className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium ${className}`}
+      className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium shadow-lg ${className}`}
       style={{ 
         backgroundColor: cores.cor,
         color: cores.texto
       }}
     >
-      <span className="font-semibold">
+      <span className="font-semibold text-white">
         {formatarData(data)}
       </span>
       {totalHoras > 8 && (
-        <span className="font-bold text-lg" data-tooltip-id="clock" data-tooltip-content="Muitas horas alocadas neste dia">
+        <span className="font-bold text-lg text-red-400" data-tooltip-id="clock" data-tooltip-content="Muitas horas alocadas neste dia">
           <ClockAlert />
           <Tooltip id="clock" />
         </span>
       )}
-      <span className="font-bold text-lg">
+      <span className="font-bold text-lg text-white">
         {totalHoras}h
       </span>
     </div>
