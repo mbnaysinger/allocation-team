@@ -1,6 +1,6 @@
 import React from 'react';
 import { Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
-import { AtividadeCompleta, StatusAtividade } from '@/core/models';
+import { AtividadeCompleta, StatusAtividade } from '@/backend/core/models';
 import { Tooltip } from 'react-tooltip';
 import { TooltipWrapper } from './TooltipWrapper';
 
@@ -26,11 +26,11 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
   const getStatusClasses = () => {
     switch (status) {
       case 'concluida':
-        return 'bg-gray-200 border-l-5 border-green-500 opacity-90';
+        return 'bg-slate-700 border-l-5 border-green-500 opacity-80 text-white';
       case 'nao_realizada':
-        return 'bg-gray-200 border-l-5 border-red-500 opacity-60';
+        return 'bg-slate-800 border-l-5 border-red-500 opacity-60 text-gray-400';
       default:
-        return 'bg-gray-200 border-l-5 border-accent';
+        return 'bg-slate-600 border-l-5 border-cyan-500 text-white';
     }
   };
 
@@ -51,7 +51,6 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
     <div
       draggable
       className={`
-        bg-gradient-to-r from-bg/80 to-bg/60
         p-2 md:p-3
         rounded-lg 
         mb-2 
@@ -61,7 +60,8 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
         text-xs md:text-sm 
         relative 
         group
-        shadow-glass
+        shadow-lg
+        hover:shadow-xl
         ${getStatusClasses()}
         ${isDragging ? 'opacity-50 scale-95' : ''}
       `}
@@ -88,20 +88,20 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
       <div className="absolute bottom-1 right-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <button
           onClick={(e) => handleStatusClick(e, 'concluida')}
-          className={`p-1 rounded-full ${status === 'concluida' ? 'bg-green-500/80 text-white' : 'bg-white/70 hover:bg-white'}`}
+          className={`p-1.5 rounded-full transition-all ${status === 'concluida' ? 'bg-green-500 text-white shadow-lg' : 'bg-slate-700/80 text-gray-300 hover:bg-green-500 hover:text-white'}`}
           data-tooltip-id="status-tooltip"
           data-tooltip-content="Concluído"
         >
-          <ThumbsUp size={16} />
+          <ThumbsUp size={14} />
           <Tooltip id="status-tooltip" />
         </button>
         <button
           onClick={(e) => handleStatusClick(e, 'nao_realizada')}
-          className={`p-1 rounded-full ${status === 'nao_realizada' ? 'bg-red-500/80 text-white' : 'bg-white/70 hover:bg-white'}`}
+          className={`p-1.5 rounded-full transition-all ${status === 'nao_realizada' ? 'bg-red-500 text-white shadow-lg' : 'bg-slate-700/80 text-gray-300 hover:bg-red-500 hover:text-white'}`}
           data-tooltip-id="status-tooltip"
           data-tooltip-content="Não Realizado"
         >
-          <ThumbsDown size={16} />
+          <ThumbsDown size={14} />
           <Tooltip id="status-tooltip" />
         </button>
         <button
@@ -109,11 +109,11 @@ const DraggableActivityCard: React.FC<DraggableActivityCardProps> = ({
             e.stopPropagation();
             onClone(atividade.id);
           }}
-          className="p-1 bg-white/70 hover:bg-white rounded-full shadow-sm"
+          className="p-1.5 bg-slate-700/80 text-gray-300 hover:bg-cyan-500 hover:text-white rounded-full shadow-sm transition-all"
           data-tooltip-id="clone-tooltip"
           data-tooltip-content="Clonar"
         >
-          <Copy size={16} className="text-accent" />
+          <Copy size={14} />
           <Tooltip id="clone-tooltip" />
         </button>
       </div>

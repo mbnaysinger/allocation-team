@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Projeto } from '@/core/models';
+import { Projeto } from '@/backend/core/models';
 import Heading from '@/components/ui/Heading';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import { Eye, Pencil } from 'lucide-react';
 
 interface ProjetosClientViewProps {

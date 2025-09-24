@@ -1,7 +1,7 @@
 // src/app/api/v1/atividades/atualizar/route.ts
 import { NextResponse } from 'next/server';
-import { dependencyFactory } from '../../../../../infrastructure/factories/DependencyFactory';
-import { DadosAtividade } from '../../../../../core/models';
+import { dependencyFactory } from '../../../../../backend/infrastructure/factories/DependencyFactory';
+import { DadosAtividade } from '../../../../../backend/core/models';
 
 interface UpdatePayload extends Partial<DadosAtividade> {
   id: string; // O ID agora vem no corpo

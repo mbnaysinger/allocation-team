@@ -1,7 +1,7 @@
 import { Collection, Document } from "mongodb";
 import { IUserRepository } from "../../../core/ports/IUserRepository";
 import { User } from "../../../core/models/User";
-import { getCollection } from '../../../config/databases/mongodb';
+import { getCollection } from '../../../../config/databases/mongodb';
 
 const fromDocument = (doc: Document): User => {
   const { _id, ...data } = doc;

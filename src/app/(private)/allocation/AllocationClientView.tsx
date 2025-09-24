@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { useSession } from "next-auth/react";
-import { signOut } from "next-auth/react"; // Importar signOut
 import AllocationHeader from "@/components/features/allocation/AllocationHeader";
 import AllocationControls from "@/components/features/allocation/AllocationControls";
 import PersonCard from "@/components/features/allocation/PersonCard";
@@ -13,7 +12,7 @@ import ModalAdicionarProjeto from "@/components/features/modals/ModalAdicionarPr
 import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionarAtividade";
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
 import ModalResumoSemanal from "@/components/features/modals/ModalResumoSemanal";
-import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/core/models";
+import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
 
 interface AllocationClientViewProps {
   initialData: {
@@ -102,6 +101,13 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     
     // Format YYYY-MM-DD
     const isoDate = newStartDate.toISOString().split('T')[0];
+    router.push(`/allocation?data=${isoDate}`);
+  };
+
+  const navigateToCurrentWeek = () => {
+    // Get current date and navigate to current week
+    const today = new Date();
+    const isoDate = today.toISOString().split('T')[0];
     router.push(`/allocation?data=${isoDate}`);
   };
   
@@ -380,23 +386,15 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-slate-900">
       <AllocationHeader />
       
-      <button 
-        onClick={() => signOut({ callbackUrl: '/login' })} 
-        className="ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-      >
-        Logout
-      </button>
-
       <AllocationControls
         weekStart={week.start}
         weekEnd={week.end}
         onPreviousWeek={() => navigateWeek('prev')}
         onNextWeek={() => navigateWeek('next')}
-        onAddPerson={() => setModalAdicionarPessoa(true)}
-        onAddProject={() => setModalAdicionarProjeto(true)}
+        onCurrentWeek={navigateToCurrentWeek}
         onManageProjects={() => router.push('/projetos')}
         pessoas={pessoas}
         projetos={projetos}
@@ -405,7 +403,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         userRole={userRole}
       />
 
-      <div className="p-4 md:p-8 space-y-6 md:space-y-8">
+      <div className="p-4 md:p-8 space-y-6 md:space-y-8 bg-slate-900">
         {pessoasExibidas.map((pessoa: Pessoa) => (
           <PersonCard
             key={pessoa.id}
@@ -477,7 +475,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         resumo={resumos.find(r => r.pessoaId === pessoaParaResumo?.id)}
         loading={loading}
       />
-    </>
+    </div>
   );
 };
 

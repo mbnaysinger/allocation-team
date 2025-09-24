@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DroppableDayColumn from "@/components/ui/DroppableDayColumn";
-import { Pessoa, AtividadeCompleta, StatusAtividade, ResumoSemanal } from "@/core/models";
+import { Pessoa, AtividadeCompleta, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 
 interface PersonCardProps {
@@ -85,28 +85,28 @@ const PersonCard: React.FC<PersonCardProps> = ({
   };
 
   return (
-    <div className="bg-gray-100 backdrop-blur-sm rounded-xl border border-accent/20 overflow-hidden shadow-glass">
+    <div className="bg-slate-800 backdrop-blur-sm rounded-xl border border-slate-700/50 overflow-hidden shadow-2xl">
       {/* Header da pessoa */}
-      <div className="bg-gradient-to-r from-bg/80 to-bg/60 text-text-light p-4 md:p-6 border-b border-accent/20">
+      <div className="bg-gradient-to-r from-slate-700/80 to-slate-600/60 text-white p-4 md:p-6 border-b border-slate-700/50">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex-1">
-            <h3 className="text-lg md:text-xl font-semibold mb-1 text-text-light uppercase">
+            <h3 className="text-lg md:text-xl font-semibold mb-1 text-white uppercase">
               {person.nome}
             </h3>
-            <div className="text-accent/80 text-sm">
+            <div className="text-cyan-400 text-sm">
               {person.cargo}
             </div>
           </div>
           <button 
               onClick={() => onOpenResumoModal(person)}
-              className="px-4 py-2 text-md font-semibold rounded-full border border-accent/50 text-accent hover:text-white hover:bg-accent hover:text-bg transition-colors"
+              className="px-4 py-2 text-md font-semibold rounded-full border border-cyan-500 text-cyan-400 hover:text-white hover:bg-cyan-500 transition-colors"
             >
               Revisão da Semana
             </button>
           <div className="flex flex-col items-end gap-2">
             <div className="text-right">
-              <div className="text-2xl md:text-3xl font-bold text-accent">{getTotalHours()}h</div>
-              <div className="text-accent/60 text-sm">Total Semana</div>
+              <div className="text-2xl md:text-3xl font-bold text-cyan-400">{getTotalHours()}h</div>
+              <div className="text-cyan-400/60 text-sm">Total Semana</div>
             </div>
           </div>
         </div>
@@ -118,7 +118,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
         <div className="grid grid-cols-5 gap-2 md:gap-4 mb-4 md:mb-6">
           {dayNames.map((dayName, index) => (
             <div key={index} className="text-center">
-              <div className="font-semibold text-text-light text-xs md:text-sm border border-accent/40 rounded-md p-2 mb-0">{dayName}</div>
+              <div className="font-semibold text-white text-xs md:text-sm border border-slate-500 rounded-md p-2 mb-0">{dayName}</div>
             </div>
           ))}
         </div>

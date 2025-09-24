@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { dependencyFactory } from '@/infrastructure/factories/DependencyFactory';
+import { dependencyFactory } from '@/backend/infrastructure/factories/DependencyFactory';
 
 export async function POST(request: Request) {
   try {

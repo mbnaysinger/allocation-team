@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { dependencyFactory } from '@/infrastructure/factories/DependencyFactory';
-import { StatusAtividade } from '@/core/models';
+import { dependencyFactory } from '@/backend/infrastructure/factories/DependencyFactory';
+import { StatusAtividade } from '@/backend/core/models';
 
 export async function POST(request: Request) {
   try {

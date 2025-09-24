@@ -1,10 +1,10 @@
 import React from "react";
 import AllocationClientView from "./AllocationClientView";
 import { getWeekDates, formatDate } from "@/app/utils/date";
-import { dependencyFactory } from "@/infrastructure/factories/DependencyFactory";
+import { dependencyFactory } from "@/backend/infrastructure/factories/DependencyFactory";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/config/auth";
-import { UserRole } from "@/core/models/UserRole";
+import { UserRole } from "@/backend/core/models/UserRole";
 
 interface AllocationPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -60,7 +60,7 @@ export default async function AllocationPage({
   const initialData = await getAlocacaoData(formatDate(week.start), formatDate(week.end));
 
   return (
-    <main className="min-h-screen bg-bg text-text-light">
+    <main className="min-h-screen bg-slate-900 text-white">
       <div className="max-w-8xl mx-auto">
         <AllocationClientView initialData={initialData} week={week} />
       </div>

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 
 import { X } from 'lucide-react';
-import { DadosProjeto, ENTIDADES, Entidade } from '@/core/models';
+import { DadosProjeto, ENTIDADES, Entidade } from '@/backend/core/models';
 
 interface ModalAdicionarProjetoProps {
   isOpen: boolean;
@@ -79,16 +79,16 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-overlay/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-100/95 backdrop-blur-md rounded-xl border border-accent/20 shadow-glass max-w-lg w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-slate-800/95 backdrop-blur-md rounded-xl border border-slate-700/50 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-accent/20">
-          <h2 className="text-xl font-semibold text-text-light">
+        <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+          <h2 className="text-xl font-semibold text-white">
             Adicionar Projeto
           </h2>
           <Button
             onClick={handleClose}
-            variant="outline"
+            variant="cancel"
             size="sm"
             className="p-2"
           >
@@ -100,7 +100,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Abreviatura */}
           <div>
-            <label htmlFor="abreviatura" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="abreviatura" className="block text-sm font-medium text-white mb-2">
               Abreviatura *
             </label>
             <input
@@ -111,8 +111,8 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
                 setFormData(prev => ({ ...prev, abreviatura: e.target.value.toUpperCase() }));
                 clearError('abreviatura');
               }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light placeholder-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.abreviatura ? 'border-red-500' : 'border-accent/20'
+              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
+                errors.abreviatura ? 'border-red-500' : 'border-slate-600'
               }`}
               placeholder="Ex: PROJ-001"
             />
@@ -123,7 +123,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
 
           {/* Nome */}
           <div>
-            <label htmlFor="nome" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="nome" className="block text-sm font-medium text-white mb-2">
               Nome *
             </label>
             <input
@@ -134,8 +134,8 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
                 setFormData(prev => ({ ...prev, nome: e.target.value }));
                 clearError('nome');
               }}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light placeholder-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all ${
-                errors.nome ? 'border-red-500' : 'border-accent/20'
+              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
+                errors.nome ? 'border-red-500' : 'border-slate-600'
               }`}
               placeholder="Nome do projeto"
             />
@@ -146,7 +146,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
 
           {/* Descrição */}
           <div>
-            <label htmlFor="descricao" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="descricao" className="block text-sm font-medium text-white mb-2">
               Descrição *
             </label>
             <textarea
@@ -157,8 +157,8 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
                 clearError('descricao');
               }}
               rows={3}
-              className={`w-full px-4 py-3 bg-bg/50 border rounded-lg text-text-light placeholder-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all resize-none ${
-                errors.descricao ? 'border-red-500' : 'border-accent/20'
+              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all resize-none ${
+                errors.descricao ? 'border-red-500' : 'border-slate-600'
               }`}
               placeholder="Descrição detalhada do projeto"
             />
@@ -169,7 +169,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
 
           {/* Entidade */}
           <div>
-            <label htmlFor="entidade" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="entidade" className="block text-sm font-medium text-white mb-2">
               Entidade (Opcional)
             </label>
             <select
@@ -181,7 +181,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
                   entidade: e.target.value as Entidade || undefined 
                 }));
               }}
-              className="w-full px-4 py-3 bg-bg/50 border border-accent/20 rounded-lg text-text-light focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
             >
               <option value="">Selecione uma entidade</option>
               {ENTIDADES.map((entidade) => (
@@ -194,7 +194,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
 
           {/* Link Jira */}
           <div>
-            <label htmlFor="linkJira" className="block text-sm font-medium text-text-light mb-2">
+            <label htmlFor="linkJira" className="block text-sm font-medium text-white mb-2">
               Link Jira (Opcional)
             </label>
             <input
@@ -204,7 +204,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
               onChange={(e) => {
                 setFormData(prev => ({ ...prev, linkJira: e.target.value }));
               }}
-              className="w-full px-4 py-3 bg-bg/50 border border-accent/20 rounded-lg text-text-light placeholder-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
               placeholder="https://jira.empresa.com/projeto/PROJ-001"
             />
           </div>
@@ -214,7 +214,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
             <Button
               type="button"
               onClick={handleClose}
-              variant="outline"
+              variant="cancel"
               className="flex-1"
               disabled={loading}
             >
@@ -222,7 +222,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
             </Button>
             <Button
               type="submit"
-              variant="primary"
+              variant="login"
               className="flex-1"
               disabled={loading}
             >

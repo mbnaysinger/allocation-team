@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { AtividadeCompleta } from '../core/models';
+import { AtividadeCompleta } from '../backend/core/models';
 
 interface UseDragAndDropProps {
   onMoveAtividade: (atividadeId: string, novaData: string) => Promise<void>;

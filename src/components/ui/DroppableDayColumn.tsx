@@ -1,9 +1,9 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
-import Button from './Button';
+import { Button } from './Button';
 import TarjaHoras from './TarjaHoras';
 import DraggableActivityCard from './DraggableActivityCard';
-import { AtividadeCompleta, StatusAtividade } from '@/core/models';
+import { AtividadeCompleta, StatusAtividade } from '@/backend/core/models';
 
 interface DroppableDayColumnProps {
   data: string;
@@ -59,12 +59,12 @@ const DroppableDayColumn: React.FC<DroppableDayColumnProps> = ({
         rounded-lg 
         p-2 
         md:p-4 
-        bg-bg/20
+        bg-slate-800/30
         transition-all
         duration-200
         ${isDragOver 
-          ? 'border-accent bg-accent/10 scale-105' 
-          : 'border-accent/30'
+          ? 'border-cyan-500 bg-cyan-500/10 scale-105 shadow-md shadow-cyan-500/60' 
+          : 'border-slate-500 hover:border-slate-500'
         }
       `}
       onDragOver={handleDragOver}
@@ -92,11 +92,11 @@ const DroppableDayColumn: React.FC<DroppableDayColumnProps> = ({
       
       <Button
         onClick={() => onAddAllocation(data)}
-        variant="outline"
+        variant="login"
         size="sm"
-        className="w-full mt-4 text-accent border-accent/50 hover:bg-accent hover:text-bg text-xs"
+        className="w-full mt-4 text-xs font-medium"
       >
-        <Plus size={12} className="mr-" />
+        <Plus size={12} className="mr-1" />
         <span className="hidden sm:inline">Adicionar</span>
       </Button>
     </div>
