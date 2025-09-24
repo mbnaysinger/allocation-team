@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
-import Button from './Button';
+import { Button } from './Button';
 import TarjaHoras from './TarjaHoras';
 import DraggableActivityCard from './DraggableActivityCard';
 import { AtividadeCompleta, StatusAtividade } from '@/core/models';

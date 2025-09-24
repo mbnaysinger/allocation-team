@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
 import { Pessoa, Projeto } from "@/core/models";
@@ -97,7 +97,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
         
         {/* Botões de Adicionar */}
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <Button onClick={onAddPerson} variant="primary" size="sm" className="flex items-center gap-2">
+          <Button onClick={onAddPerson} variant="default" size="sm" className="flex items-center gap-2">
             <Plus size={16} />
             Adicionar Pessoa
           </Button>

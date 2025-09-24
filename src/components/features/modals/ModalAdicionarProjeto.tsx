@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 
 import { X } from 'lucide-react';
 import { DadosProjeto, ENTIDADES, Entidade } from '@/core/models';
@@ -222,7 +222,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
             </Button>
             <Button
               type="submit"
-              variant="primary"
+              variant="default"
               className="flex-1"
               disabled={loading}
             >

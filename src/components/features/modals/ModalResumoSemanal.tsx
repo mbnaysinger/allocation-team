@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Pessoa, ResumoSemanal } from '@/core/models';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 
 interface ModalResumoSemanalProps {
   isOpen: boolean;
@@ -60,7 +60,7 @@ const ModalResumoSemanal: React.FC<ModalResumoSemanalProps> = ({
             <Button type="button" onClick={onClose} variant="outline" disabled={loading}>
               Cancelar
             </Button>
-            <Button type="submit" variant="primary" loading={loading}>
+            <Button type="submit" variant="default" disabled={loading}>
               {loading ? 'Salvando...' : 'Salvar Resumo'}
             </Button>
           </div>

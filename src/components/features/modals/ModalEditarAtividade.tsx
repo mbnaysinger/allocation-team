@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import ContadorCaracteres from '@/components/ui/ContadorCaracteres';
 import SearchableSelect, { SelectOption } from '@/components/ui/SearchableSelect';
 import { X, Trash2 } from 'lucide-react';
@@ -387,7 +387,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
             </Button>
             <Button
               type="submit"
-              variant="primary"
+              variant="default"
               className="flex-1"
               disabled={loading || deleteLoading}
             >

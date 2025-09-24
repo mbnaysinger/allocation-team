@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import ContadorCaracteres from '@/components/ui/ContadorCaracteres';
 import SearchableSelect, { SelectOption } from '@/components/ui/SearchableSelect'; // Importar o novo componente
 import { X } from 'lucide-react';
@@ -360,7 +360,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
             </Button>
             <Button
               type="submit"
-              variant="primary"
+              variant="default"
               className="flex-1"
               disabled={loading}
             >
