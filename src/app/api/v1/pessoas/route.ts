@@ -1,7 +1,7 @@
 // src/app/api/v1/pessoas/route.ts
 import { NextResponse } from 'next/server';
 import { dependencyFactory } from '../../../../backend/infrastructure/factories/DependencyFactory';
-import { DadosPessoa } from '../../../../core/models';
+import { DadosPessoa } from '../../../../backend/core/models';
 
 export async function GET() {
   try {

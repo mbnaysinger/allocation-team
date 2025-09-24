@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { dependencyFactory } from '../../../../backend/infrastructure/factories/DependencyFactory';
-import { DadosProjeto } from '../../../../core/models';
+import { DadosProjeto } from '../../../../backend/core/models';
 
 export async function GET() {
   try {

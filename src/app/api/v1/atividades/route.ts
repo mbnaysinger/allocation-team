@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { dependencyFactory } from '../../../../backend/infrastructure/factories/DependencyFactory';
-import { DadosAtividade } from '../../../../core/models';
+import { DadosAtividade } from '../../../../backend/core/models';
 
 /**
  * @swagger
