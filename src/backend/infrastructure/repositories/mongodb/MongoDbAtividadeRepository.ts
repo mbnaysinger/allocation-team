@@ -1,3 +1,4 @@
+import { getWeekNumber } from '../../../../app/utils/date';
 import { Collection, Document } from 'mongodb';
 import { getCollection } from '../../../../config/databases/mongodb';
 import { IAtividadeRepository } from '../../../core/ports/IAtividadeRepository';
@@ -10,6 +11,7 @@ const fromDocument = (doc: Document): Atividade => {
     id: data.id,
     titulo: data.titulo,
     data: data.data,
+    semana: data.semana,
     pessoaId: data.pessoaId,
     tipo: data.tipo,
     projetoId: data.projetoId,
@@ -34,6 +36,14 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
     return documents.map(fromDocument);
   }
 
+  async buscarPorSemana(semana: string): Promise<Atividade[]> {
+    const collection = await this.getAtividadesCollection();
+    const documents = await collection.find({
+      semana
+    }).toArray();
+    return documents.map(fromDocument);
+  }
+
   async buscarPorPessoaEPeriodo(pessoaId: string, dataInicio: string, dataFim: string): Promise<Atividade[]> {
     const collection = await this.getAtividadesCollection();
     const documents = await collection.find({
@@ -50,6 +60,7 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
     const novaAtividade: Omit<Atividade, 'id'> & { id?: string } = {
       ...dados,
       id: `ativ_${Date.now()}`,
+      semana: getWeekNumber(dados.data),
       createdAt: now,
       updatedAt: now,
     };
@@ -64,6 +75,10 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
 
   async atualizar(id: string, dados: Partial<DadosAtividade>): Promise<Atividade | null> {
     const collection = await this.getAtividadesCollection();
+
+    if (dados.data) {
+      dados.semana = getWeekNumber(dados.data);
+    }
 
     const result = await collection.findOneAndUpdate(
       { id },

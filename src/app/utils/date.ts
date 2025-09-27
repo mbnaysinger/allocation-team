@@ -3,6 +3,23 @@
 /**
  * Retorna o primeiro (segunda-feira) e o último (sexta-feira) dia da semana para uma data.
  */
+export const getWeekNumber = (date: string) => {
+  const [year, month, day] = date.split('-').map(Number);
+  const d = new Date(Date.UTC(year, month - 1, day));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  return `${weekNo}${year}`;
+};
+
+export const getWeekString = (date: Date) => {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  return `${weekNo}${date.getFullYear()}`;
+};
+
 export const getWeekDates = (date: Date) => {
   const start = new Date(date);
   // Ajusta para o início da semana (considerando Domingo = 0)

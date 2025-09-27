@@ -2,6 +2,7 @@ import { Collection, Document } from 'mongodb';
 import { getCollection } from '../../../../config/databases/mongodb';
 import { IResumoSemanalRepository } from '../../../core/ports/IResumoSemanalRepository';
 import { ResumoSemanal } from '../../../core/models';
+import { getWeekNumber } from '../../../../app/utils/date';
 
 const fromDocument = (doc: Document): ResumoSemanal => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -10,6 +11,7 @@ const fromDocument = (doc: Document): ResumoSemanal => {
     id: data.id,
     pessoaId: data.pessoaId,
     semana_inicio: data.semana_inicio,
+    semana: data.semana,
     comentario: data.comentario,
     createdAt: new Date(data.createdAt),
     updatedAt: new Date(data.updatedAt),
@@ -24,6 +26,7 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
   async salvar(resumo: Omit<ResumoSemanal, 'id' | 'createdAt' | 'updatedAt'>): Promise<ResumoSemanal> {
     const collection = await this.getResumosCollection();
     const now = new Date();
+    const semana = getWeekNumber(resumo.semana_inicio);
 
     const result = await collection.findOneAndUpdate(
       { 
@@ -39,6 +42,7 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
           id: `res_${Date.now()}`,
           pessoaId: resumo.pessoaId,
           semana_inicio: resumo.semana_inicio,
+          semana,
           createdAt: now,
         }
       },
@@ -64,11 +68,11 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
     return fromDocument(novoDocumento);
   }
 
-  async buscarPorPessoasESemana(pessoaIds: string[], semana_inicio: string): Promise<ResumoSemanal[]> {
+  async buscarPorPessoasESemana(pessoaIds: string[], semana: string): Promise<ResumoSemanal[]> {
     const collection = await this.getResumosCollection();
     const documents = await collection.find({
       pessoaId: { $in: pessoaIds },
-      semana_inicio: semana_inicio,
+      semana: semana,
     }).toArray();
 
     return documents.map(fromDocument);

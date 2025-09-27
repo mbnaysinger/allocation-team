@@ -1,6 +1,6 @@
 import React from "react";
 import AllocationClientView from "./AllocationClientView";
-import { getWeekDates, formatDate } from "@/app/utils/date";
+import { getWeekDates, getWeekString } from "@/app/utils/date";
 import { dependencyFactory } from "@/backend/infrastructure/factories/DependencyFactory";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/config/auth";
@@ -10,7 +10,7 @@ interface AllocationPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-async function getAlocacaoData(dataInicio: string, dataFim: string) {
+async function getAlocacaoData(semana: string) {
   const session = await getServerSession(authOptions);
   const userRole = session?.user?.role;
   const personIds = session?.user?.personIds;
@@ -26,8 +26,7 @@ async function getAlocacaoData(dataInicio: string, dataFim: string) {
 
     // Passa os personIds para o serviço se o usuário não for ADMIN
     const alocacaoData = await buscarAlocacaoSemana.execute({
-      dataInicio,
-      dataFim,
+      semana,
       personIds: userRole === UserRole.ADMIN ? undefined : personIds,
     });
     
@@ -35,7 +34,7 @@ async function getAlocacaoData(dataInicio: string, dataFim: string) {
     const pessoaIdsParaResumo = alocacaoData.pessoas.map(p => p.id);
 
     // Busca os resumos para as pessoas e a semana
-    const resumosSemanais = await buscarResumosSemanais.execute(pessoaIdsParaResumo, dataInicio);
+    const resumosSemanais = await buscarResumosSemanais.execute(pessoaIdsParaResumo, semana);
 
     return { ...alocacaoData, resumosSemanais };
 
@@ -46,18 +45,25 @@ async function getAlocacaoData(dataInicio: string, dataFim: string) {
   }
 }
 
-export default async function AllocationPage({
-  searchParams,
-}: AllocationPageProps) {
+export default async function AllocationPage({ searchParams, }: AllocationPageProps) {
   const params = await searchParams;
   
-  const dateParam = params?.data as string | undefined;
-  const baseDate = dateParam ? new Date(`${dateParam}T00:00:00`) : new Date();
+  const semanaParam = params?.semana as string | undefined;
+  let baseDate: Date;
+
+  if (semanaParam) {
+    const year = parseInt(semanaParam.slice(-4));
+    const week = parseInt(semanaParam.slice(0, -4));
+    baseDate = new Date(year, 0, 1 + (week - 1) * 7);
+  } else {
+    baseDate = new Date();
+  }
 
   const week = getWeekDates(baseDate);
+  const semana = getWeekString(baseDate);
 
   // Busca os dados no servidor, agora incluindo os resumos
-  const initialData = await getAlocacaoData(formatDate(week.start), formatDate(week.end));
+  const initialData = await getAlocacaoData(semana);
 
   return (
     <main className="min-h-screen bg-slate-900 text-white">

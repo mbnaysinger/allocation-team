@@ -13,6 +13,7 @@ import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionar
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
 import ModalResumoSemanal from "@/components/features/modals/ModalResumoSemanal";
 import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
+import { getWeekString } from "@/app/utils/date";
 
 interface AllocationClientViewProps {
   initialData: {
@@ -99,16 +100,14 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     const newStartDate = new Date(week.start);
     newStartDate.setDate(newStartDate.getDate() + (direction === 'next' ? 7 : -7));
     
-    // Format YYYY-MM-DD
-    const isoDate = newStartDate.toISOString().split('T')[0];
-    router.push(`/allocation?data=${isoDate}`);
+    const semana = getWeekString(newStartDate);
+    router.push(`/allocation?semana=${semana}`);
   };
 
   const navigateToCurrentWeek = () => {
-    // Get current date and navigate to current week
     const today = new Date();
-    const isoDate = today.toISOString().split('T')[0];
-    router.push(`/allocation?data=${isoDate}`);
+    const semana = getWeekString(today);
+    router.push(`/allocation?semana=${semana}`);
   };
   
   const calcularHorasDia = (pessoaId: string, data: string) => {
@@ -353,6 +352,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         body: JSON.stringify({ 
           pessoaId: pessoaParaResumo.id,
           semana_inicio: week.start.toISOString().split('T')[0],
+          semana: getWeekString(week.start),
           comentario,
         }),
       });

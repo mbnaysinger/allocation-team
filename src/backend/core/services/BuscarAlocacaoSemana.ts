@@ -4,8 +4,9 @@ import { IAtividadeRepository } from '../ports/IAtividadeRepository';
 import { Pessoa, Projeto, Atividade, AtividadeCompleta } from '../models';
 
 interface BuscarAlocacaoSemanaDTO {
-  dataInicio: string;
-  dataFim: string;
+  dataInicio?: string;
+  dataFim?: string;
+  semana?: string;
   personIds?: string[]; // Opcional para filtrar por pessoas específicas
 }
 
@@ -22,18 +23,28 @@ export class BuscarAlocacaoSemana {
     private atividadeRepository: IAtividadeRepository
   ) {}
 
-  async execute({ dataInicio, dataFim, personIds }: BuscarAlocacaoSemanaDTO): Promise<AlocacaoSemana> {
+  async execute({ dataInicio, dataFim, semana, personIds }: BuscarAlocacaoSemanaDTO): Promise<AlocacaoSemana> {
     try {
       // Define a busca de pessoas com base na presença de personIds
       const buscarPessoasPromise = personIds && personIds.length > 0
         ? this.pessoaRepository.findByIds(personIds)
         : this.pessoaRepository.buscarAtivos();
 
+      let atividadesPromise: Promise<Atividade[]>;
+
+      if (semana) {
+        atividadesPromise = this.atividadeRepository.buscarPorSemana(semana);
+      } else if (dataInicio && dataFim) {
+        atividadesPromise = this.atividadeRepository.buscarPorPeriodo(dataInicio, dataFim);
+      } else {
+        throw new Error('É necessário fornecer ou a semana ou o período de datas.');
+      }
+
       // 1. Buscar todas as entidades em paralelo para otimizar
       const [pessoas, projetos, atividades] = await Promise.all([
         buscarPessoasPromise,
         this.projetoRepository.buscarAtivos(),
-        this.atividadeRepository.buscarPorPeriodo(dataInicio, dataFim),
+        atividadesPromise,
       ]);
 
       // 2. Enriquecer as atividades com dados de pessoas e projetos
