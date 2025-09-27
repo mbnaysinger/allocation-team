@@ -10,7 +10,6 @@ const fromDocument = (doc: Document): ResumoSemanal => {
   return {
     id: data.id,
     pessoaId: data.pessoaId,
-    semana_inicio: data.semana_inicio,
     semana: data.semana,
     comentario: data.comentario,
     createdAt: new Date(data.createdAt),
@@ -26,12 +25,11 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
   async salvar(resumo: Omit<ResumoSemanal, 'id' | 'createdAt' | 'updatedAt'>): Promise<ResumoSemanal> {
     const collection = await this.getResumosCollection();
     const now = new Date();
-    const semana = getWeekNumber(resumo.semana_inicio);
 
     const result = await collection.findOneAndUpdate(
       { 
         pessoaId: resumo.pessoaId,
-        semana_inicio: resumo.semana_inicio,
+        semana: resumo.semana,
       },
       { 
         $set: { 
@@ -41,8 +39,7 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
         $setOnInsert: {
           id: `res_${Date.now()}`,
           pessoaId: resumo.pessoaId,
-          semana_inicio: resumo.semana_inicio,
-          semana,
+          semana: resumo.semana,
           createdAt: now,
         }
       },
@@ -60,7 +57,7 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
     // ou se a lógica precisar ser mais explícita.
     const novoDocumento = await collection.findOne({ 
         pessoaId: resumo.pessoaId,
-        semana_inicio: resumo.semana_inicio,
+        semana: resumo.semana,
     });
     
     if(!novoDocumento) throw new Error("Não foi possível salvar ou encontrar o resumo semanal.");

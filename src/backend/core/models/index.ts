@@ -47,7 +47,6 @@ export interface AtividadeCompleta extends Atividade {
 export interface ResumoSemanal {
   id: string;
   pessoaId: string;
-  semana_inicio: string; // YYYY-MM-DD
   semana: string;
   comentario: string;
   createdAt: Date;

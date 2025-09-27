@@ -351,7 +351,6 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           pessoaId: pessoaParaResumo.id,
-          semana_inicio: week.start.toISOString().split('T')[0],
           semana: getWeekString(week.start),
           comentario,
         }),
