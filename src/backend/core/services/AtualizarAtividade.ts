@@ -1,5 +1,6 @@
 import { IAtividadeRepository } from '../ports/IAtividadeRepository';
 import { Atividade, DadosAtividade, StatusAtividade } from '../models';
+import { getWeekNumber } from '@/app/utils/date';
 
 // Reutilizamos a mesma validação da criação, mas a adaptamos se necessário no futuro
 const validarDadosAtividade = (dados: Partial<DadosAtividade>): void => {
@@ -22,6 +23,10 @@ export class AtualizarAtividade {
       validarDadosAtividade(dados);
       const atividadeAtualizada = await this.atividadeRepository.atualizar(id, dados);
       
+      if (dados.data) {
+        dados.semana = getWeekNumber(dados.data);
+      }
+
       if (!atividadeAtualizada) {
         throw new Error("Atividade não encontrada ou não pôde ser atualizada.");
       }

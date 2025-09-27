@@ -60,7 +60,6 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
     const novaAtividade: Omit<Atividade, 'id'> & { id?: string } = {
       ...dados,
       id: `ativ_${Date.now()}`,
-      semana: getWeekNumber(dados.data),
       createdAt: now,
       updatedAt: now,
     };
@@ -75,10 +74,6 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
 
   async atualizar(id: string, dados: Partial<DadosAtividade>): Promise<Atividade | null> {
     const collection = await this.getAtividadesCollection();
-
-    if (dados.data) {
-      dados.semana = getWeekNumber(dados.data);
-    }
 
     const result = await collection.findOneAndUpdate(
       { id },
