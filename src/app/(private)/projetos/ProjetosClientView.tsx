@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Projeto } from '@/backend/core/models';
+import { Projeto } from '@/backend/core/models/projeto/Projeto';
 import Heading from '@/components/ui/Heading';
 import { Button } from '@/components/ui/Button';
 import { Eye, Pencil } from 'lucide-react';
@@ -28,7 +28,7 @@ const ProjetosClientView: React.FC<ProjetosClientViewProps> = ({ projetos }) => 
             </thead>
             <tbody>
               {projetos.map((projeto) => (
-                <tr key={projeto.id} className="border-b border-gray-700/50 hover:bg-gray-700/30 transition-colors">
+                <tr key={projeto.projetoId} className="border-b border-gray-700/50 hover:bg-gray-700/30 transition-colors">
                   <td className="p-4 font-mono text-accent">{projeto.abreviatura}</td>
                   <td className="p-4">{projeto.nome}</td>
                   <td className="p-4">{projeto.entidade || 'N/A'}</td>

@@ -1,4 +1,4 @@
-import { Projeto, DadosProjeto } from '../models';
+import { Projeto, DadosProjeto } from '../models/projeto/Projeto';
 
 export interface IProjetoRepository {
   buscarTodos(): Promise<Projeto[]>;

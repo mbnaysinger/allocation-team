@@ -1,19 +1,24 @@
 import { Collection, Document } from 'mongodb';
 import { getCollection } from '../../../../config/databases/mongodb';
 import { IProjetoRepository } from '../../../core/ports/IProjetoRepository';
-import { Projeto, DadosProjeto } from '../../../core/models';
+import { Projeto, DadosProjeto } from '../../../core/models/projeto/Projeto';
 
 const fromDocument = (doc: Document): Projeto => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { _id, ...data } = doc;
   return {
-    id: data.id,
-    nome: data.nome,
+    projetoId: data.projetoId,
     abreviatura: data.abreviatura,
+    nome: data.nome,
     descricao: data.descricao,
     entidade: data.entidade,
-    linkJira: data.linkJira,
-    ativo: data.ativo,
+    linkDocumentacao: data.linkDocumentacao,
+    responsavelId: data.responsavelId,
+    fase: data.fase,
+    status: data.status,
+    dataInicio: data.dataInicio,
+    dataFimPrevisto: data.dataFimPrevisto,
+    dataFimReal: data.dataFimReal,
     createdAt: new Date(data.createdAt),
     updatedAt: new Date(data.updatedAt),
   } as Projeto;
@@ -48,8 +53,7 @@ export class MongoDbProjetoRepository implements IProjetoRepository {
 
     const novoProjeto: Omit<Projeto, 'id'> & { id?: string } = {
       ...dados,
-      id: `proj_${Date.now()}`,
-      ativo: true,
+      projetoId: `proj_${Date.now()}`,
       createdAt: now,
       updatedAt: now,
     };

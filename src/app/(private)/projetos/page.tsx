@@ -1,12 +1,12 @@
 import React from 'react';
 import ProjetosClientView from './ProjetosClientView';
 import { dependencyFactory } from '@/backend/infrastructure/factories/DependencyFactory';
-import { Projeto } from '@/backend/core/models';
+import { Projeto } from '@/backend/core/models/projeto/Projeto';
 
 async function getProjetosData(): Promise<Projeto[]> {
   try {
-    const buscarProjetos = dependencyFactory.createBuscarProjetos();
-    const projetos = await buscarProjetos.execute();
+    const buscarProjetos = dependencyFactory.createProjetoService();
+    const projetos = await buscarProjetos.buscarProjetos();
     return projetos;
   } catch (error) {
     console.error("Falha ao buscar dados de projetos diretamente do serviço:", error);

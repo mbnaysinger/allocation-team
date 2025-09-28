@@ -4,7 +4,7 @@ import { IPessoaRepository } from '../../core/ports/IPessoaRepository';
 import { IProjetoRepository } from '../../core/ports/IProjetoRepository';
 import { MongoDbAtividadeRepository } from '../repositories/mongodb/MongoDbAtividadeRepository';
 import { MongoDbPessoaRepository } from '../repositories/mongodb/MongoDbPessoaRepository';
-import { MongoDbProjetoRepository } from '../repositories/mongodb/MongoDbProjetoRepository';
+import { MongoDbProjetoRepository } from '../repositories/mongodb/ProjetoRepository';
 import { MongoDbResumoSemanalRepository } from '../repositories/mongodb/MongoDbResumoSemanalRepository';
 import { IUserRepository } from '../../core/ports/IUserRepository';
 import { MongoDbUserRepository } from '../repositories/mongodb/MongoDbUserRepository';
@@ -14,12 +14,11 @@ import { CriarAtividade } from '../../core/services/CriarAtividade';
 import { AtualizarAtividade } from '../../core/services/AtualizarAtividade';
 import { DeletarAtividade } from '../../core/services/DeletarAtividade';
 import { ClonarAtividade } from '../../core/services/ClonarAtividade';
-import { CriarProjeto } from '../../core/services/CriarProjeto';
+import { ProjetoService } from '../../core/services/projeto/ProjetoService';
 import { CriarPessoa } from '../../core/services/CriarPessoa';
 import { BuscarPessoas } from '../../core/services/BuscarPessoas';
 import { SalvarResumoSemanal } from '../../core/services/SalvarResumoSemanal';
 import { BuscarResumosSemanais } from '../../core/services/BuscarResumosSemanais';
-import { BuscarProjetos } from '../../core/services/BuscarProjetos';
 import { CriarUsuario } from '../../core/services/CriarUsuario';
 
 
@@ -86,18 +85,13 @@ class DependencyFactory {
   public createBuscarPessoas(): BuscarPessoas {
     return new BuscarPessoas(this.createPessoaRepository());
   }
-
-  public createBuscarProjetos(): BuscarProjetos {
-    return new BuscarProjetos(this.createProjetoRepository());
-  }
-  
   
   public createCriarPessoa(): CriarPessoa {
     return new CriarPessoa(this.createPessoaRepository());
   }
 
-  public createCriarProjeto(): CriarProjeto {
-    return new CriarProjeto(this.createProjetoRepository());
+  public createProjetoService(): ProjetoService {
+    return new ProjetoService(this.createProjetoRepository());
   }
 
   public async createCriarUsuario(): Promise<CriarUsuario> {
