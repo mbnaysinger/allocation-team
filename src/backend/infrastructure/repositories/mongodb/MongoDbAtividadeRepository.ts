@@ -1,4 +1,3 @@
-import { getWeekNumber } from '../../../../app/utils/date';
 import { Collection, Document } from 'mongodb';
 import { getCollection } from '../../../../config/databases/mongodb';
 import { IAtividadeRepository } from '../../../core/ports/IAtividadeRepository';

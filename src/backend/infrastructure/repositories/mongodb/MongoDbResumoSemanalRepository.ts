@@ -2,7 +2,6 @@ import { Collection, Document } from 'mongodb';
 import { getCollection } from '../../../../config/databases/mongodb';
 import { IResumoSemanalRepository } from '../../../core/ports/IResumoSemanalRepository';
 import { ResumoSemanal } from '../../../core/models';
-import { getWeekNumber } from '../../../../app/utils/date';
 
 const fromDocument = (doc: Document): ResumoSemanal => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
