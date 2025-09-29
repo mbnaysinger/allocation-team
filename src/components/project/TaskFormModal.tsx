@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CalendarIcon, CheckSquare, Users, AlertTriangle, X } from "lucide-react";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -37,6 +38,7 @@ import {
 } from "@/components/ui/Popover";
 import { Calendar } from "@/components/ui/Calendar";
 import { Tarefa, STATUS_TAREFA } from "@/backend/core/models/projeto/Tarefa";
+import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
 
 const taskSchema = z.object({
   nome: z.string().min(3, "Nome é obrigatório").max(100, "Máximo 100 caracteres"),
@@ -85,6 +87,8 @@ export function TaskFormModal({
   };
 
   if (!isOpen) return null;
+
+  const statusOptions: SelectOption[] = STATUS_TAREFA.map(s => ({ value: s, label: s === 'nao_iniciada' ? 'Não Iniciada' : s === 'em_andamento' ? 'Em Andamento' : s === 'concluida' ? 'Concluída' : 'Cancelada' }));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
@@ -146,22 +150,12 @@ export function TaskFormModal({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                          <SelectValue placeholder="Selecione o status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-slate-800 text-white border-slate-700">
-                        {STATUS_TAREFA.map((status) => (
-                          <SelectItem key={status} value={status} className="hover:bg-slate-700">
-                            {status === 'nao_iniciada' ? 'Não Iniciada' :
-                             status === 'em_andamento' ? 'Em Andamento' :
-                             status === 'concluida' ? 'Concluída' : 'Cancelada'}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <SearchableSelect
+                      options={statusOptions}
+                      value={statusOptions.find(o => o.value === field.value)}
+                      onChange={(option) => field.onChange(option ? option.value : null)}
+                      placeholder="Selecione o status"
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -211,7 +205,7 @@ export function TaskFormModal({
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "PPP", { locale: ptBR })
                             ) : (
                               <span>Selecione a data</span>
                             )}
@@ -251,7 +245,7 @@ export function TaskFormModal({
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "PPP", { locale: ptBR })
                             ) : (
                               <span>Selecione a data</span>
                             )}

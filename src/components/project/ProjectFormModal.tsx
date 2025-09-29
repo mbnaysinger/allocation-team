@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CalendarIcon, Users, Target, X } from "lucide-react";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -37,6 +38,7 @@ import {
 } from "@/components/ui/Popover";
 import { Calendar } from "@/components/ui/Calendar";
 import { Projeto, ENTIDADES, FASES_PROJETO, STATUS_PROJETO } from "@/backend/core/models/projeto/Projeto";
+import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
 
 const projectSchema = z.object({
   abreviatura: z.string().min(2, "Abreviatura deve ter pelo menos 2 caracteres").max(10, "Máximo 10 caracteres"),
@@ -91,6 +93,10 @@ export function ProjectFormModal({
   };
 
   if (!isOpen) return null;
+
+  const entidadeOptions: SelectOption[] = ENTIDADES.map(e => ({ value: e, label: e }));
+  const faseOptions: SelectOption[] = FASES_PROJETO.map(f => ({ value: f, label: f === 'upstream' ? 'Upstream' : f === 'downstream' ? 'Downstream' : f === 'internal' ? 'Interno' : 'Cancelado' }));
+  const statusOptions: SelectOption[] = STATUS_PROJETO.map(s => ({ value: s, label: s === 'backlog' ? 'Backlog' : s === 'em_andamento' ? 'Em Andamento' : s === 'concluido' ? 'Concluído' : 'Cancelado' }));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
@@ -163,18 +169,12 @@ export function ProjectFormModal({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Entidade</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                          <SelectValue placeholder="Selecione a entidade" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-slate-800 text-white border-slate-700">
-                        {ENTIDADES.map((entidade) => (
-                          <SelectItem key={entidade} value={entidade} className="hover:bg-slate-700">{entidade}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <SearchableSelect
+                      options={entidadeOptions}
+                      value={entidadeOptions.find(o => o.value === field.value)}
+                      onChange={(option) => field.onChange(option ? option.value : null)}
+                      placeholder="Selecione a entidade"
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -209,22 +209,12 @@ export function ProjectFormModal({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Fase</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                          <SelectValue placeholder="Selecione a fase" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-slate-800 text-white border-slate-700">
-                        {FASES_PROJETO.map((fase) => (
-                          <SelectItem key={fase} value={fase} className="hover:bg-slate-700">
-                            {fase === 'upstream' ? 'Upstream' :
-                             fase === 'downstream' ? 'Downstream' :
-                             fase === 'internal' ? 'Interno' : 'Cancelado'}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <SearchableSelect
+                      options={faseOptions}
+                      value={faseOptions.find(o => o.value === field.value)}
+                      onChange={(option) => field.onChange(option ? option.value : null)}
+                      placeholder="Selecione a fase"
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -236,22 +226,12 @@ export function ProjectFormModal({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                          <SelectValue placeholder="Selecione o status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-slate-800 text-white border-slate-700">
-                        {STATUS_PROJETO.map((status) => (
-                          <SelectItem key={status} value={status} className="hover:bg-slate-700">
-                            {status === 'backlog' ? 'Backlog' :
-                             status === 'em_andamento' ? 'Em Andamento' :
-                             status === 'concluido' ? 'Concluído' : 'Cancelado'}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <SearchableSelect
+                      options={statusOptions}
+                      value={statusOptions.find(o => o.value === field.value)}
+                      onChange={(option) => field.onChange(option ? option.value : null)}
+                      placeholder="Selecione o status"
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -290,7 +270,7 @@ export function ProjectFormModal({
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "PPP", { locale: ptBR })
                             ) : (
                               <span>Selecione a data</span>
                             )}
@@ -330,7 +310,7 @@ export function ProjectFormModal({
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "PPP", { locale: ptBR })
                             ) : (
                               <span>Selecione a data</span>
                             )}
