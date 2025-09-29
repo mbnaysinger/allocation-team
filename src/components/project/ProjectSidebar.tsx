@@ -78,26 +78,26 @@ export function ProjectSidebar({
   const getStatusColor = (type: string, status: string) => {
     const statusColors = {
       project: {
-        'em_andamento': "text-success",
-        'backlog': "text-warning",
-        'concluido': "text-muted-foreground",
-        'cancelado': "text-destructive"
+        'em_andamento': "bg-green-500",
+        'backlog': "bg-yellow-500",
+        'concluido': "bg-gray-500",
+        'cancelado': "bg-red-500"
       },
       epic: {
-        'planejado': "text-warning",
-        'em_andamento': "text-info",
-        'concluido': "text-success",
-        'cancelado': "text-destructive"
+        'planejado': "bg-yellow-500",
+        'em_andamento': "bg-blue-500",
+        'concluido': "bg-green-500",
+        'cancelado': "bg-red-500"
       },
       task: {
-        'nao_iniciada': "text-muted-foreground",
-        'em_andamento': "text-info",
-        'concluida': "text-success",
-        'cancelada': "text-destructive"
+        'nao_iniciada': "bg-gray-500",
+        'em_andamento': "bg-blue-500",
+        'concluida': "bg-green-500",
+        'cancelada': "bg-red-500"
       }
     };
     
-    return statusColors[type as keyof typeof statusColors]?.[status as keyof (typeof statusColors)[keyof typeof statusColors]] || "text-muted-foreground";
+    return statusColors[type as keyof typeof statusColors]?.[status as keyof (typeof statusColors)[keyof typeof statusColors]] || "bg-gray-500";
   };
 
   const ItemActions = ({ 
@@ -150,12 +150,12 @@ export function ProjectSidebar({
   );
 
   return (
-    <div className="h-full border-r bg-card">
+    <div className="h-full border-r bg-slate-900/80 backdrop-blur-sm text-slate-200">
       {/* Header */}
-      <div className="p-4 border-b">
+      <div className="p-4 border-b border-slate-700 bg-gradient-to-r from-slate-900 to-slate-800">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-lg">Projetos</h2>
-          <Button size="sm" onClick={onCreateProject}>
+          <h2 className="font-semibold text-lg text-white">Projetos</h2>
+          <Button size="sm" onClick={onCreateProject} variant="outline" className="border-slate-700 hover:bg-slate-800">
             <Plus className="h-4 w-4 mr-2" />
             Novo
           </Button>
@@ -173,8 +173,8 @@ export function ProjectSidebar({
               {/* Project */}
               <div
                 className={cn(
-                  "group flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-accent transition-colors",
-                  isProjectSelected && "bg-accent"
+                  "group flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800 transition-colors",
+                  isProjectSelected && "bg-slate-700"
                 )}
                 onClick={() => {
                   onSelectItem('project', project.projetoId);
@@ -186,7 +186,7 @@ export function ProjectSidebar({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-4 w-4 p-0"
+                  className="h-4 w-4 p-0 text-slate-400 hover:text-white"
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleProject(project.projetoId);
@@ -202,12 +202,12 @@ export function ProjectSidebar({
                 </Button>
                 
                 {isProjectExpanded ? (
-                  <FolderOpen className="h-4 w-4 text-primary" />
+                  <FolderOpen className="h-4 w-4 text-sky-400" />
                 ) : (
-                  <Folder className="h-4 w-4 text-primary" />
+                  <Folder className="h-4 w-4 text-sky-400" />
                 )}
                 
-                <span className="flex-1 truncate text-sm font-medium">
+                <span className="flex-1 truncate text-sm font-medium text-slate-100">
                   {project.nome}
                 </span>
                 
@@ -230,8 +230,8 @@ export function ProjectSidebar({
                   <div key={epic.epicoId} className="ml-4 space-y-1">
                     <div
                       className={cn(
-                        "group flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-accent transition-colors",
-                        isEpicSelected && "bg-accent"
+                        "group flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800 transition-colors",
+                        isEpicSelected && "bg-slate-700"
                       )}
                       onClick={() => {
                         onSelectItem('epic', epic.epicoId);
@@ -243,7 +243,7 @@ export function ProjectSidebar({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-4 w-4 p-0"
+                        className="h-4 w-4 p-0 text-slate-400 hover:text-white"
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleEpic(epic.epicoId);
@@ -258,9 +258,9 @@ export function ProjectSidebar({
                         )}
                       </Button>
                       
-                      <Layers className="h-4 w-4 text-secondary" />
+                      <Layers className="h-4 w-4 text-teal-400" />
                       
-                      <span className="flex-1 truncate text-sm">
+                      <span className="flex-1 truncate text-sm text-slate-300">
                         {epic.nome}
                       </span>
                       
@@ -282,15 +282,15 @@ export function ProjectSidebar({
                         <div
                           key={task.tarefaId}
                           className={cn(
-                            "group ml-4 flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-accent transition-colors",
-                            isTaskSelected && "bg-accent"
+                            "group ml-4 flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-slate-800 transition-colors",
+                            isTaskSelected && "bg-slate-700"
                           )}
                           onClick={() => onSelectItem('task', task.tarefaId)}
                         >
                           <div className="w-4" />
-                          <CheckSquare className="h-4 w-4 text-accent-foreground" />
+                          <CheckSquare className="h-4 w-4 text-slate-400" />
                           
-                          <span className="flex-1 truncate text-sm">
+                          <span className="flex-1 truncate text-sm text-slate-400">
                             {task.nome}
                           </span>
                           

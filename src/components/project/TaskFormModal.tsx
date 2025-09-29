@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CalendarIcon, CheckSquare, Users, AlertTriangle } from "lucide-react";
+import { CalendarIcon, CheckSquare, Users, AlertTriangle, X } from "lucide-react";
 import { format } from "date-fns";
 
 import { cn } from "@/lib/utils";
@@ -84,20 +84,25 @@ export function TaskFormModal({
     form.reset();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <CheckSquare className="h-5 w-5 text-primary" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+      <div className="bg-slate-800 rounded-lg shadow-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto text-slate-200">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <CheckSquare className="h-5 w-5 text-slate-400" />
             {mode === 'create' ? 'Nova Tarefa' : 'Editar Tarefa'}
-          </DialogTitle>
-          {epicTitle && (
-            <p className="text-sm text-muted-foreground">
-              Épico: {epicTitle}
-            </p>
-          )}
-        </DialogHeader>
+          </h2>
+          <Button variant="ghost" size="sm" onClick={onClose} className="text-slate-400 hover:text-white">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+        {epicTitle && (
+          <p className="text-sm text-slate-400 mb-4">
+            Épico: {epicTitle}
+          </p>
+        )}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -108,7 +113,7 @@ export function TaskFormModal({
                 <FormItem>
                   <FormLabel>Nome *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nome da tarefa" {...field} />
+                    <Input placeholder="Nome da tarefa" {...field} className="bg-slate-700 border-slate-600 text-white" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -126,6 +131,7 @@ export function TaskFormModal({
                       placeholder="Descreva o que deve ser feito nesta tarefa"
                       rows={3}
                       {...field} 
+                      className="bg-slate-700 border-slate-600 text-white"
                     />
                   </FormControl>
                   <FormMessage />
@@ -142,13 +148,13 @@ export function TaskFormModal({
                     <FormLabel>Status</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
                           <SelectValue placeholder="Selecione o status" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-slate-800 text-white border-slate-700">
                         {STATUS_TAREFA.map((status) => (
-                          <SelectItem key={status} value={status}>
+                          <SelectItem key={status} value={status} className="hover:bg-slate-700">
                             {status === 'nao_iniciada' ? 'Não Iniciada' :
                              status === 'em_andamento' ? 'Em Andamento' :
                              status === 'concluida' ? 'Concluída' : 'Cancelada'}
@@ -169,11 +175,11 @@ export function TaskFormModal({
                     <FormLabel>Executores *</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <Input 
-                          className="pl-10"
+                          className="pl-10 bg-slate-700 border-slate-600 text-white"
                           placeholder="IDs dos executores (separados por vírgula)" 
-                          value={field.value.join(', ')}
+                          value={Array.isArray(field.value) ? field.value.join(', ') : ''}
                           onChange={(e) => {
                             const values = e.target.value.split(',').map(v => v.trim()).filter(v => v);
                             field.onChange(values);
@@ -200,8 +206,8 @@ export function TaskFormModal({
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
+                              "w-full pl-3 text-left font-normal bg-slate-700 border-slate-600 text-white hover:bg-slate-600",
+                              !field.value && "text-slate-400"
                             )}
                           >
                             {field.value ? (
@@ -213,13 +219,13 @@ export function TaskFormModal({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 bg-slate-800 border-slate-700" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
                           initialFocus
-                          className="pointer-events-auto"
+                          className="pointer-events-auto text-white"
                         />
                       </PopoverContent>
                     </Popover>
@@ -240,8 +246,8 @@ export function TaskFormModal({
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
+                              "w-full pl-3 text-left font-normal bg-slate-700 border-slate-600 text-white hover:bg-slate-600",
+                              !field.value && "text-slate-400"
                             )}
                           >
                             {field.value ? (
@@ -253,7 +259,7 @@ export function TaskFormModal({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 bg-slate-800 border-slate-700" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -262,7 +268,7 @@ export function TaskFormModal({
                             form.getValues().dataInicio ? date < form.getValues().dataInicio! : false
                           }
                           initialFocus
-                          className="pointer-events-auto"
+                          className="pointer-events-auto text-white"
                         />
                       </PopoverContent>
                     </Popover>
@@ -272,17 +278,17 @@ export function TaskFormModal({
               />
             </div>
 
-            <DialogFooter className="gap-2">
-              <Button type="button" variant="outline" onClick={onClose}>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={onClose} className="border-slate-700 hover:bg-slate-700">
                 Cancelar
               </Button>
-              <Button type="submit" className="min-w-[100px]">
+              <Button type="submit" className="min-w-[100px] bg-slate-500 hover:bg-slate-600 text-white">
                 {mode === 'create' ? 'Criar' : 'Salvar'}
               </Button>
-            </DialogFooter>
+            </div>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CalendarIcon, Layers } from "lucide-react";
+import { CalendarIcon, Layers, X } from "lucide-react";
 import { format } from "date-fns";
 
 import { cn } from "@/lib/utils";
@@ -82,20 +82,25 @@ export function EpicFormModal({
     form.reset();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Layers className="h-5 w-5 text-primary" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+      <div className="bg-slate-800 rounded-lg shadow-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto text-slate-200">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <Layers className="h-5 w-5 text-teal-400" />
             {mode === 'create' ? 'Novo Épico' : 'Editar Épico'}
-          </DialogTitle>
-          {projectTitle && (
-            <p className="text-sm text-muted-foreground">
-              Projeto: {projectTitle}
-            </p>
-          )}
-        </DialogHeader>
+          </h2>
+          <Button variant="ghost" size="sm" onClick={onClose} className="text-slate-400 hover:text-white">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+        {projectTitle && (
+          <p className="text-sm text-slate-400 mb-4">
+            Projeto: {projectTitle}
+          </p>
+        )}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -106,7 +111,7 @@ export function EpicFormModal({
                 <FormItem>
                   <FormLabel>Nome *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nome do épico" {...field} />
+                    <Input placeholder="Nome do épico" {...field} className="bg-slate-700 border-slate-600 text-white" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -124,6 +129,7 @@ export function EpicFormModal({
                       placeholder="Descreva o objetivo e entregáveis do épico"
                       rows={3}
                       {...field} 
+                      className="bg-slate-700 border-slate-600 text-white"
                     />
                   </FormControl>
                   <FormMessage />
@@ -139,13 +145,13 @@ export function EpicFormModal({
                   <FormLabel>Status</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
                         <SelectValue placeholder="Selecione o status" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-slate-800 text-white border-slate-700">
                       {STATUS_EPICO.map((status) => (
-                        <SelectItem key={status} value={status}>
+                        <SelectItem key={status} value={status} className="hover:bg-slate-700">
                           {status === 'planejado' ? 'Planejado' :
                            status === 'em_andamento' ? 'Em Andamento' :
                            status === 'concluido' ? 'Concluído' : 'Cancelado'}
@@ -171,8 +177,8 @@ export function EpicFormModal({
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
+                              "w-full pl-3 text-left font-normal bg-slate-700 border-slate-600 text-white hover:bg-slate-600",
+                              !field.value && "text-slate-400"
                             )}
                           >
                             {field.value ? (
@@ -184,13 +190,13 @@ export function EpicFormModal({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 bg-slate-800 border-slate-700" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
                           initialFocus
-                          className="pointer-events-auto"
+                          className="pointer-events-auto text-white"
                         />
                       </PopoverContent>
                     </Popover>
@@ -211,8 +217,8 @@ export function EpicFormModal({
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
+                              "w-full pl-3 text-left font-normal bg-slate-700 border-slate-600 text-white hover:bg-slate-600",
+                              !field.value && "text-slate-400"
                             )}
                           >
                             {field.value ? (
@@ -224,7 +230,7 @@ export function EpicFormModal({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 bg-slate-800 border-slate-700" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -233,7 +239,7 @@ export function EpicFormModal({
                             form.getValues().dataInicio ? date < form.getValues().dataInicio! : false
                           }
                           initialFocus
-                          className="pointer-events-auto"
+                          className="pointer-events-auto text-white"
                         />
                       </PopoverContent>
                     </Popover>
@@ -243,17 +249,17 @@ export function EpicFormModal({
               />
             </div>
 
-            <DialogFooter className="gap-2">
-              <Button type="button" variant="outline" onClick={onClose}>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={onClose} className="border-slate-700 hover:bg-slate-700">
                 Cancelar
               </Button>
-              <Button type="submit" className="min-w-[100px]">
+              <Button type="submit" className="min-w-[100px] bg-teal-500 hover:bg-teal-600 text-white">
                 {mode === 'create' ? 'Criar' : 'Salvar'}
               </Button>
-            </DialogFooter>
+            </div>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

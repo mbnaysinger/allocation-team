@@ -333,7 +333,7 @@ const ProjetosClientView = () => {
   const renderContent = () => {
     if (!selectedItem) {
       return (
-        <div className="flex items-center justify-center h-full text-muted-foreground">
+        <div className="flex items-center justify-center h-full text-slate-500">
           <div className="text-center">
             <Target className="h-16 w-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg">Selecione um item para ver os detalhes</p>
@@ -356,47 +356,47 @@ const ProjetosClientView = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">{project.nome}</h1>
-              <p className="text-muted-foreground mt-1">{project.descricao}</p>
+              <h1 className="text-3xl font-bold text-white">{project.nome}</h1>
+              <p className="text-slate-400 mt-1">{project.descricao}</p>
             </div>
-            <Button onClick={() => handleEditItem('project', project)}>
+            <Button onClick={() => handleEditItem('project', project)} className="bg-slate-700 hover:bg-slate-600">
               <Edit className="h-4 w-4 mr-2" />
               Editar
             </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
+            <Card className="bg-slate-800 border-slate-700">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Progresso Geral</CardTitle>
-                <Target className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-slate-300">Progresso Geral</CardTitle>
+                <Target className="h-4 w-4 text-slate-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{Math.round(progressPercentage)}%</div>
+                <div className="text-2xl font-bold text-white">{Math.round(progressPercentage)}%</div>
                 <Progress value={progressPercentage} className="mt-2" />
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="text-xs text-slate-400 mt-2">
                   {completedEpics} de {totalEpics} épicos concluídos
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-slate-800 border-slate-700">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Responsável</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-slate-300">Responsável</CardTitle>
+                <Users className="h-4 w-4 text-slate-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{project.responsavelId}</div>
-                <p className="text-xs text-muted-foreground mt-2">
+                <div className="text-2xl font-bold text-white">{project.responsavelId}</div>
+                <p className="text-xs text-slate-400 mt-2">
                   {project.entidade || 'Sem entidade'}
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-slate-800 border-slate-700">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Status</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-slate-300">Status</CardTitle>
+                <Clock className="h-4 w-4 text-slate-400" />
               </CardHeader>
               <CardContent>
                 <Badge variant="secondary" className="text-xs">
@@ -405,7 +405,7 @@ const ProjetosClientView = () => {
                    project.status === 'concluido' ? 'Concluído' : 'Cancelado'}
                 </Badge>
                 {project.dataFimPrevisto && (
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-slate-400 mt-2">
                     Término: {format(project.dataFimPrevisto, "PPP", { locale: ptBR })}
                   </p>
                 )}
@@ -413,11 +413,11 @@ const ProjetosClientView = () => {
             </Card>
           </div>
 
-          <Card>
+          <Card className="bg-slate-800 border-slate-700">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Épicos ({totalEpics})</CardTitle>
-                <Button size="sm" onClick={() => handleCreateEpic(project.projetoId)}>
+                <CardTitle className="text-white">Épicos ({totalEpics})</CardTitle>
+                <Button size="sm" onClick={() => handleCreateEpic(project.projetoId)} className="bg-slate-700 hover:bg-slate-600">
                   <Plus className="h-4 w-4 mr-2" />
                   Novo Épico
                 </Button>
@@ -427,18 +427,18 @@ const ProjetosClientView = () => {
               {totalEpics > 0 ? (
                 <div className="space-y-4">
                   {project.epics?.map((epic) => (
-                    <div key={epic.epicoId} className="p-4 border rounded-lg cursor-pointer hover:bg-accent transition-colors"
+                    <div key={epic.epicoId} className="p-4 border border-slate-700 rounded-lg cursor-pointer hover:bg-slate-700/50 transition-colors"
                          onClick={() => handleSelectItem('epic', epic.epicoId)}>
                       <div className="flex items-center justify-between">
-                        <h4 className="font-medium">{epic.nome}</h4>
-                        <Badge variant="outline">
+                        <h4 className="font-medium text-slate-100">{epic.nome}</h4>
+                        <Badge variant="outline" className="border-slate-600 text-slate-300">
                           {epic.status === 'planejado' ? 'Planejado' :
                            epic.status === 'em_andamento' ? 'Em Andamento' :
                            epic.status === 'concluido' ? 'Concluído' : 'Cancelado'}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">{epic.descricao}</p>
-                      <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                      <p className="text-sm text-slate-400 mt-1">{epic.descricao}</p>
+                      <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
                         <span>{epic.tarefas?.length || 0} tarefas</span>
                         <span>{epic.tarefas?.filter(t => t.status === 'concluida').length || 0} concluídas</span>
                       </div>
@@ -446,9 +446,9 @@ const ProjetosClientView = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center text-muted-foreground py-8">
+                <div className="text-center text-slate-500 py-8">
                   <p>Nenhum épico criado ainda.</p>
-                  <Button variant="outline" size="sm" className="mt-2" onClick={() => handleCreateEpic(project.projetoId)}>
+                  <Button variant="outline" size="sm" className="mt-2 border-slate-700 hover:bg-slate-700" onClick={() => handleCreateEpic(project.projetoId)}>
                     <Plus className="h-4 w-4 mr-2" />
                     Criar primeiro épico
                   </Button>
@@ -468,10 +468,10 @@ const ProjetosClientView = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Carregando projetos...</p>
+      <div className="flex items-center justify-center h-screen bg-slate-900">
+        <div className="text-center text-slate-400">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-sky-400 mx-auto"></div>
+          <p className="mt-4">Carregando projetos...</p>
         </div>
       </div>
     );
@@ -479,18 +479,18 @@ const ProjetosClientView = () => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <AlertTriangle className="h-16 w-16 text-destructive mx-auto mb-4" />
-          <p className="text-lg text-destructive">Erro ao carregar projetos</p>
-          <p className="text-sm text-muted-foreground mt-2">{error}</p>
+      <div className="flex items-center justify-center h-screen bg-slate-900">
+        <div className="text-center text-red-400">
+          <AlertTriangle className="h-16 w-16 mx-auto mb-4" />
+          <p className="text-lg">Erro ao carregar projetos</p>
+          <p className="text-sm text-slate-500 mt-2">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex bg-slate-900 text-slate-200">
       {/* Sidebar */}
       <div className="w-80 flex-shrink-0">
         <ProjectSidebar
@@ -506,9 +506,9 @@ const ProjetosClientView = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 overflow-auto">
+      <main className="flex-1 p-6 overflow-auto">
         {renderContent()}
-      </div>
+      </main>
 
       {/* Modals */}
       <ProjectFormModal
