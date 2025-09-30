@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CalendarIcon, CheckSquare, Users, X } from "lucide-react";
@@ -24,7 +24,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/Popover";
 import { Calendar } from "@/components/ui/Calendar";
-import { Tarefa, STATUS_TAREFA } from "@/backend/core/models/projeto/Tarefa";
+import { STATUS_TAREFA } from "@/backend/core/models/projeto/Tarefa";
 import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
 
 const taskSchema = z.object({
@@ -65,10 +65,10 @@ export function TaskCreateModal({
     },
   });
 
-  const dataInicio = useWatch({
-    control: form.control,
-    name: "dataInicio",
-  });
+    // const dataInicio = useWatch({
+    //   control: form.control,
+    //   name: "dataInicio",
+    // });
 
   const handleSubmit = (data: TaskFormData) => {
     onSubmit(data, epicId);
@@ -248,7 +248,9 @@ export function TaskCreateModal({
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          minDate={dataInicio}
+                          disabled={(date) =>
+                            form.getValues().dataInicio ? date < form.getValues().dataInicio! : false
+                          }
                           initialFocus
                           className="pointer-events-auto"
                         />

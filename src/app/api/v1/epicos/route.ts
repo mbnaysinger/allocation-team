@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dependencyFactory } from '@/backend/infrastructure/factories/DependencyFactory';
-import { DadosEpico } from '@/backend/core/models/projeto/Epico';
 
 const epicoService = dependencyFactory.createEpicoService();
 

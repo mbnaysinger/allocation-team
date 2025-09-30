@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CalendarIcon, Users, Target, X } from "lucide-react";
@@ -24,7 +24,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/Popover";
 import { Calendar } from "@/components/ui/Calendar";
-import { Projeto, ENTIDADES, FASES_PROJETO, STATUS_PROJETO } from "@/backend/core/models/projeto/Projeto";
+import { ENTIDADES, FASES_PROJETO, STATUS_PROJETO } from "@/backend/core/models/projeto/Projeto";
 import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
 
 const projectSchema = z.object({
@@ -69,10 +69,10 @@ export function ProjectCreateModal({
     },
   });
 
-  const dataInicio = useWatch({
-    control: form.control,
-    name: "dataInicio",
-  });
+  // const dataInicio = useWatch({
+  //   control: form.control,
+  //   name: "dataInicio",
+  // });
 
   const handleSubmit = (data: ProjectFormData) => {
     onSubmit(data);

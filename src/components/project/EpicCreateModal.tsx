@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CalendarIcon, Layers, X } from "lucide-react";
@@ -24,7 +24,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/Popover";
 import { Calendar } from "@/components/ui/Calendar";
-import { Epico, STATUS_EPICO } from "@/backend/core/models/projeto/Epico";
+import { STATUS_EPICO } from "@/backend/core/models/projeto/Epico";
 import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
 
 const epicSchema = z.object({
@@ -65,10 +65,10 @@ export function EpicCreateModal({
     },
   });
 
-  const dataInicio = useWatch({
-    control: form.control,
-    name: "dataInicio",
-  });
+  // const dataInicio = useWatch({
+  //   control: form.control,
+  //   name: "dataInicio",
+  // });
 
   const handleSubmit = (data: EpicFormData) => {
     onSubmit({ ...data, projetoId: projetoId });

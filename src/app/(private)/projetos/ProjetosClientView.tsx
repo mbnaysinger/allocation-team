@@ -23,10 +23,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Progress } from "@/components/ui/Progress";
 import { Button } from "@/components/ui/Button";
 import { 
-  Calendar, 
   Users, 
   Target, 
-  CheckSquare, 
   Plus,
   Edit,
   Clock,
@@ -296,15 +294,15 @@ const ProjetosClientView = () => {
     }
     return null;
   };
-  const findTask = (id: string) => {
-    for (const project of projects) {
-      for (const epic of project.epics || []) {
-        const task = epic.tarefas?.find(t => t.tarefaId === id);
-        if (task) return { task, epic, project };
-      }
-    }
-    return null;
-  };
+  // const findTask = (id: string) => {
+  //   for (const project of projects) {
+  //     for (const epic of project.epics || []) {
+  //       const task = epic.tarefas?.find(t => t.tarefaId === id);
+  //       if (task) return { task, epic, project };
+  //     }
+  //   }
+  //   return null;
+  // };
 
   // Event handlers
   const handleSelectItem = (type: 'project' | 'epic' | 'task', id: string) => {
