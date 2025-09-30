@@ -2,11 +2,12 @@ import * as React from "react";
 import { DayPicker } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
-import "./Calendar.dark.css";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
+  minDate?: Date;
+};
 
-function Calendar({ className, ...props }: CalendarProps) {
+function Calendar({ className, minDate, ...props }: CalendarProps) {
   const [month, setMonth] = React.useState<Date>(props.defaultMonth || new Date());
 
   const handleMonthChange = (newMonth: Date) => {
@@ -111,6 +112,13 @@ function Calendar({ className, ...props }: CalendarProps) {
         month={month}
         onMonthChange={handleMonthChange}
         className="w-full"
+        disabled={(date) => {
+          if (!minDate) return false;
+          // Comparar apenas a data, ignorando a hora
+          const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+          const minDateOnly = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate());
+          return dateOnly < minDateOnly;
+        }}
         classNames={{
           months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
           month: "space-y-4",
@@ -120,21 +128,23 @@ function Calendar({ className, ...props }: CalendarProps) {
           nav_button: "hidden",
           nav_button_previous: "hidden",
           nav_button_next: "hidden",
-          table: "w-full border-collapse space-y-1",
+          table: "w-full border-collapse",
           head_row: "flex",
-          head_cell: "text-slate-400 rounded-md w-9 font-normal text-[0.8rem]",
-          row: "flex w-full mt-2",
+          head_cell: "text-slate-500 rounded-md w-9 font-normal text-[0.8rem] text-center flex items-center justify-center",
+          row: "flex w-full mt-4 gap-1",
           cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-slate-800/50 [&:has([aria-selected])]:bg-slate-700 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
           day: cn(
-            "h-9 w-9 p-0 font-normal aria-selected:opacity-100 text-slate-200 hover:bg-slate-700 rounded-md transition-colors"
+            "h-9 w-9 p-0 font-normal aria-selected:opacity-100 text-slate-200 hover:bg-sky-500 hover:text-white rounded-md transition-colors text-center"
           ),
           day_range_end: "day-range-end",
-          day_selected: "bg-sky-500 text-white hover:bg-sky-600 focus:bg-sky-500",
+          day_selected: "bg-sky-500 text-white hover:bg-sky-600 focus:bg-sky-500 font-medium",
           day_today: "bg-slate-700 text-sky-400",
           day_outside: "day-outside text-slate-500 opacity-50 aria-selected:bg-slate-800/50 aria-selected:text-slate-500 aria-selected:opacity-30",
-          day_disabled: "text-slate-500 opacity-50",
+          day_disabled: "text-slate-500 opacity-50 cursor-not-allowed",
           day_range_middle: "aria-selected:bg-slate-700 aria-selected:text-slate-200",
           day_hidden: "invisible",
+          // Estilos para a coluna de semana
+          weeknumber: "text-slate-400 text-xs font-medium w-8 text-left flex items-left justify-left mr-3",
         }}
         components={{
           Chevron: ({ ...props }) => (

@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CalendarIcon, Layers, X } from "lucide-react";
@@ -67,6 +67,11 @@ export function EpicEditModal({
       });
     }
   }, [isOpen, epic, form]);
+
+  const dataInicio = useWatch({
+    control: form.control,
+    name: "dataInicio",
+  });
 
   const handleSubmit = (data: EpicFormData) => {
     onSubmit(data);
@@ -219,9 +224,7 @@ export function EpicEditModal({
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) =>
-                            form.getValues().dataInicio ? date < form.getValues().dataInicio! : false
-                          }
+                          minDate={dataInicio}
                           initialFocus
                           className="pointer-events-auto"
                         />
