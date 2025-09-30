@@ -1,177 +1,145 @@
+"use client";
+
 import * as React from "react";
-import { DayPicker } from "react-day-picker";
+import { DayPicker, useDayPicker } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import "react-day-picker/dist/style.css";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
-  minDate?: Date;
-};
+export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
-function Calendar({ className, minDate, ...props }: CalendarProps) {
-  const [month, setMonth] = React.useState<Date>(props.defaultMonth || new Date());
+// Componente para o dropdown de seleção de mês/ano
+const CustomDropdown = ({ value, onChange, options }: { value: number, onChange: (value: number) => void, options: { label: string, value: number }[] }) => (
+  <div className="relative">
+    <select
+      value={value}
+      onChange={(e) => onChange(parseInt(e.target.value))}
+      className="bg-transparent text-slate-200 text-sm font-medium appearance-none cursor-pointer pr-6 focus:outline-none hover:text-sky-400 transition-colors"
+    >
+      {options.map(opt => (
+        <option key={opt.value} value={opt.value} className="bg-slate-800 text-slate-200">
+          {opt.label}
+        </option>
+      ))}
+    </select>
+    <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 h-3 w-3 text-sky-400 pointer-events-none" />
+  </div>
+);
 
-  const handleMonthChange = (newMonth: Date) => {
-    setMonth(newMonth);
-  };
+// Componente para os botões de navegação (setas)
+const NavButton = ({ children, ...props }: React.ComponentProps<'button'>) => (
+  <button
+    type="button"
+    className="h-7 w-7 bg-slate-700 text-sky-400 hover:bg-slate-600 border-0 rounded-md flex items-center justify-center transition-colors"
+    {...props}
+  >
+    {children}
+  </button>
+);
 
-  const months = [
+// Componente do cabeçalho customizado que usa o hook da biblioteca
+const CustomCaption = () => {
+  const { goToMonth, months } = useDayPicker();
+  const currentMonth = months[0]?.date || new Date();
+
+  const monthNames = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
     "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
   ];
 
-  const currentYear = month.getFullYear();
-  const currentMonth = month.getMonth();
-  
-  // Gerar anos (10 anos atrás até 10 anos à frente)
+  const currentYear = currentMonth.getFullYear();
   const years = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
 
   const handleMonthSelect = (monthIndex: number) => {
-    const newDate = new Date(month);
+    const newDate = new Date(currentMonth);
     newDate.setMonth(monthIndex);
-    setMonth(newDate);
+    goToMonth(newDate);
   };
 
   const handleYearSelect = (year: number) => {
-    const newDate = new Date(month);
+    const newDate = new Date(currentMonth);
     newDate.setFullYear(year);
-    setMonth(newDate);
+    goToMonth(newDate);
   };
 
   const goToPreviousMonth = () => {
-    const newDate = new Date(month);
+    const newDate = new Date(currentMonth);
     newDate.setMonth(newDate.getMonth() - 1);
-    setMonth(newDate);
+    goToMonth(newDate);
   };
 
   const goToNextMonth = () => {
-    const newDate = new Date(month);
+    const newDate = new Date(currentMonth);
     newDate.setMonth(newDate.getMonth() + 1);
-    setMonth(newDate);
+    goToMonth(newDate);
   };
 
   return (
-    <div className={cn("rdp p-3 bg-slate-800 text-white rounded-md border border-slate-700", className)}>
-      {/* Header personalizado com dropdowns */}
-      <div className="flex items-center justify-between w-full px-1 mb-4">
-        {/* Mês e Ano com Dropdowns */}
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <select
-              value={currentMonth}
-              onChange={(e) => handleMonthSelect(parseInt(e.target.value))}
-              className="bg-transparent text-slate-200 text-sm font-medium appearance-none cursor-pointer pr-6 focus:outline-none hover:text-sky-400 transition-colors"
-            >
-              {months.map((monthName, index) => (
-                <option key={index} value={index} className="bg-slate-800 text-slate-200">
-                  {monthName}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-0 top-1/2 transform -translate-y-1/2 h-3 w-3 text-sky-400 pointer-events-none" />
-          </div>
-          
-          <div className="relative">
-            <select
-              value={currentYear}
-              onChange={(e) => handleYearSelect(parseInt(e.target.value))}
-              className="bg-transparent text-slate-200 text-sm font-medium appearance-none cursor-pointer pr-6 focus:outline-none hover:text-sky-400 transition-colors"
-            >
-              {years.map((year) => (
-                <option key={year} value={year} className="bg-slate-800 text-slate-200">
-                  {year}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-0 top-1/2 transform -translate-y-1/2 h-3 w-3 text-sky-400 pointer-events-none" />
-          </div>
-        </div>
-
-        {/* Controles de Navegação */}
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={goToPreviousMonth}
-            className="h-7 w-7 bg-slate-700 text-sky-400 hover:bg-slate-600 border-0 rounded-md flex items-center justify-center transition-colors"
-            aria-label="Mês anterior"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={goToNextMonth}
-            className="h-7 w-7 bg-slate-700 text-sky-400 hover:bg-slate-600 border-0 rounded-md flex items-center justify-center transition-colors"
-            aria-label="Próximo mês"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
+    <div className="flex items-center justify-between w-full px-1 mb-4">
+      <div className="flex items-center gap-2">
+        <CustomDropdown
+          value={currentMonth.getMonth()}
+          onChange={handleMonthSelect}
+          options={monthNames.map((m, i) => ({ label: m, value: i }))}
+        />
+        <CustomDropdown
+          value={currentYear}
+          onChange={handleYearSelect}
+          options={years.map(y => ({ label: y.toString(), value: y }))}
+        />
       </div>
+      <div className="flex items-center gap-1">
+        <NavButton onClick={goToPreviousMonth} aria-label="Mês anterior">
+          <ChevronLeft className="h-4 w-4" />
+        </NavButton>
+        <NavButton onClick={goToNextMonth} aria-label="Próximo mês">
+          <ChevronRight className="h-4 w-4" />
+        </NavButton>
+      </div>
+    </div>
+  );
+};
 
-      {/* Calendar Grid */}
+// Componente principal Calendar
+function Calendar({
+  className,
+  classNames,
+  showOutsideDays = true,
+  ...props
+}: CalendarProps) {
+  return (
+    <div className={cn("p-3 bg-slate-800 text-white rounded-md border border-slate-700", className)}>
       <DayPicker
-        month={month}
-        onMonthChange={handleMonthChange}
+        showOutsideDays={showOutsideDays}
         className="w-full"
-        disabled={(date) => {
-          if (!minDate) return false;
-          // Comparar apenas a data, ignorando a hora
-          const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-          const minDateOnly = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate());
-          return dateOnly < minDateOnly;
-        }}
         classNames={{
           months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
           month: "space-y-4",
-          caption: "hidden", // Esconder o caption padrão
+          caption: "hidden", // Esconde o cabeçalho padrão
           caption_label: "hidden",
-          nav: "hidden", // Esconder a navegação padrão
-          nav_button: "hidden",
-          nav_button_previous: "hidden",
-          nav_button_next: "hidden",
+          nav: "hidden", // Esconde a navegação padrão
           table: "w-full border-collapse",
-          head_row: "flex",
-          head_cell: "text-slate-500 rounded-md w-9 font-normal text-[0.8rem] text-center flex items-center justify-center",
-          row: "flex w-full mt-4 gap-1",
-          cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-slate-800/50 [&:has([aria-selected])]:bg-slate-700 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-          day: cn(
-            "h-9 w-9 p-0 font-normal aria-selected:opacity-100 text-slate-200 hover:bg-sky-500 hover:text-white rounded-md transition-colors text-center"
-          ),
-          day_range_end: "day-range-end",
-          day_selected: "bg-sky-500 text-white hover:bg-sky-600 focus:bg-sky-500 font-medium",
-          day_today: "bg-slate-700 text-sky-400",
-          day_outside: "day-outside text-slate-500 opacity-50 aria-selected:bg-slate-800/50 aria-selected:text-slate-500 aria-selected:opacity-30",
-          day_disabled: "text-slate-500 opacity-50 cursor-not-allowed",
-          day_range_middle: "aria-selected:bg-slate-700 aria-selected:text-slate-200",
+          head_row: "flex justify-around",
+          head_cell: "text-slate-500 rounded-md w-9 font-normal text-[0.8rem]",
+          row: "flex w-full mt-2 justify-around",
+          cell: "h-9 w-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+          day: "h-9 w-9 p-0 font-normal rounded-md transition-colors aria-selected:opacity-100",
+          day_selected: "bg-sky-500 text-sky-50 hover:bg-sky-500 focus:bg-sky-500 focus:text-sky-50",
+          day_today: "bg-slate-700 text-sky-400 rounded-md",
+          day_outside: "text-slate-500 opacity-50",
+          day_disabled: "text-slate-600 opacity-50 cursor-not-allowed",
           day_hidden: "invisible",
-          // Estilos para a coluna de semana
-          weeknumber: "text-slate-400 text-xs font-medium w-8 text-left flex items-left justify-left mr-3",
+          ...classNames,
         }}
-        components={{
-          Chevron: ({ ...props }) => (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-4 w-4"
-              {...props}
-            >
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-          ),
-        }}
-        showOutsideDays
-        fixedWeeks
-        showWeekNumber
-        weekStartsOn={1}
+         components={{
+           MonthCaption: CustomCaption,
+         }}
         {...props}
       />
     </div>
   );
 }
+
 Calendar.displayName = "Calendar";
 
 export { Calendar };

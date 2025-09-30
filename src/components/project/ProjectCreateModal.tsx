@@ -311,7 +311,9 @@ export function ProjectCreateModal({
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          minDate={dataInicio}
+                          disabled={(date) =>
+                            form.getValues().dataInicio ? date < form.getValues().dataInicio! : false
+                          }
                           initialFocus
                           className="pointer-events-auto"
                         />
