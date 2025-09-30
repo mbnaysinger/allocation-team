@@ -41,6 +41,7 @@ const ProjetosClientView = () => {
   const [projects, setProjects] = useState<ProjectWithChildren[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set());
   
   const [selectedItem, setSelectedItem] = useState<{ type: 'project' | 'epic' | 'task'; id: string } | null>(null);
   
@@ -95,7 +96,7 @@ const ProjetosClientView = () => {
     }
   };
 
-  // Operações CRUD
+  // Operações CRUD com atualização otimista
   const createProject = async (data: Partial<Projeto>) => {
     const response = await fetch('/api/v1/projetos', {
       method: 'POST',
@@ -103,23 +104,56 @@ const ProjetosClientView = () => {
       body: JSON.stringify(data)
     });
     if (!response.ok) throw new Error('Erro ao criar projeto');
-    await fetchData();
+    
+    const newProject = await response.json();
+    // Atualização otimista: adicionar projeto localmente
+    setProjects(prev => [...prev, { ...newProject, epics: [] }]);
   };
 
   const updateProject = async (id: string, data: Partial<Projeto>) => {
-    const response = await fetch(`/api/v1/projetos/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Erro ao atualizar projeto');
-    await fetchData();
+    // Marcar como atualizando
+    setUpdatingItems(prev => new Set(prev).add(id));
+    
+    // Atualização otimista: atualizar localmente primeiro
+    setProjects(prev => prev.map(project => 
+      project.projetoId === id 
+        ? { ...project, ...data }
+        : project
+    ));
+
+    try {
+      const response = await fetch(`/api/v1/projetos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Erro ao atualizar projeto');
+    } catch (error) {
+      // Em caso de erro, recarregar dados para reverter
+      await fetchData();
+      throw error;
+    } finally {
+      // Remover indicador de carregamento
+      setUpdatingItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    }
   };
 
   const deleteProject = async (id: string) => {
-    const response = await fetch(`/api/v1/projetos/${id}`, { method: 'DELETE' });
-    if (!response.ok) throw new Error('Erro ao deletar projeto');
-    await fetchData();
+    // Atualização otimista: remover localmente primeiro
+    setProjects(prev => prev.filter(project => project.projetoId !== id));
+
+    try {
+      const response = await fetch(`/api/v1/projetos/${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Erro ao deletar projeto');
+    } catch (error) {
+      // Em caso de erro, recarregar dados para reverter
+      await fetchData();
+      throw error;
+    }
   };
 
   const createEpic = async (projectId: string, data: Partial<Epico>) => {
@@ -129,23 +163,56 @@ const ProjetosClientView = () => {
       body: JSON.stringify({ ...data, projetoId: projectId })
     });
     if (!response.ok) throw new Error('Erro ao criar épico');
-    await fetchData();
+    
+    const newEpic = await response.json();
+    // Atualização otimista: adicionar épico localmente
+    setProjects(prev => prev.map(project => 
+      project.projetoId === projectId
+        ? { ...project, epics: [...(project.epics || []), { ...newEpic, tarefas: [] }] }
+        : project
+    ));
   };
 
   const updateEpic = async (id: string, data: Partial<Epico>) => {
-    const response = await fetch(`/api/v1/epicos/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Erro ao atualizar épico');
-    await fetchData();
+    // Atualização otimista: atualizar localmente primeiro
+    setProjects(prev => prev.map(project => ({
+      ...project,
+      epics: project.epics?.map(epic => 
+        epic.epicoId === id 
+          ? { ...epic, ...data }
+          : epic
+      ) || []
+    })));
+
+    try {
+      const response = await fetch(`/api/v1/epicos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Erro ao atualizar épico');
+    } catch (error) {
+      // Em caso de erro, recarregar dados para reverter
+      await fetchData();
+      throw error;
+    }
   };
 
   const deleteEpic = async (id: string) => {
-    const response = await fetch(`/api/v1/epicos/${id}`, { method: 'DELETE' });
-    if (!response.ok) throw new Error('Erro ao deletar épico');
-    await fetchData();
+    // Atualização otimista: remover localmente primeiro
+    setProjects(prev => prev.map(project => ({
+      ...project,
+      epics: project.epics?.filter(epic => epic.epicoId !== id) || []
+    })));
+
+    try {
+      const response = await fetch(`/api/v1/epicos/${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Erro ao deletar épico');
+    } catch (error) {
+      // Em caso de erro, recarregar dados para reverter
+      await fetchData();
+      throw error;
+    }
   };
 
   const createTask = async (epicId: string, data: Partial<Tarefa>) => {
@@ -155,23 +222,64 @@ const ProjetosClientView = () => {
       body: JSON.stringify({ ...data, epicoId: epicId })
     });
     if (!response.ok) throw new Error('Erro ao criar tarefa');
-    await fetchData();
+    
+    const newTask = await response.json();
+    // Atualização otimista: adicionar tarefa localmente
+    setProjects(prev => prev.map(project => ({
+      ...project,
+      epics: project.epics?.map(epic => 
+        epic.epicoId === epicId
+          ? { ...epic, tarefas: [...(epic.tarefas || []), newTask] }
+          : epic
+      ) || []
+    })));
   };
 
   const updateTask = async (id: string, data: Partial<Tarefa>) => {
-    const response = await fetch(`/api/v1/tarefas/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Erro ao atualizar tarefa');
-    await fetchData();
+    // Atualização otimista: atualizar localmente primeiro
+    setProjects(prev => prev.map(project => ({
+      ...project,
+      epics: project.epics?.map(epic => ({
+        ...epic,
+        tarefas: epic.tarefas?.map(task => 
+          task.tarefaId === id 
+            ? { ...task, ...data }
+            : task
+        ) || []
+      })) || []
+    })));
+
+    try {
+      const response = await fetch(`/api/v1/tarefas/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Erro ao atualizar tarefa');
+    } catch (error) {
+      // Em caso de erro, recarregar dados para reverter
+      await fetchData();
+      throw error;
+    }
   };
 
   const deleteTask = async (id: string) => {
-    const response = await fetch(`/api/v1/tarefas/${id}`, { method: 'DELETE' });
-    if (!response.ok) throw new Error('Erro ao deletar tarefa');
-    await fetchData();
+    // Atualização otimista: remover localmente primeiro
+    setProjects(prev => prev.map(project => ({
+      ...project,
+      epics: project.epics?.map(epic => ({
+        ...epic,
+        tarefas: epic.tarefas?.filter(task => task.tarefaId !== id) || []
+      })) || []
+    })));
+
+    try {
+      const response = await fetch(`/api/v1/tarefas/${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Erro ao deletar tarefa');
+    } catch (error) {
+      // Em caso de erro, recarregar dados para reverter
+      throw error;
+    }
   };
 
   // Carregar dados na inicialização
@@ -505,6 +613,7 @@ const ProjetosClientView = () => {
           onCreateTask={handleCreateTask}
           onEditItem={handleEditItem}
           onDeleteItem={handleDeleteItem}
+          updatingItems={updatingItems}
         />
       </div>
 

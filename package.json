@@ -38,6 +38,7 @@
     "next-auth": "^4.24.5",
     "next-swagger-doc": "^0.4.1",
     "react": "^19.0.0",
+    "react-calendar": "^6.0.0",
     "react-day-picker": "^9.11.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.63.0",

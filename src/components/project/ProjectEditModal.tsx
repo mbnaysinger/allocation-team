@@ -274,7 +274,7 @@ export function ProjectEditModal({
                           selected={field.value}
                           onSelect={field.onChange}
                           initialFocus
-                          className="pointer-events-auto text-white"
+                          className="pointer-events-auto"
                         />
                       </PopoverContent>
                     </Popover>
@@ -317,7 +317,7 @@ export function ProjectEditModal({
                             form.getValues().dataInicio ? date < form.getValues().dataInicio! : false
                           }
                           initialFocus
-                          className="pointer-events-auto text-white"
+                          className="pointer-events-auto"
                         />
                       </PopoverContent>
                     </Popover>

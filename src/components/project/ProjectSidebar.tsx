@@ -9,7 +9,8 @@ import {
   Plus,
   MoreHorizontal,
   Edit,
-  Trash2
+  Trash2,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -40,6 +41,7 @@ interface ProjectSidebarProps {
   onCreateTask: (epicId: string) => void;
   onEditItem: (type: 'project' | 'epic' | 'task', item: Projeto | Epico | Tarefa) => void;
   onDeleteItem: (type: 'project' | 'epic' | 'task', id: string) => void;
+  updatingItems?: Set<string>;
 }
 
 export function ProjectSidebar({
@@ -50,7 +52,8 @@ export function ProjectSidebar({
   onCreateEpic,
   onCreateTask,
   onEditItem,
-  onDeleteItem
+  onDeleteItem,
+  updatingItems = new Set()
 }: ProjectSidebarProps) {
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
   const [expandedEpics, setExpandedEpics] = useState<Set<string>>(new Set());
@@ -167,6 +170,7 @@ export function ProjectSidebar({
         {projects.map((project) => {
           const isProjectExpanded = expandedProjects.has(project.projetoId);
           const isProjectSelected = selectedItem?.type === 'project' && selectedItem.id === project.projetoId;
+          const isProjectUpdating = updatingItems.has(project.projetoId);
 
           return (
             <div key={project.projetoId} className="space-y-1">
@@ -211,7 +215,11 @@ export function ProjectSidebar({
                   {project.nome}
                 </span>
                 
-                <div className={cn("h-2 w-2 rounded-full", getStatusColor('project', project.status))} />
+                {isProjectUpdating ? (
+                  <Loader2 className="h-3 w-3 animate-spin text-blue-400" />
+                ) : (
+                  <div className={cn("h-2 w-2 rounded-full", getStatusColor('project', project.status))} />
+                )}
                 
                 <ItemActions 
                   type="project" 
@@ -225,6 +233,7 @@ export function ProjectSidebar({
               {isProjectExpanded && project.epics && project.epics.map((epic) => {
                 const isEpicExpanded = expandedEpics.has(epic.epicoId);
                 const isEpicSelected = selectedItem?.type === 'epic' && selectedItem.id === epic.epicoId;
+                const isEpicUpdating = updatingItems.has(epic.epicoId);
 
                 return (
                   <div key={epic.epicoId} className="ml-4 space-y-1">
@@ -264,7 +273,11 @@ export function ProjectSidebar({
                         {epic.nome}
                       </span>
                       
-                      <div className={cn("h-2 w-2 rounded-full", getStatusColor('epic', epic.status))} />
+                      {isEpicUpdating ? (
+                        <Loader2 className="h-3 w-3 animate-spin text-blue-400" />
+                      ) : (
+                        <div className={cn("h-2 w-2 rounded-full", getStatusColor('epic', epic.status))} />
+                      )}
                       
                       <ItemActions 
                         type="epic" 
@@ -277,6 +290,7 @@ export function ProjectSidebar({
                     {/* Tasks */}
                     {isEpicExpanded && epic.tarefas && epic.tarefas.map((task) => {
                       const isTaskSelected = selectedItem?.type === 'task' && selectedItem.id === task.tarefaId;
+                      const isTaskUpdating = updatingItems.has(task.tarefaId);
 
                       return (
                         <div
@@ -294,7 +308,11 @@ export function ProjectSidebar({
                             {task.nome}
                           </span>
                           
-                          <div className={cn("h-2 w-2 rounded-full", getStatusColor('task', task.status))} />
+                          {isTaskUpdating ? (
+                            <Loader2 className="h-3 w-3 animate-spin text-blue-400" />
+                          ) : (
+                            <div className={cn("h-2 w-2 rounded-full", getStatusColor('task', task.status))} />
+                          )}
                           
                           <ItemActions 
                             type="task" 
