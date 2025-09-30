@@ -8,7 +8,7 @@ export interface Epico {
   status: StatusEpico;
   dataInicio: Date;
   dataFimPrevisto: Date;
-  dataFimReal: Date;
+  dataFimReal?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,7 +20,7 @@ export interface DadosEpico {
   status: StatusEpico;
   dataInicio: Date;
   dataFimPrevisto: Date;
-  dataFimReal: Date;
+  dataFimReal?: Date;
 }
 
 export const STATUS_EPICO: StatusEpico[] = [

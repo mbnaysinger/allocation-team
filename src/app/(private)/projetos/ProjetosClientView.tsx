@@ -13,9 +13,11 @@ interface EpicWithChildren extends Epico {
   tarefas: Tarefa[];
 }
 import { ProjectSidebar } from "@/components/project/ProjectSidebar";
-import { ProjectFormModal } from "@/components/project/ProjectFormModal";
-import { EpicFormModal } from "@/components/project/EpicFormModal";
-import { TaskFormModal } from "@/components/project/TaskFormModal";
+import { ProjectCreateModal } from "@/components/project/ProjectCreateModal";
+import { ProjectEditModal } from "@/components/project/ProjectEditModal";
+import { EpicCreateModal } from "@/components/project/EpicCreateModal";
+import { EpicEditModal } from "@/components/project/EpicEditModal";
+import { TaskCreateModal } from "@/components/project/TaskCreateModal";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Progress } from "@/components/ui/Progress";
@@ -33,6 +35,7 @@ import {
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
+import { TaskEditModal } from "@/components/project/TaskEditModal";
 
 const ProjetosClientView = () => {
   const [projects, setProjects] = useState<ProjectWithChildren[]>([]);
@@ -47,7 +50,7 @@ const ProjetosClientView = () => {
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [editingItem, setEditingItem] = useState<any>(null);
-  const [contextIds, setContextIds] = useState<{ projectId?: string; epicId?: string }>({});
+  const [contextIds, setContextIds] = useState<{ projetoId?: string; epicId?: string }>({});
 
   const { toast } = useToast();
 
@@ -206,10 +209,10 @@ const ProjetosClientView = () => {
     setProjectModalOpen(true);
   };
 
-  const handleCreateEpic = (projectId: string) => {
+  const handleCreateEpic = (projetoId: string) => {
     setModalMode('create');
     setEditingItem(null);
-    setContextIds({ projectId });
+    setContextIds({ projetoId });
     setEpicModalOpen(true);
   };
 
@@ -281,10 +284,10 @@ const ProjetosClientView = () => {
     }
   };
 
-  const handleEpicSubmit = async (data: any) => {
+  const handleEpicSubmit = async (data: any, projectId?: string) => {
     try {
-      if (modalMode === 'create' && contextIds.projectId) {
-        await createEpic(contextIds.projectId, data);
+      if (modalMode === 'create' && projectId) {
+        await createEpic(projectId, data);
         toast({
           title: "Épico criado",
           description: `${data.nome} foi criado com sucesso.`,
@@ -511,29 +514,48 @@ const ProjetosClientView = () => {
       </main>
 
       {/* Modals */}
-      <ProjectFormModal
-        isOpen={projectModalOpen}
+      <ProjectCreateModal
+        isOpen={projectModalOpen && modalMode === 'create'}
+        onClose={() => setProjectModalOpen(false)}
+        onSubmit={handleProjectSubmit}
+      />
+
+      <ProjectEditModal
+        isOpen={projectModalOpen && modalMode === 'edit'}
         onClose={() => setProjectModalOpen(false)}
         onSubmit={handleProjectSubmit}
         project={editingItem}
-        mode={modalMode}
       />
 
-      <EpicFormModal
-        isOpen={epicModalOpen}
+      <EpicCreateModal
+        isOpen={epicModalOpen && modalMode === 'create'}
+        onClose={() => setEpicModalOpen(false)}
+        onSubmit={(data) => handleEpicSubmit(data, contextIds.projetoId)}
+        projetoTitulo={contextIds.projetoId ? findProject(contextIds.projetoId)?.nome : undefined}
+        projetoId={contextIds.projetoId || ''}
+      />
+
+      <EpicEditModal
+        isOpen={epicModalOpen && modalMode === 'edit'}
         onClose={() => setEpicModalOpen(false)}
         onSubmit={handleEpicSubmit}
         epic={editingItem}
-        mode={modalMode}
-        projectTitle={contextIds.projectId ? findProject(contextIds.projectId)?.nome : undefined}
+        projectTitle={contextIds.projetoId ? findProject(contextIds.projetoId)?.nome : undefined}
       />
 
-      <TaskFormModal
+      <TaskCreateModal
         isOpen={taskModalOpen}
         onClose={() => setTaskModalOpen(false)}
         onSubmit={handleTaskSubmit}
+        epicTitle={contextIds.epicId ? findEpic(contextIds.epicId)?.epic.nome : undefined}
+        epicId={contextIds.epicId || ''}
+      />
+
+      <TaskEditModal
+        isOpen={taskModalOpen && modalMode === 'edit'}
+        onClose={() => setTaskModalOpen(false)}
+        onSubmit={handleTaskSubmit}
         task={editingItem}
-        mode={modalMode}
         epicTitle={contextIds.epicId ? findEpic(contextIds.epicId)?.epic.nome : undefined}
       />
     </div>

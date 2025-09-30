@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { dependencyFactory } from '@/backend/infrastructure/factories/DependencyFactory';
 import { DadosEpico } from '@/backend/core/models/projeto/Epico';
 
+const epicoService = dependencyFactory.createEpicoService();
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -37,29 +39,19 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
+  const body = await request.json();
+  console.log("POST /api/v1/epicos - body:", body);
+  const { nome, descricao, status, dataInicio, dataFimPrevisto, projetoId } = body;
+
+  if (!nome || !status || !dataInicio || !dataFimPrevisto || !projetoId) {
+    return new Response(JSON.stringify({ message: 'Campos obrigatórios não preenchidos' }), { status: 400 });
+  }
+
   try {
-    const body = await request.json();
-    const epicoService = dependencyFactory.createEpicoService();
-    
-    const dadosEpico: DadosEpico = {
-      nome: body.title || body.nome,
-      descricao: body.description || body.descricao || '',
-      projetoId: body.projectId,
-      status: body.status || 'planejado',
-      dataInicio: body.startDate || body.dataInicio || new Date(),
-      dataFimPrevisto: body.endDate || body.dataFimPrevisto || new Date(),
-      dataFimReal: body.dataFimReal || new Date(),
-    };
-    
-    const novoEpico = await epicoService.criarEpico(dadosEpico);
-    
-    return NextResponse.json(novoEpico, { status: 201 });
+    const epico = await epicoService.criarEpico({ nome, descricao, status, dataInicio, dataFimPrevisto, projetoId });
+    return new Response(JSON.stringify(epico), { status: 201 });
   } catch (error) {
-    console.error('Erro ao criar épico:', error);
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ message: 'Erro ao criar épico' }), { status: 500 });
   }
 }

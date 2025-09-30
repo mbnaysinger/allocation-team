@@ -1,19 +1,13 @@
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CalendarIcon, Layers, X } from "lucide-react";
+import { CalendarIcon, CheckSquare, Users, X } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/Dialog";
 import {
   Form,
   FormControl,
@@ -25,84 +19,77 @@ import {
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/Select";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/Popover";
 import { Calendar } from "@/components/ui/Calendar";
-import { Epico, STATUS_EPICO } from "@/backend/core/models/projeto/Epico";
+import { Tarefa, STATUS_TAREFA } from "@/backend/core/models/projeto/Tarefa";
 import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
 
-const epicSchema = z.object({
+const taskSchema = z.object({
   nome: z.string().min(3, "Nome é obrigatório").max(100, "Máximo 100 caracteres"),
   descricao: z.string().max(500, "Máximo 500 caracteres").optional(),
-  status: z.enum(STATUS_EPICO as [string, ...string[]]),
+  status: z.enum(STATUS_TAREFA),
+  executorId: z.array(z.string()).min(1, "Pelo menos um executor é obrigatório"),
   dataInicio: z.date(),
   dataFimPrevisto: z.date(),
 });
 
-type EpicFormData = z.infer<typeof epicSchema>;
+type TaskFormData = z.infer<typeof taskSchema>;
 
-interface EpicFormModalProps {
+interface TaskCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: EpicFormData) => void;
-  epic?: Partial<Epico>;
-  mode: 'create' | 'edit';
-  projectTitle?: string;
+  onSubmit: (data: TaskFormData, epicId: string) => void;
+  epicTitle?: string;
+  epicId: string;
 }
 
-export function EpicFormModal({
+export function TaskCreateModal({
   isOpen,
   onClose,
   onSubmit,
-  epic,
-  mode,
-  projectTitle
-}: EpicFormModalProps) {
-  const form = useForm<EpicFormData>({
-    resolver: zodResolver(epicSchema),
+  epicTitle,
+  epicId,
+}: TaskCreateModalProps) {
+  const form = useForm<TaskFormData>({
+    resolver: zodResolver(taskSchema),
     defaultValues: {
-      nome: epic?.nome || "",
-      descricao: epic?.descricao || "",
-      status: epic?.status || "planejado",
-      dataInicio: epic?.dataInicio,
-      dataFimPrevisto: epic?.dataFimPrevisto,
+      nome: "",
+      descricao: "",
+      status: "nao_iniciada",
+      executorId: [],
+      dataInicio: new Date(),
+      dataFimPrevisto: new Date(),
     },
   });
 
-  const handleSubmit = (data: EpicFormData) => {
-    onSubmit(data);
+  const handleSubmit = (data: TaskFormData) => {
+    onSubmit(data, epicId);
     onClose();
     form.reset();
   };
 
   if (!isOpen) return null;
 
-  const statusOptions: SelectOption[] = STATUS_EPICO.map(s => ({ value: s, label: s === 'planejado' ? 'Planejado' : s === 'em_andamento' ? 'Em Andamento' : s === 'concluido' ? 'Concluído' : 'Cancelado' }));
+  const statusOptions: SelectOption[] = STATUS_TAREFA.map(s => ({ value: s, label: s === 'nao_iniciada' ? 'Não Iniciada' : s === 'em_andamento' ? 'Em Andamento' : s === 'concluida' ? 'Concluída' : 'Cancelada' }));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
       <div className="bg-slate-800 rounded-lg shadow-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto text-slate-200">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-            <Layers className="h-5 w-5 text-teal-400" />
-            {mode === 'create' ? 'Novo Épico' : 'Editar Épico'}
+            <CheckSquare className="h-5 w-5 text-slate-400" />
+            Nova Tarefa
           </h2>
           <Button variant="ghost" size="sm" onClick={onClose} className="text-slate-400 hover:text-white">
             <X className="h-4 w-4" />
           </Button>
         </div>
-        {projectTitle && (
+        {epicTitle && (
           <p className="text-sm text-slate-400 mb-4">
-            Projeto: {projectTitle}
+            Épico: {epicTitle}
           </p>
         )}
 
@@ -115,7 +102,7 @@ export function EpicFormModal({
                 <FormItem>
                   <FormLabel>Nome *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nome do épico" {...field} className="bg-slate-700 border-slate-600 text-white" />
+                    <Input placeholder="Nome da tarefa" {...field} className="bg-slate-700 border-slate-600 text-white" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -130,7 +117,7 @@ export function EpicFormModal({
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Descreva o objetivo e entregáveis do épico"
+                      placeholder="Descreva o que deve ser feito nesta tarefa"
                       rows={3}
                       {...field} 
                       className="bg-slate-700 border-slate-600 text-white"
@@ -141,22 +128,49 @@ export function EpicFormModal({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <SearchableSelect
-                    options={statusOptions}
-                    value={statusOptions.find(o => o.value === field.value)}
-                    onChange={(option) => field.onChange(option ? option.value : null)}
-                    placeholder="Selecione o status"
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <SearchableSelect
+                      options={statusOptions}
+                      value={statusOptions.find(o => o.value === field.value)}
+                      onChange={(option) => field.onChange(option ? option.value : null)}
+                      placeholder="Selecione o status"
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="executorId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Executores *</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Input 
+                          className="pl-10 bg-slate-700 border-slate-600 text-white"
+                          placeholder="IDs dos executores (separados por vírgula)" 
+                          value={Array.isArray(field.value) ? field.value.join(', ') : ''}
+                          onChange={(e) => {
+                            const values = e.target.value.split(',').map(v => v.trim()).filter(v => v);
+                            field.onChange(values);
+                          }}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -247,8 +261,8 @@ export function EpicFormModal({
               <Button type="button" variant="outline" onClick={onClose} className="border-slate-700 hover:bg-slate-700">
                 Cancelar
               </Button>
-              <Button type="submit" className="min-w-[100px] bg-teal-500 hover:bg-teal-600 text-white">
-                {mode === 'create' ? 'Criar' : 'Salvar'}
+              <Button type="submit" className="min-w-[100px] bg-slate-500 hover:bg-slate-600 text-white">
+                Criar
               </Button>
             </div>
           </form>

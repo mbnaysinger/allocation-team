@@ -1,19 +1,13 @@
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CalendarIcon, CheckSquare, Users, AlertTriangle, X } from "lucide-react";
+import { CalendarIcon, Users, Target, X } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/Dialog";
 import {
   Form,
   FormControl,
@@ -25,62 +19,64 @@ import {
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/Select";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/Popover";
 import { Calendar } from "@/components/ui/Calendar";
-import { Tarefa, STATUS_TAREFA } from "@/backend/core/models/projeto/Tarefa";
+import { Projeto, ENTIDADES, FASES_PROJETO, STATUS_PROJETO } from "@/backend/core/models/projeto/Projeto";
 import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
 
-const taskSchema = z.object({
+const projectSchema = z.object({
+  abreviatura: z.string().min(2, "Abreviatura deve ter pelo menos 2 caracteres").max(10, "Máximo 10 caracteres"),
   nome: z.string().min(3, "Nome é obrigatório").max(100, "Máximo 100 caracteres"),
   descricao: z.string().max(500, "Máximo 500 caracteres").optional(),
-  status: z.enum(STATUS_TAREFA),
-  executorId: z.array(z.string()).min(1, "Pelo menos um executor é obrigatório"),
+  entidade: z.enum(ENTIDADES).optional(),
+  linkDocumentacao: z.string().url("URL inválida").optional().or(z.literal("")),
+  responsavelId: z.string().min(1, "Responsável é obrigatório"),
+  fase: z.enum(FASES_PROJETO),
+  status: z.enum(STATUS_PROJETO),
   dataInicio: z.date(),
   dataFimPrevisto: z.date(),
 });
 
-type TaskFormData = z.infer<typeof taskSchema>;
+type ProjectFormData = z.infer<typeof projectSchema>;
 
-interface TaskFormModalProps {
+interface ProjectEditModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: TaskFormData) => void;
-  task?: Partial<Tarefa>;
-  mode: 'create' | 'edit';
-  epicTitle?: string;
+  onSubmit: (data: ProjectFormData) => void;
+  project: Partial<Projeto>;
 }
 
-export function TaskFormModal({
+export function ProjectEditModal({
   isOpen,
   onClose,
   onSubmit,
-  task,
-  mode,
-  epicTitle
-}: TaskFormModalProps) {
-  const form = useForm<TaskFormData>({
-    resolver: zodResolver(taskSchema),
-    defaultValues: {
-      nome: task?.nome || "",
-      descricao: task?.descricao || "",
-      status: task?.status || "nao_iniciada",
-      executorId: task?.executorId || [],
-      dataInicio: task?.dataInicio,
-      dataFimPrevisto: task?.dataFimPrevisto,
-    },
+  project,
+}: ProjectEditModalProps) {
+  const form = useForm<ProjectFormData>({
+    resolver: zodResolver(projectSchema),
   });
 
-  const handleSubmit = (data: TaskFormData) => {
+  React.useEffect(() => {
+    if (isOpen) {
+      form.reset({
+        abreviatura: project?.abreviatura || "",
+        nome: project?.nome || "",
+        descricao: project?.descricao || "",
+        entidade: project?.entidade || undefined,
+        linkDocumentacao: project?.linkDocumentacao || "",
+        responsavelId: project?.responsavelId || "",
+        fase: project?.fase || "internal",
+        status: project?.status || "backlog",
+        dataInicio: project?.dataInicio ? new Date(project.dataInicio) : new Date(),
+        dataFimPrevisto: project?.dataFimPrevisto ? new Date(project.dataFimPrevisto) : new Date(),
+      });
+    }
+  }, [isOpen, project, form]);
+
+  const handleSubmit = (data: ProjectFormData) => {
     onSubmit(data);
     onClose();
     form.reset();
@@ -88,41 +84,54 @@ export function TaskFormModal({
 
   if (!isOpen) return null;
 
-  const statusOptions: SelectOption[] = STATUS_TAREFA.map(s => ({ value: s, label: s === 'nao_iniciada' ? 'Não Iniciada' : s === 'em_andamento' ? 'Em Andamento' : s === 'concluida' ? 'Concluída' : 'Cancelada' }));
+  const entidadeOptions: SelectOption[] = ENTIDADES.map(e => ({ value: e, label: e }));
+  const faseOptions: SelectOption[] = FASES_PROJETO.map(f => ({ value: f, label: f === 'upstream' ? 'Upstream' : f === 'downstream' ? 'Downstream' : f === 'internal' ? 'Interno' : 'Cancelado' }));
+  const statusOptions: SelectOption[] = STATUS_PROJETO.map(s => ({ value: s, label: s === 'backlog' ? 'Backlog' : s === 'em_andamento' ? 'Em Andamento' : s === 'concluido' ? 'Concluído' : 'Cancelado' }));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
       <div className="bg-slate-800 rounded-lg shadow-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto text-slate-200">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-            <CheckSquare className="h-5 w-5 text-slate-400" />
-            {mode === 'create' ? 'Nova Tarefa' : 'Editar Tarefa'}
+            <Target className="h-5 w-5 text-sky-400" />
+            Editar Projeto
           </h2>
           <Button variant="ghost" size="sm" onClick={onClose} className="text-slate-400 hover:text-white">
             <X className="h-4 w-4" />
           </Button>
         </div>
-        {epicTitle && (
-          <p className="text-sm text-slate-400 mb-4">
-            Épico: {epicTitle}
-          </p>
-        )}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="nome"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Nome da tarefa" {...field} className="bg-slate-700 border-slate-600 text-white" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="abreviatura"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Abreviatura *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: ECOM" {...field} className="bg-slate-700 border-slate-600 text-white" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="nome"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nome do projeto" {...field} className="bg-slate-700 border-slate-600 text-white" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -132,7 +141,7 @@ export function TaskFormModal({
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Descreva o que deve ser feito nesta tarefa"
+                      placeholder="Descreva o objetivo e escopo do projeto"
                       rows={3}
                       {...field} 
                       className="bg-slate-700 border-slate-600 text-white"
@@ -144,6 +153,63 @@ export function TaskFormModal({
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="entidade"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Entidade</FormLabel>
+                    <SearchableSelect
+                      options={entidadeOptions}
+                      value={entidadeOptions.find(o => o.value === field.value)}
+                      onChange={(option) => field.onChange(option ? option.value : null)}
+                      placeholder="Selecione a entidade"
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="responsavelId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Responsável *</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Input 
+                          className="pl-10 bg-slate-700 border-slate-600 text-white"
+                          placeholder="ID do responsável" 
+                          {...field} 
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="fase"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fase</FormLabel>
+                    <SearchableSelect
+                      options={faseOptions}
+                      value={faseOptions.find(o => o.value === field.value)}
+                      onChange={(option) => field.onChange(option ? option.value : null)}
+                      placeholder="Selecione a fase"
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="status"
@@ -160,32 +226,21 @@ export function TaskFormModal({
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="executorId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Executores *</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <Input 
-                          className="pl-10 bg-slate-700 border-slate-600 text-white"
-                          placeholder="IDs dos executores (separados por vírgula)" 
-                          value={Array.isArray(field.value) ? field.value.join(', ') : ''}
-                          onChange={(e) => {
-                            const values = e.target.value.split(',').map(v => v.trim()).filter(v => v);
-                            field.onChange(values);
-                          }}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
+
+            <FormField
+              control={form.control}
+              name="linkDocumentacao"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Link da Documentação</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://..." {...field} className="bg-slate-700 border-slate-600 text-white" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -276,8 +331,8 @@ export function TaskFormModal({
               <Button type="button" variant="outline" onClick={onClose} className="border-slate-700 hover:bg-slate-700">
                 Cancelar
               </Button>
-              <Button type="submit" className="min-w-[100px] bg-slate-500 hover:bg-slate-600 text-white">
-                {mode === 'create' ? 'Criar' : 'Salvar'}
+              <Button type="submit" className="min-w-[100px] bg-sky-500 hover:bg-sky-600 text-white">
+                Salvar
               </Button>
             </div>
           </form>

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dependencyFactory } from '@/backend/infrastructure/factories/DependencyFactory';
-import { Projeto, DadosProjeto } from '@/backend/core/models/projeto/Projeto';
-import { Epico } from '@/backend/core/models/projeto/Epico';
-import { Tarefa } from '@/backend/core/models/projeto/Tarefa';
+import { DadosProjeto } from '@/backend/core/models/projeto/Projeto';
 
 export async function GET() {
   try {

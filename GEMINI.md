@@ -41,6 +41,34 @@ A aplicação é um monorepo construído com Next.js e segue princípios da **Cl
 - **`src/components`**: Componentes React, divididos em `features` (específicos de uma funcionalidade) e `ui` (genéricos).
 - **`src/config`**: Lógica de configuração da aplicação.
 
+### Árvore de Arquitetura Simplificada
+
+A estrutura do projeto segue uma organização baseada em Clean Architecture, separando as responsabilidades em camadas distintas:
+
+```
+src/
+├── app/                  # Camada de Apresentação (Frontend - Next.js App Router)
+│   ├── (private)/        # Rotas privadas da aplicação
+│   ├── api/              # Camada de Entrada (Backend - API Endpoints)
+│   └── ...
+│
+├── backend/              # Lógica de Negócio e Infraestrutura (Backend)
+│   ├── core/             # "Coração" da Aplicação (Clean Architecture)
+│   │   ├── models/       # Entidades de negócio (ex: Pessoa, Projeto)
+│   │   ├── ports/        # Interfaces (Contratos) para repositórios e serviços
+│   │   └── services/     # Casos de Uso e lógica de negócio
+│   │
+│   └── infrastructure/   # Camada de Infraestrutura
+│       ├── repositories/ # Implementações concretas dos repositórios (ex: MongoDB)
+│       └── factories/    # Fábricas para injeção de dependência
+│
+├── components/           # Componentes React reutilizáveis
+│   ├── features/         # Componentes específicos de uma funcionalidade
+│   └── ui/               # Componentes de UI genéricos (Botão, Input, etc.)
+│
+└── config/               # Configurações da aplicação (banco de dados, auth, etc.)
+```
+
 ### Stack Tecnológica:
 
 - **Framework**: Next.js (com App Router e Turbopack)

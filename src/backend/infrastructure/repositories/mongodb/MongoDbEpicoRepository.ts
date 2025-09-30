@@ -47,6 +47,7 @@ export class MongoDbEpicoRepository implements IEpicoRepository {
     const collection = await this.getEpicosCollection();
     const now = new Date();
 
+    console.log("------Chegou aqui: " + dados);
     const novoEpico: Omit<Epico, 'epicoId'> & { epicoId?: string } = {
       ...dados,
       epicoId: `epic_${Date.now()}`,
