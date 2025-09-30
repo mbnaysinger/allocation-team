@@ -48,7 +48,7 @@ const ProjetosClientView = () => {
   const [epicModalOpen, setEpicModalOpen] = useState(false);
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
-  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingItem, setEditingItem] = useState<ProjectWithChildren | EpicWithChildren | Tarefa | null>(null);
   const [contextIds, setContextIds] = useState<{ projetoId?: string; epicId?: string }>({});
 
   const { toast } = useToast();
@@ -329,7 +329,7 @@ const ProjetosClientView = () => {
     setTaskModalOpen(true);
   };
 
-  const handleEditItem = (type: 'project' | 'epic' | 'task', item: any) => {
+  const handleEditItem = (type: 'project' | 'epic' | 'task', item: ProjectWithChildren | EpicWithChildren | Tarefa) => {
     setModalMode('edit');
     setEditingItem(item);
     
@@ -357,6 +357,7 @@ const ProjetosClientView = () => {
         description: `${type} foi removido com sucesso.`,
       });
     } catch (error) {
+      console.error(error);
       toast({
         title: "Erro",
         description: "Ocorreu um erro ao excluir o item.",
@@ -366,7 +367,7 @@ const ProjetosClientView = () => {
   };
 
   // Form submission handlers
-  const handleProjectSubmit = async (data: any) => {
+  const handleProjectSubmit = async (data: Partial<Projeto>) => {
     try {
       if (modalMode === 'create') {
         await createProject(data);
@@ -374,7 +375,7 @@ const ProjetosClientView = () => {
           title: "Projeto criado",
           description: `${data.nome} foi criado com sucesso.`,
         });
-      } else {
+      } else if (editingItem && 'projetoId' in editingItem) {
         await updateProject(editingItem.projetoId, data);
         toast({
           title: "Projeto atualizado", 
@@ -382,6 +383,7 @@ const ProjetosClientView = () => {
         });
       }
     } catch (error) {
+      console.error(error);
       toast({
         title: "Erro",
         description: "Ocorreu um erro ao salvar o projeto.",
@@ -390,7 +392,7 @@ const ProjetosClientView = () => {
     }
   };
 
-  const handleEpicSubmit = async (data: any, projectId?: string) => {
+  const handleEpicSubmit = async (data: Partial<Epico>, projectId?: string) => {
     try {
       if (modalMode === 'create' && projectId) {
         await createEpic(projectId, data);
@@ -398,14 +400,15 @@ const ProjetosClientView = () => {
           title: "Épico criado",
           description: `${data.nome} foi criado com sucesso.`,
         });
-      } else {
-        await updateEpic(editingItem.epicoId, data);
+      } else if (editingItem && 'epicoId' in editingItem) {
+        await updateEpic(editingItem.epicoId, data as Partial<Epico>);
         toast({
           title: "Épico atualizado",
           description: `${data.nome} foi atualizado com sucesso.`,
         });
       }
     } catch (error) {
+      console.error(error);
       toast({
         title: "Erro",
         description: "Ocorreu um erro ao salvar o épico.",
@@ -414,7 +417,7 @@ const ProjetosClientView = () => {
     }
   };
 
-  const handleTaskSubmit = async (data: any) => {
+  const handleTaskSubmit = async (data: Partial<Tarefa>) => {
     try {
       if (modalMode === 'create' && contextIds.epicId) {
         await createTask(contextIds.epicId, data);
@@ -422,14 +425,15 @@ const ProjetosClientView = () => {
           title: "Tarefa criada",
           description: `${data.nome} foi criada com sucesso.`,
         });
-      } else {
-        await updateTask(editingItem.tarefaId, data);
+      } else if (editingItem && 'tarefaId' in editingItem) {
+        await updateTask(editingItem.tarefaId, data as Partial<Tarefa>);
         toast({
           title: "Tarefa atualizada",
           description: `${data.nome} foi atualizada com sucesso.`,
         });
       }
     } catch (error) {
+      console.error(error);
       toast({
         title: "Erro",
         description: "Ocorreu um erro ao salvar a tarefa.",
@@ -609,7 +613,7 @@ const ProjetosClientView = () => {
           onCreateProject={handleCreateProject}
           onCreateEpic={handleCreateEpic}
           onCreateTask={handleCreateTask}
-          onEditItem={handleEditItem}
+          onEditItem={handleEditItem as (type: 'project' | 'epic' | 'task', item: Projeto | Epico | Tarefa) => void}
           onDeleteItem={handleDeleteItem}
           updatingItems={updatingItems}
         />
@@ -631,13 +635,13 @@ const ProjetosClientView = () => {
         isOpen={projectModalOpen && modalMode === 'edit'}
         onClose={() => setProjectModalOpen(false)}
         onSubmit={handleProjectSubmit}
-        project={editingItem}
+        project={editingItem as Partial<Projeto>}
       />
 
       <EpicCreateModal
         isOpen={epicModalOpen && modalMode === 'create'}
         onClose={() => setEpicModalOpen(false)}
-        onSubmit={(data) => handleEpicSubmit(data, contextIds.projetoId)}
+        onSubmit={(data) => handleEpicSubmit(data as Partial<Epico>, contextIds.projetoId)}
         projetoTitulo={contextIds.projetoId ? findProject(contextIds.projetoId)?.nome : undefined}
         projetoId={contextIds.projetoId || ''}
       />
@@ -645,8 +649,8 @@ const ProjetosClientView = () => {
       <EpicEditModal
         isOpen={epicModalOpen && modalMode === 'edit'}
         onClose={() => setEpicModalOpen(false)}
-        onSubmit={handleEpicSubmit}
-        epic={editingItem}
+        onSubmit={(data) => handleEpicSubmit(data as Partial<Epico>, contextIds.projetoId)}
+        epic={editingItem as Partial<Epico>}
         projectTitle={contextIds.projetoId ? findProject(contextIds.projetoId)?.nome : undefined}
       />
 
@@ -662,7 +666,7 @@ const ProjetosClientView = () => {
         isOpen={taskModalOpen && modalMode === 'edit'}
         onClose={() => setTaskModalOpen(false)}
         onSubmit={handleTaskSubmit}
-        task={editingItem}
+        task={editingItem as Partial<Tarefa>}
         epicTitle={contextIds.epicId ? findEpic(contextIds.epicId)?.epic.nome : undefined}
       />
     </div>

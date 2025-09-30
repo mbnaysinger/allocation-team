@@ -20,6 +20,7 @@ export class ClonarAtividade {
         tipo: atividadeOriginal.tipo,
         projetoId: atividadeOriginal.projetoId,
         descricaoJira: atividadeOriginal.descricaoJira,
+        semana: atividadeOriginal.semana,
         status: STATUS_ATIVIDADE[0],  // Planejada
         horas: atividadeOriginal.horas,
       };

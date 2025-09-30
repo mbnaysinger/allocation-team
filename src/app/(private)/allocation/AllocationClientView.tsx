@@ -12,8 +12,9 @@ import ModalAdicionarProjeto from "@/components/features/modals/ModalAdicionarPr
 import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionarAtividade";
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
 import ModalResumoSemanal from "@/components/features/modals/ModalResumoSemanal";
-import { Pessoa, Projeto, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
+import { Pessoa, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
 import { getWeekString } from "@/app/utils/date";
+import { Projeto } from "@/backend/core/models/projeto/Projeto";
 
 interface AllocationClientViewProps {
   initialData: {
@@ -79,7 +80,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
 
     // 2. Se houver projetos filtrados, refine a lista de pessoas
     if (projetosFiltrados.length > 0) {
-      const projetosFiltradosIds = new Set(projetosFiltrados.map(p => p.id));
+      const projetosFiltradosIds = new Set(projetosFiltrados.map(p => p.projetoId));
       
       // Encontra os IDs das pessoas que têm atividades nos projetos selecionados
       const pessoasComAtividadesNosProjetos = new Set(

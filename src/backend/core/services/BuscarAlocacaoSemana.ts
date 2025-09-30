@@ -1,7 +1,8 @@
 import { IPessoaRepository } from '../ports/IPessoaRepository';
 import { IProjetoRepository } from '../ports/IProjetoRepository';
 import { IAtividadeRepository } from '../ports/IAtividadeRepository';
-import { Pessoa, Projeto, Atividade, AtividadeCompleta } from '../models';
+import { Pessoa, Atividade, AtividadeCompleta } from '../models';
+import { Projeto } from '../models/projeto/Projeto';
 
 interface BuscarAlocacaoSemanaDTO {
   dataInicio?: string;
@@ -43,7 +44,7 @@ export class BuscarAlocacaoSemana {
       // 1. Buscar todas as entidades em paralelo para otimizar
       const [pessoas, projetos, atividades] = await Promise.all([
         buscarPessoasPromise,
-        this.projetoRepository.buscarAtivos(),
+        this.projetoRepository.buscarTodos(),
         atividadesPromise,
       ]);
 
@@ -63,7 +64,7 @@ export class BuscarAlocacaoSemana {
   }
 
   private combinarDados(atividades: Atividade[], pessoas: Pessoa[], projetos: Projeto[]): AtividadeCompleta[] {
-    const projetosMap = new Map(projetos.map(p => [p.id, p]));
+    const projetosMap = new Map(projetos.map(p => [p.projetoId, p]));
     const pessoasMap = new Map(pessoas.map(p => [p.id, p]));
 
     return atividades.map(atividade => {

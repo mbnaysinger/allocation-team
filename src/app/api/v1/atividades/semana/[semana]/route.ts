@@ -4,12 +4,15 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/config/auth';
 import { UserRole } from '@/backend/core/models/UserRole';
 
-export async function GET(request: Request, { params }: { params: { semana: string } }) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ semana: string }> }
+) {
   try {
     const session = await getServerSession(authOptions);
     const userRole = session?.user?.role;
     const personIds = session?.user?.personIds;
-    const { semana } = params;
+    const { semana } = await params;
 
     if (!semana) {
       return NextResponse.json({ message: 'O parâmetro semana é obrigatório' }, { status: 400 });

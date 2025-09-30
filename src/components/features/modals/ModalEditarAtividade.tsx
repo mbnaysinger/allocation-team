@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/Button';
 import ContadorCaracteres from '@/components/ui/ContadorCaracteres';
 import SearchableSelect, { SelectOption } from '@/components/ui/SearchableSelect';
 import { X, Trash2 } from 'lucide-react';
-import { AtividadeCompleta, DadosAtividade, Pessoa, Projeto, TipoAtividade, TIPOS_ATIVIDADE } from '@/backend/core/models';
+import { AtividadeCompleta, DadosAtividade, Pessoa, TipoAtividade, TIPOS_ATIVIDADE } from '@/backend/core/models';
+import { Projeto } from '@/backend/core/models/projeto/Projeto';
 
 interface ModalEditarAtividadeProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
     tipo: 'Projeto',
     projetoId: '',
     descricaoJira: '',
+    semana: '',
     status: 'planejada',
     horas: 8
   });
@@ -48,6 +50,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
         tipo: atividade.tipo,
         projetoId: atividade.projetoId || '',
         descricaoJira: atividade.descricaoJira || '',
+        semana: atividade.semana,
         horas: atividade.horas,
         status: atividade.status
       });
@@ -123,6 +126,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
       tipo: 'Projeto',
       projetoId: '',
       descricaoJira: '',
+      semana: '',
       status: 'planejada',
       horas: 8
     });
@@ -144,7 +148,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
 
   // Formatar projetos para o SearchableSelect
   const projectOptions: SelectOption[] = projetos.map(p => ({
-    value: p.id,
+    value: p.projetoId,
     label: `${p.abreviatura} - ${p.nome}`
   }));
 

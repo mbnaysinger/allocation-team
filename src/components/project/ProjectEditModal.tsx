@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CalendarIcon, Users, Target, X } from "lucide-react";
@@ -75,11 +75,6 @@ export function ProjectEditModal({
       });
     }
   }, [isOpen, project, form]);
-
-  const dataInicio = useWatch({
-    control: form.control,
-    name: "dataInicio",
-  });
 
   const handleSubmit = (data: ProjectFormData) => {
     onSubmit(data);
@@ -318,7 +313,9 @@ export function ProjectEditModal({
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          minDate={dataInicio}
+                          disabled={(date) =>
+                            form.getValues().dataInicio ? date < form.getValues().dataInicio! : false
+                          }
                           initialFocus
                           className="pointer-events-auto"
                         />

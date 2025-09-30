@@ -1,3 +1,5 @@
+import { Projeto } from "./projeto/Projeto";
+
 export type Cargo = 'Analista de TI' | 'Analista de Negócios';
 export type TipoAtividade = 'Projeto' | 'Melhoria' | 'Sustentação' | 'Administrativo' | 'Capacitação';
 export type Entidade = 'SESI' | 'SENAI' | 'IEL' | 'CIERGS' | 'GINFO' | 'SISTEMA FIERGS';
@@ -7,18 +9,6 @@ export interface Pessoa {
   id: string;
   nome: string;
   cargo: Cargo;
-  ativo: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Projeto {
-  id: string;
-  abreviatura: string;
-  nome: string;
-  descricao: string;
-  entidade?: Entidade;
-  linkJira?: string;
   ativo: boolean;
   createdAt: Date;
   updatedAt: Date;

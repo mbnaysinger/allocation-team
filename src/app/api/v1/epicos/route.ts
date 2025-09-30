@@ -51,6 +51,7 @@ export async function POST(request: Request) {
     const epico = await epicoService.criarEpico({ nome, descricao, status, dataInicio, dataFimPrevisto, projetoId });
     return new Response(JSON.stringify(epico), { status: 201 });
   } catch (error) {
+    console.error('Erro ao criar épico:', error);
     return new Response(JSON.stringify({ message: 'Erro ao criar épico' }), { status: 500 });
   }
 }

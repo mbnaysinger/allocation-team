@@ -124,11 +124,11 @@ function Calendar({
           row: "flex w-full mt-2 justify-around",
           cell: "h-9 w-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
           day: "h-9 w-9 p-0 font-normal rounded-md transition-colors aria-selected:opacity-100",
-          day_selected: "bg-sky-500 text-sky-50 hover:bg-sky-500 focus:bg-sky-500 focus:text-sky-50",
-          day_today: "bg-slate-700 text-sky-400 rounded-md",
+          selected: "bg-sky-500 text-sky-50 focus:bg-sky-500 focus:text-sky-50",
+          today: "text-sky-500 font-normal",
           day_outside: "text-slate-500 opacity-50",
-          day_disabled: "text-slate-600 opacity-50 cursor-not-allowed",
-          day_hidden: "invisible",
+          disabled: "text-slate-500 opacity-50 cursor-not-allowed",
+          hidden: "invisible",
           ...classNames,
         }}
          components={{
