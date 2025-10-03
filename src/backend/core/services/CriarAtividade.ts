@@ -1,5 +1,6 @@
 import { IAtividadeRepository } from '../ports/IAtividadeRepository';
 import { Atividade, DadosAtividade } from '../models';
+import { getWeekNumber } from '@/app/utils/date';
 
 const validarDadosAtividade = (dados: DadosAtividade): void => {
   if (!dados.titulo || dados.titulo.trim().length < 3) {
@@ -25,6 +26,10 @@ export class CriarAtividade {
   async execute(dados: DadosAtividade): Promise<Atividade[]> {
     try {
       validarDadosAtividade(dados);
+
+      if (dados) {
+        dados.semana = getWeekNumber(dados.data);
+      }
       
       const atividadesCriadas: Atividade[] = [];
 

@@ -2,10 +2,14 @@ import { IAtividadeRepository } from '../../core/ports/IAtividadeRepository';
 import { IResumoSemanalRepository } from '../../core/ports/IResumoSemanalRepository';
 import { IPessoaRepository } from '../../core/ports/IPessoaRepository';
 import { IProjetoRepository } from '../../core/ports/IProjetoRepository';
+import { IEpicoRepository } from '../../core/ports/IEpicoRepository';
+import { ITarefaRepository } from '../../core/ports/ITarefaRepository';
 import { MongoDbAtividadeRepository } from '../repositories/mongodb/MongoDbAtividadeRepository';
 import { MongoDbPessoaRepository } from '../repositories/mongodb/MongoDbPessoaRepository';
-import { MongoDbProjetoRepository } from '../repositories/mongodb/MongoDbProjetoRepository';
+import { MongoDbProjetoRepository } from '../repositories/mongodb/ProjetoRepository';
 import { MongoDbResumoSemanalRepository } from '../repositories/mongodb/MongoDbResumoSemanalRepository';
+import { MongoDbEpicoRepository } from '../repositories/mongodb/MongoDbEpicoRepository';
+import { MongoDbTarefaRepository } from '../repositories/mongodb/MongoDbTarefaRepository';
 import { IUserRepository } from '../../core/ports/IUserRepository';
 import { MongoDbUserRepository } from '../repositories/mongodb/MongoDbUserRepository';
 
@@ -14,12 +18,13 @@ import { CriarAtividade } from '../../core/services/CriarAtividade';
 import { AtualizarAtividade } from '../../core/services/AtualizarAtividade';
 import { DeletarAtividade } from '../../core/services/DeletarAtividade';
 import { ClonarAtividade } from '../../core/services/ClonarAtividade';
-import { CriarProjeto } from '../../core/services/CriarProjeto';
+import { ProjetoService } from '../../core/services/projeto/ProjetoService';
+import { EpicoService } from '../../core/services/projeto/EpicoService';
+import { TarefaService } from '../../core/services/projeto/TarefaService';
 import { CriarPessoa } from '../../core/services/CriarPessoa';
 import { BuscarPessoas } from '../../core/services/BuscarPessoas';
 import { SalvarResumoSemanal } from '../../core/services/SalvarResumoSemanal';
 import { BuscarResumosSemanais } from '../../core/services/BuscarResumosSemanais';
-import { BuscarProjetos } from '../../core/services/BuscarProjetos';
 import { CriarUsuario } from '../../core/services/CriarUsuario';
 
 
@@ -38,6 +43,14 @@ class DependencyFactory {
   
   private createProjetoRepository(): IProjetoRepository {
     return new MongoDbProjetoRepository();
+  }
+
+  private createEpicoRepository(): IEpicoRepository {
+    return new MongoDbEpicoRepository();
+  }
+
+  private createTarefaRepository(): ITarefaRepository {
+    return new MongoDbTarefaRepository();
   }
 
   private createResumoSemanalRepository(): IResumoSemanalRepository {
@@ -86,18 +99,21 @@ class DependencyFactory {
   public createBuscarPessoas(): BuscarPessoas {
     return new BuscarPessoas(this.createPessoaRepository());
   }
-
-  public createBuscarProjetos(): BuscarProjetos {
-    return new BuscarProjetos(this.createProjetoRepository());
-  }
-  
   
   public createCriarPessoa(): CriarPessoa {
     return new CriarPessoa(this.createPessoaRepository());
   }
 
-  public createCriarProjeto(): CriarProjeto {
-    return new CriarProjeto(this.createProjetoRepository());
+  public createProjetoService(): ProjetoService {
+    return new ProjetoService(this.createProjetoRepository());
+  }
+
+  public createEpicoService(): EpicoService {
+    return new EpicoService(this.createEpicoRepository());
+  }
+
+  public createTarefaService(): TarefaService {
+    return new TarefaService(this.createTarefaRepository());
   }
 
   public async createCriarUsuario(): Promise<CriarUsuario> {

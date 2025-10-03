@@ -3,7 +3,9 @@ import { Button } from '@/components/ui/Button';
 import ContadorCaracteres from '@/components/ui/ContadorCaracteres';
 import SearchableSelect, { SelectOption } from '@/components/ui/SearchableSelect'; // Importar o novo componente
 import { X } from 'lucide-react';
-import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, Projeto, TipoAtividade } from '@/backend/core/models';
+import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, TipoAtividade } from '@/backend/core/models';
+import { Projeto } from '@/backend/core/models/projeto/Projeto';
+import { getWeekNumber } from '@/app/utils/date';
 
 interface ModalAdicionarAtividadeProps {
   isOpen: boolean;
@@ -33,6 +35,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
     tipo: 'Melhoria',
     projetoId: '',
     descricaoJira: '',
+    semana: getWeekNumber(dataSelecionada),
     horas: 8,
     status: 'planejada'
   });
@@ -100,6 +103,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
       tipo: 'Melhoria',
       projetoId: '',
       descricaoJira: '',
+      semana: getWeekNumber(dataSelecionada),
       horas: 8,
       status: 'planejada'
     });
@@ -122,7 +126,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
 
   // Formatar projetos para o SearchableSelect
   const projectOptions: SelectOption[] = projetos.map(p => ({
-    value: p.id,
+    value: p.projetoId,
     label: `${p.abreviatura} - ${p.nome}`
   }));
 

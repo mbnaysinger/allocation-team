@@ -10,6 +10,7 @@ const fromDocument = (doc: Document): Atividade => {
     id: data.id,
     titulo: data.titulo,
     data: data.data,
+    semana: data.semana,
     pessoaId: data.pessoaId,
     tipo: data.tipo,
     projetoId: data.projetoId,
@@ -30,6 +31,14 @@ export class MongoDbAtividadeRepository implements IAtividadeRepository {
     const collection = await this.getAtividadesCollection();
     const documents = await collection.find({
       data: { $gte: dataInicio, $lte: dataFim }
+    }).toArray();
+    return documents.map(fromDocument);
+  }
+
+  async buscarPorSemana(semana: string): Promise<Atividade[]> {
+    const collection = await this.getAtividadesCollection();
+    const documents = await collection.find({
+      semana
     }).toArray();
     return documents.map(fromDocument);
   }

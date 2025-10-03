@@ -4,14 +4,14 @@ import { dependencyFactory } from '@/backend/infrastructure/factories/Dependency
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { pessoaId, semana_inicio, comentario } = body;
+    const { pessoaId, semana, comentario } = body;
 
-    if (!pessoaId || !semana_inicio || typeof comentario !== 'string') {
-      return NextResponse.json({ message: 'Campos pessoaId, semana_inicio e comentario são obrigatórios.' }, { status: 400 });
+    if (!pessoaId || !semana || typeof comentario !== 'string') {
+      return NextResponse.json({ message: 'Campos pessoaId, semana e comentario são obrigatórios.' }, { status: 400 });
     }
 
     const salvarResumoSemanal = dependencyFactory.createSalvarResumoSemanal();
-    const resumoSalvo = await salvarResumoSemanal.execute({ pessoaId, semana_inicio, comentario });
+    const resumoSalvo = await salvarResumoSemanal.execute({ pessoaId, semana, comentario });
 
     return NextResponse.json(resumoSalvo, { status: 200 });
 

@@ -9,7 +9,7 @@ const fromDocument = (doc: Document): ResumoSemanal => {
   return {
     id: data.id,
     pessoaId: data.pessoaId,
-    semana_inicio: data.semana_inicio,
+    semana: data.semana,
     comentario: data.comentario,
     createdAt: new Date(data.createdAt),
     updatedAt: new Date(data.updatedAt),
@@ -28,7 +28,7 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
     const result = await collection.findOneAndUpdate(
       { 
         pessoaId: resumo.pessoaId,
-        semana_inicio: resumo.semana_inicio,
+        semana: resumo.semana,
       },
       { 
         $set: { 
@@ -38,7 +38,7 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
         $setOnInsert: {
           id: `res_${Date.now()}`,
           pessoaId: resumo.pessoaId,
-          semana_inicio: resumo.semana_inicio,
+          semana: resumo.semana,
           createdAt: now,
         }
       },
@@ -56,7 +56,7 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
     // ou se a lógica precisar ser mais explícita.
     const novoDocumento = await collection.findOne({ 
         pessoaId: resumo.pessoaId,
-        semana_inicio: resumo.semana_inicio,
+        semana: resumo.semana,
     });
     
     if(!novoDocumento) throw new Error("Não foi possível salvar ou encontrar o resumo semanal.");
@@ -64,11 +64,11 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
     return fromDocument(novoDocumento);
   }
 
-  async buscarPorPessoasESemana(pessoaIds: string[], semana_inicio: string): Promise<ResumoSemanal[]> {
+  async buscarPorPessoasESemana(pessoaIds: string[], semana: string): Promise<ResumoSemanal[]> {
     const collection = await this.getResumosCollection();
     const documents = await collection.find({
       pessoaId: { $in: pessoaIds },
-      semana_inicio: semana_inicio,
+      semana: semana,
     }).toArray();
 
     return documents.map(fromDocument);

@@ -2,7 +2,8 @@ import React from "react";
 import { Button } from "@/components/ui/Button";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
-import { Pessoa, Projeto } from "@/backend/core/models";
+import { Pessoa } from "@/backend/core/models";
+import { Projeto } from "@/backend/core/models/projeto/Projeto";
 import { formatDateForDisplay } from "@/app/utils/date";
 import { UserRole } from "@/backend/core/models/UserRole";
 
@@ -37,7 +38,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   const dateRange = `${formatDateForDisplay(weekStart)} - ${formatDateForDisplay(weekEnd)}`;
 
   const pessoaOptions: SelectOption[] = pessoas.map(p => ({ value: p.id, label: p.nome }));
-  const projetoOptions: SelectOption[] = projetos.map(p => ({ value: p.id, label: p.nome }));
+  const projetoOptions: SelectOption[] = projetos.map(p => ({ value: p.projetoId, label: p.nome }));
 
   const handleFiltroPessoaChange = (selectedOptions: readonly SelectOption[]) => {
     const selectedIds = selectedOptions.map(option => option.value);
@@ -47,7 +48,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
 
   const handleFiltroProjetoChange = (selectedOptions: readonly SelectOption[]) => {
     const selectedIds = selectedOptions.map(option => option.value);
-    const projetosFiltrados = projetos.filter(p => selectedIds.includes(p.id));
+    const projetosFiltrados = projetos.filter(p => selectedIds.includes(p.projetoId));
     onFiltroProjetosChange(projetosFiltrados);
   };
 

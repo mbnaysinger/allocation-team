@@ -1,5 +1,7 @@
+import { Projeto } from "./projeto/Projeto";
+
 export type Cargo = 'Analista de TI' | 'Analista de Negócios';
-export type TipoAtividade = 'Projeto' | 'Melhoria' | 'Sustentação' | 'Backoffice';
+export type TipoAtividade = 'Projeto' | 'Melhoria' | 'Sustentação' | 'Administrativo' | 'Capacitação';
 export type Entidade = 'SESI' | 'SENAI' | 'IEL' | 'CIERGS' | 'GINFO' | 'SISTEMA FIERGS';
 export type StatusAtividade = 'planejada' | 'concluida' | 'nao_realizada';
 
@@ -12,22 +14,11 @@ export interface Pessoa {
   updatedAt: Date;
 }
 
-export interface Projeto {
-  id: string;
-  abreviatura: string;
-  nome: string;
-  descricao: string;
-  entidade?: Entidade;
-  linkJira?: string;
-  ativo: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface Atividade {
   id:string;
   titulo: string;
   data: string; // YYYY-MM-DD format
+  semana: string;
   pessoaId: string;
   tipo: TipoAtividade;
   projetoId?: string; // Obrigatório se tipo === "Projeto"
@@ -46,7 +37,7 @@ export interface AtividadeCompleta extends Atividade {
 export interface ResumoSemanal {
   id: string;
   pessoaId: string;
-  semana_inicio: string; // YYYY-MM-DD
+  semana: string;
   comentario: string;
   createdAt: Date;
   updatedAt: Date;
@@ -68,6 +59,7 @@ export interface DadosProjeto {
 export interface DadosAtividade {
   titulo: string;
   data: string;
+  semana: string;
   pessoaId: string;
   tipo: TipoAtividade;
   projetoId?: string;
@@ -87,7 +79,8 @@ export const TIPOS_ATIVIDADE: TipoAtividade[] = [
   'Melhoria',
   'Projeto',
   'Sustentação',
-  'Backoffice'
+  'Administrativo',
+  'Capacitação'
 ];
 
 export const ENTIDADES: Entidade[] = [

@@ -1,5 +1,5 @@
-import { IProjetoRepository } from '../ports/IProjetoRepository';
-import { Projeto, DadosProjeto } from '../models';
+import { IProjetoRepository } from '../../ports/IProjetoRepository';
+import { Projeto, DadosProjeto } from '../../models/projeto/Projeto';
 
 const validarDadosProjeto = (dados: DadosProjeto): void => {
   if (!dados.nome || dados.nome.trim().length < 3) {
@@ -10,10 +10,10 @@ const validarDadosProjeto = (dados: DadosProjeto): void => {
   }
 };
 
-export class CriarProjeto {
+export class ProjetoService {
   constructor(private projetoRepository: IProjetoRepository) {}
 
-  async execute(dados: DadosProjeto): Promise<Projeto> {
+  async criarProjeto(dados: DadosProjeto): Promise<Projeto> {
     try {
       validarDadosProjeto(dados);
       const novoProjeto = await this.projetoRepository.criar(dados);
@@ -22,5 +22,21 @@ export class CriarProjeto {
       console.error("Erro ao criar projeto:", error);
       throw new Error(`Falha ao criar projeto: ${(error as Error).message}`);
     }
+  }
+
+  async buscarProjetos(): Promise<Projeto[]> {
+    return this.projetoRepository.buscarTodos();
+  }
+
+  async buscarProjetoPorId(id: string): Promise<Projeto | null> {
+    return this.projetoRepository.buscarPorId(id);
+  }
+
+  async atualizarProjeto(id: string, dados: Partial<DadosProjeto>): Promise<Projeto | null> {
+    return this.projetoRepository.atualizar(id, dados);
+  }
+
+  async alternarAtivoProjeto(id: string, ativo: boolean): Promise<Projeto | null> {
+    return this.projetoRepository.alternarAtivo(id, ativo);
   }
 } 
