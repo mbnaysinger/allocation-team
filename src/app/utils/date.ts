@@ -13,20 +13,12 @@ export const getWeekNumber = (date: string) => {
 };
 
 export const getWeekString = (date: Date) => {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  // Usa sempre a data local do cliente
+  const d = new Date(date);
+  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+  const yearStart = new Date(d.getFullYear(), 0, 1);
   const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
-  return `${weekNo}${d.getUTCFullYear()}`;
-};
-
-/**
- * Obtém a data atual de forma consistente, considerando timezone
- */
-export const getCurrentDate = (): Date => {
-  const now = new Date();
-  // Normaliza para UTC para evitar problemas de timezone
-  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  return `${weekNo}${d.getFullYear()}`;
 };
 
 export const getWeekDates = (date: Date) => {

@@ -1,6 +1,6 @@
 import React from "react";
 import AllocationClientView from "./AllocationClientView";
-import { getWeekDates, getWeekString, getCurrentDate } from "@/app/utils/date";
+import { getWeekDates, getWeekString } from "@/app/utils/date";
 import { dependencyFactory } from "@/backend/infrastructure/factories/DependencyFactory";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/config/auth";
@@ -54,10 +54,10 @@ export default async function AllocationPage({ searchParams, }: AllocationPagePr
   if (semanaParam) {
     const year = parseInt(semanaParam.slice(-4));
     const week = parseInt(semanaParam.slice(0, -4));
-    // Cria a data de forma mais robusta para evitar problemas de timezone
-    baseDate = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
+    // Usa sempre data local do cliente
+    baseDate = new Date(year, 0, 1 + (week - 1) * 7);
   } else {
-    baseDate = getCurrentDate();
+    baseDate = new Date();
   }
 
   const week = getWeekDates(baseDate);
