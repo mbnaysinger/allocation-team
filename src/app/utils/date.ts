@@ -17,11 +17,22 @@ export const getWeekString = (date: Date) => {
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
-  return `${weekNo}${date.getFullYear()}`;
+  return `${weekNo}${d.getUTCFullYear()}`;
+};
+
+/**
+ * Obtém a data atual de forma consistente, considerando timezone
+ */
+export const getCurrentDate = (): Date => {
+  const now = new Date();
+  // Normaliza para UTC para evitar problemas de timezone
+  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
 };
 
 export const getWeekDates = (date: Date) => {
+  // Cria uma cópia da data para evitar mutação
   const start = new Date(date);
+  
   // Ajusta para o início da semana (considerando Domingo = 0)
   const day = start.getDay();
   const diff = start.getDate() - day + (day === 0 ? -6 : 1); // se for Domingo, vai para a segunda anterior

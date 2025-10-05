@@ -13,7 +13,7 @@ import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionar
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
 import ModalResumoSemanal from "@/components/features/modals/ModalResumoSemanal";
 import { Pessoa, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
-import { getWeekString } from "@/app/utils/date";
+import { getWeekString, getCurrentDate } from "@/app/utils/date";
 import { Projeto } from "@/backend/core/models/projeto/Projeto";
 
 interface AllocationClientViewProps {
@@ -98,15 +98,15 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
 
 
   const navigateWeek = (direction: 'prev' | 'next') => {
-    const newStartDate = new Date(week.start);
-    newStartDate.setDate(newStartDate.getDate() + (direction === 'next' ? 7 : -7));
+    // Cria uma nova data baseada na data atual da semana para evitar problemas de timezone
+    const newStartDate = new Date(week.start.getTime() + (direction === 'next' ? 7 : -7) * 24 * 60 * 60 * 1000);
     
     const semana = getWeekString(newStartDate);
     router.push(`/allocation?semana=${semana}`);
   };
 
   const navigateToCurrentWeek = () => {
-    const today = new Date();
+    const today = getCurrentDate();
     const semana = getWeekString(today);
     router.push(`/allocation?semana=${semana}`);
   };
