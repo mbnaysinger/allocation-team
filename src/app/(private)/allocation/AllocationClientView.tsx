@@ -74,6 +74,15 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   const [atividadeSelecionada, setAtividadeSelecionada] = useState<AtividadeCompleta | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const atividadesFiltradas = React.useMemo(() => {
+    // Se há projetos filtrados, filtra as atividades por projeto
+    if (projetosFiltrados.length > 0) {
+      const projetosFiltradosIds = new Set(projetosFiltrados.map(p => p.projetoId));
+      return atividades.filter(a => a.projetoId && projetosFiltradosIds.has(a.projetoId));
+    }
+    return atividades;
+  }, [atividades, projetosFiltrados]);
+
   const pessoasExibidas = React.useMemo(() => {
     // 1. Define a lista base de pessoas (filtrada ou todas)
     let basePessoas = pessoasFiltradas.length > 0 ? pessoasFiltradas : pessoas;
@@ -84,7 +93,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       
       // Encontra os IDs das pessoas que têm atividades nos projetos selecionados
       const pessoasComAtividadesNosProjetos = new Set(
-        atividades
+        atividadesFiltradas
           .filter(a => a.projetoId && projetosFiltradosIds.has(a.projetoId))
           .map(a => a.pessoaId)
       );
@@ -94,7 +103,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     }
 
     return basePessoas;
-  }, [pessoas, pessoasFiltradas, projetosFiltrados, atividades]);
+  }, [pessoas, pessoasFiltradas, projetosFiltrados, atividadesFiltradas]);
 
 
   const navigateWeek = (direction: 'prev' | 'next') => {
@@ -114,7 +123,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   };
   
   const calcularHorasDia = (pessoaId: string, data: string) => {
-    return atividades
+    return atividadesFiltradas
       .filter(a => a.pessoaId === pessoaId && a.data === data)
       .reduce((acc, a) => acc + a.horas, 0);
   };
@@ -411,7 +420,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
             key={pessoa.id}
             person={pessoa}
             weekStart={week.start}
-            atividades={atividades}
+            atividades={atividadesFiltradas}
             onAddAllocation={handleAddAllocation}
             onEditAllocation={handleEditAllocation}
             onCloneAllocation={handleClonarAtividade}
