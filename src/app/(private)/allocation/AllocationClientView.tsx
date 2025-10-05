@@ -13,7 +13,7 @@ import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionar
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
 import ModalResumoSemanal from "@/components/features/modals/ModalResumoSemanal";
 import { Pessoa, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
-import { getWeekString } from "@/app/utils/date";
+import { getWeekString, getBrazilianDate, toBrazilianTimezone } from "@/app/utils/date";
 import { Projeto } from "@/backend/core/models/projeto/Projeto";
 
 interface AllocationClientViewProps {
@@ -98,19 +98,18 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
 
 
   const navigateWeek = (direction: 'prev' | 'next') => {
-    // Força o cálculo em UTC para evitar problemas de timezone entre servidor e cliente.
-
-    const newStartDate = new Date(week.start);
-    newStartDate.setUTCDate(newStartDate.getUTCDate() + (direction === 'next' ? 7 : -7));
+    // Usa timezone brasileiro para consistência
+    const brazilianStart = toBrazilianTimezone(week.start);
+    const newStartDate = new Date(brazilianStart);
+    newStartDate.setDate(newStartDate.getDate() + (direction === 'next' ? 7 : -7));
     const semana = getWeekString(newStartDate);
     router.push(`/allocation?semana=${semana}`);
   };
 
   const navigateToCurrentWeek = () => {
-    // Usa UTC para consistência.
-    const today = new Date();
-    const todayUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
-    const semana = getWeekString(todayUTC);
+    // Usa timezone brasileiro para consistência
+    const todayBrazilian = getBrazilianDate();
+    const semana = getWeekString(todayBrazilian);
     router.push(`/allocation?semana=${semana}`);
   };
   

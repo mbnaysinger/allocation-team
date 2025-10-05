@@ -60,3 +60,25 @@ export const getCurrentDateFromWeekNumber = (weekNumber: string) => {
   const [week, year] = weekNumber.split('-').map(Number);
   return new Date(year, 0, 1 + (week - 1) * 7);
 };
+
+/**
+ * Obtém a data atual considerando o timezone do Brasil (UTC-3)
+ * Garante consistência entre servidor (UTC) e cliente brasileiro
+ */
+export const getBrazilianDate = (): Date => {
+  const now = new Date();
+  // Ajusta para o timezone brasileiro (UTC-3)
+  const brazilOffset = -3 * 60; // -3 horas em minutos
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const brazilTime = new Date(utc + (brazilOffset * 60000));
+  return brazilTime;
+};
+
+/**
+ * Converte uma data para o timezone brasileiro
+ */
+export const toBrazilianTimezone = (date: Date): Date => {
+  const brazilOffset = -3 * 60; // -3 horas em minutos
+  const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+  return new Date(utc + (brazilOffset * 60000));
+};
