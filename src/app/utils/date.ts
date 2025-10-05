@@ -55,3 +55,8 @@ export const formatDateForDisplay = (date: Date): string => {
   const day = String(date.getUTCDate()).padStart(2, '0');
   return `${day}/${month}/${year}`;
 };
+
+export const getCurrentDateFromWeekNumber = (weekNumber: string) => {
+  const [week, year] = weekNumber.split('-').map(Number);
+  return new Date(year, 0, 1 + (week - 1) * 7);
+};
