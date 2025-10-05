@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import DroppableDayColumn from "@/components/ui/DroppableDayColumn";
 import { Pessoa, AtividadeCompleta, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
+import { toBrazilianTimezone } from "@/app/utils/date";
 
 interface PersonCardProps {
   person: Pessoa;
@@ -61,7 +62,7 @@ const PersonCard: React.FC<PersonCardProps> = ({
   };
 
   const getDayDate = (dayIndex: number) => {
-    const date = new Date(weekStart);
+    const date = toBrazilianTimezone(weekStart);
     date.setDate(date.getDate() + dayIndex);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
