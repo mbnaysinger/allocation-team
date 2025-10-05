@@ -98,17 +98,25 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
 
 
   const navigateWeek = (direction: 'prev' | 'next') => {
-    // Usa sempre data local do cliente
-    const newStartDate = new Date(week.start);
-    newStartDate.setDate(newStartDate.getDate() + (direction === 'next' ? 7 : -7));
+    // Força o cálculo em UTC para evitar problemas de timezone entre servidor e cliente.
+    const originalDate = new Date(week.start);
+    const newStartDate = new Date(Date.UTC(
+      originalDate.getUTCFullYear(),
+      originalDate.getUTCMonth(),
+      originalDate.getUTCDate()
+    ));
+
+    newStartDate.setUTCDate(newStartDate.getUTCDate() + (direction === 'next' ? 7 : -7));
     
     const semana = getWeekString(newStartDate);
     router.push(`/allocation?semana=${semana}`);
   };
 
   const navigateToCurrentWeek = () => {
+    // Usa UTC para consistência.
     const today = new Date();
-    const semana = getWeekString(today);
+    const todayUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+    const semana = getWeekString(todayUTC);
     router.push(`/allocation?semana=${semana}`);
   };
   
