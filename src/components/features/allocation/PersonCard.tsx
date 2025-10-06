@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import DroppableDayColumn from "@/components/ui/DroppableDayColumn";
 import { Pessoa, AtividadeCompleta, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
-import { toBrazilianTimezone } from "@/app/utils/date";
+import { toSampaTime, formatDate } from "@/app/utils/date";
+import { addDays } from "date-fns";
 
 interface PersonCardProps {
   person: Pessoa;
@@ -42,17 +43,14 @@ const PersonCard: React.FC<PersonCardProps> = ({
 
   // Calcular horas por dia
   useEffect(() => {
-    const calcularHoras = () => {
-      const horas: Record<string, number> = {};
-      for (let i = 0; i < 5; i++) {
-        const date = new Date(weekStart);
-        date.setDate(date.getDate() + i);
-        const dataStr = date.toISOString().split('T')[0];
-        horas[dataStr] = calcularHorasDia(person.id, dataStr);
-      }
-      setHorasPorDia(horas);
-    };
-    calcularHoras();
+    const zonedStart = toSampaTime(weekStart);
+    const newHoras: Record<string, number> = {};
+    for (let i = 0; i < 5; i++) {
+      const targetDay = addDays(zonedStart, i);
+      const dataStr = formatDate(targetDay);
+      newHoras[dataStr] = calcularHorasDia(person.id, dataStr);
+    }
+    setHorasPorDia(newHoras);
   }, [person.id, weekStart, atividades, calcularHorasDia]);
 
   const getTotalHours = () => {
@@ -62,12 +60,9 @@ const PersonCard: React.FC<PersonCardProps> = ({
   };
 
   const getDayDate = (dayIndex: number) => {
-    const date = toBrazilianTimezone(weekStart);
-    date.setDate(date.getDate() + dayIndex);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    const zonedStart = toSampaTime(weekStart);
+    const targetDay = addDays(zonedStart, dayIndex);
+    return formatDate(targetDay); // formatDate do nosso utils já é seguro
   };
 
   const getAtividadesDoDia = (data: string) => {

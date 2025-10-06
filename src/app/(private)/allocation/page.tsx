@@ -1,6 +1,6 @@
 import React from "react";
 import AllocationClientView from "./AllocationClientView";
-import { getWeekDates, getWeekString, getBrazilianDate } from "@/app/utils/date";
+import { getWeekDates, getWeekString, getDateFromWeekString, getNowInSampa } from "@/app/utils/date";
 import { dependencyFactory } from "@/backend/infrastructure/factories/DependencyFactory";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/config/auth";
@@ -51,14 +51,17 @@ export default async function AllocationPage({ searchParams, }: AllocationPagePr
   const semanaParam = params?.semana as string | undefined;
   let baseDate: Date;
 
-  if (semanaParam) {
-    const year = parseInt(semanaParam.slice(-4));
-    const week = parseInt(semanaParam.slice(0, -4));
-    // Usa sempre data local do cliente
-    baseDate = new Date(year, 0, 1 + (week - 1) * 7);
+  if (semanaParam && /\d{4}-\d{2}/.test(semanaParam)) {
+    // Se a URL tem o parâmetro da semana, converte-o para uma data.
+    baseDate = getDateFromWeekString(semanaParam);
   } else {
-    // Usa timezone brasileiro para consistência
-    baseDate = getBrazilianDate();
+    // Se não, usa a data atual no fuso horário de São Paulo.
+    baseDate = getNowInSampa();
+    
+    // REGRA DE NEGÓCIO: Se hoje for domingo, o painel deve abrir na próxima semana.
+    if (baseDate.getDay() === 0) {
+      baseDate.setDate(baseDate.getDate() + 1);
+    }
   }
 
   const week = getWeekDates(baseDate);

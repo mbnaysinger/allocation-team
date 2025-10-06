@@ -1,6 +1,6 @@
 import { IAtividadeRepository } from '../ports/IAtividadeRepository';
 import { Atividade, DadosAtividade } from '../models';
-import { getWeekNumber } from '@/app/utils/date';
+import { getWeekString } from '@/app/utils/date';
 
 const validarDadosAtividade = (dados: DadosAtividade): void => {
   if (!dados.titulo || dados.titulo.trim().length < 3) {
@@ -28,10 +28,10 @@ export class CriarAtividade {
       validarDadosAtividade(dados);
 
       if (dados) {
-        dados.semana = getWeekNumber(dados.data);
+        dados.semana = getWeekString(new Date(dados.data));
       }
       
-      const atividadesCriadas: Atividade[] = [];
+      const atividadesCriadas: Atividade[] = [] ;
 
       // 1. Criar a atividade principal
       const atividadePrincipal = await this.atividadeRepository.criar(dados);

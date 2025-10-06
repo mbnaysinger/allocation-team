@@ -13,7 +13,7 @@ import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionar
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
 import ModalResumoSemanal from "@/components/features/modals/ModalResumoSemanal";
 import { Pessoa, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
-import { getWeekString, getBrazilianDate, toBrazilianTimezone } from "@/app/utils/date";
+import { getWeekString, getNowInSampa, toSampaTime } from "@/app/utils/date";
 import { Projeto } from "@/backend/core/models/projeto/Projeto";
 
 interface AllocationClientViewProps {
@@ -107,18 +107,24 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
 
 
   const navigateWeek = (direction: 'prev' | 'next') => {
-    // Usa timezone brasileiro para consistência
-    const brazilianStart = toBrazilianTimezone(week.start);
-    const newStartDate = new Date(brazilianStart);
-    newStartDate.setDate(newStartDate.getDate() + (direction === 'next' ? 7 : -7));
-    const semana = getWeekString(newStartDate);
+    // Converte a data de início da semana para o fuso horário correto antes de calcular
+    const zonedStart = toSampaTime(week.start);
+    zonedStart.setDate(zonedStart.getDate() + (direction === 'next' ? 7 : -7));
+    
+    const semana = getWeekString(zonedStart);
     router.push(`/allocation?semana=${semana}`);
   };
 
   const navigateToCurrentWeek = () => {
-    // Usa timezone brasileiro para consistência
-    const todayBrazilian = getBrazilianDate();
-    const semana = getWeekString(todayBrazilian);
+    // Pega a data atual já no fuso horário de São Paulo.
+    const baseDate = getNowInSampa();
+    
+    // REGRA DE NEGÓCIO: Se hoje for domingo, o painel deve abrir na próxima semana.
+    if (baseDate.getDay() === 0) {
+      baseDate.setDate(baseDate.getDate() + 1);
+    }
+
+    const semana = getWeekString(baseDate);
     router.push(`/allocation?semana=${semana}`);
   };
   

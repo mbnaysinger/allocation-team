@@ -1,6 +1,6 @@
 import { IAtividadeRepository } from '../ports/IAtividadeRepository';
 import { Atividade, DadosAtividade, StatusAtividade } from '../models';
-import { getWeekNumber } from '@/app/utils/date';
+import { getWeekString } from '@/app/utils/date';
 
 // Reutilizamos a mesma validação da criação, mas a adaptamos se necessário no futuro
 const validarDadosAtividade = (dados: Partial<DadosAtividade>): void => {
@@ -24,7 +24,10 @@ export class AtualizarAtividade {
       const atividadeAtualizada = await this.atividadeRepository.atualizar(id, dados);
       
       if (dados.data) {
-        dados.semana = getWeekNumber(dados.data);
+        // Converte a string 'YYYY-MM-DD' para um objeto Date.
+        // O formato YYYY-MM-DD é interpretado como UTC, o que é seguro.
+        const dateObject = new Date(dados.data);
+        dados.semana = getWeekString(dateObject);
       }
 
       if (!atividadeAtualizada) {
