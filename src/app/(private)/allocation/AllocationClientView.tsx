@@ -406,7 +406,6 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         onPreviousWeek={() => navigateWeek('prev')}
         onNextWeek={() => navigateWeek('next')}
         onCurrentWeek={navigateToCurrentWeek}
-        onManageProjects={() => router.push('/projetos')}
         pessoas={pessoas}
         projetos={projetos}
         onFiltroPessoasChange={setPessoasFiltradas}
