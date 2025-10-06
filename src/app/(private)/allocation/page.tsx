@@ -1,6 +1,6 @@
 import React from "react";
 import AllocationClientView from "./AllocationClientView";
-import { getWeekDates, getWeekString } from "@/app/utils/date";
+import { getSundayWeekStart, getWeekString, getNowInSampa, parseDateString } from "@/app/utils/date";
 import { dependencyFactory } from "@/backend/infrastructure/factories/DependencyFactory";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/config/auth";
@@ -45,30 +45,36 @@ async function getAlocacaoData(semana: string) {
   }
 }
 
-export default async function AllocationPage({ searchParams, }: AllocationPageProps) {
+export default async function AllocationPage({ searchParams }: AllocationPageProps) {
   const params = await searchParams;
   
-  const semanaParam = params?.semana as string | undefined;
-  let baseDate: Date;
+  const dateParam = params?.date as string | undefined;
+  let weekStartDate: Date;
 
-  if (semanaParam) {
-    const year = parseInt(semanaParam.slice(-4));
-    const week = parseInt(semanaParam.slice(0, -4));
-    baseDate = new Date(year, 0, 1 + (week - 1) * 7);
+  if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+    // Se a URL tem o parâmetro de data, usa-o para definir o início da semana.
+    weekStartDate = getSundayWeekStart(parseDateString(dateParam));
   } else {
-    baseDate = new Date();
+    // Se não, calcula com base na data atual.
+    const baseDate = getNowInSampa();
+    
+    // REGRA DE NEGÓCIO: Se hoje for domingo, o painel deve abrir na próxima semana.
+    if (baseDate.getDay() === 0) {
+      baseDate.setDate(baseDate.getDate() + 1);
+    }
+    weekStartDate = getSundayWeekStart(baseDate);
   }
 
-  const week = getWeekDates(baseDate);
-  const semana = getWeekString(baseDate);
+  // Gera o identificador numérico (WWYYYY) para o backend.
+  const backendWeekId = getWeekString(weekStartDate);
 
-  // Busca os dados no servidor, agora incluindo os resumos
-  const initialData = await getAlocacaoData(semana);
+  // Busca os dados no servidor.
+  const initialData = await getAlocacaoData(backendWeekId.toString());
 
   return (
     <main className="min-h-screen bg-slate-900 text-white">
       <div className="max-w-8xl mx-auto">
-        <AllocationClientView initialData={initialData} week={week} />
+        <AllocationClientView initialData={initialData} weekStartDate={weekStartDate} />
       </div>
     </main>
   );

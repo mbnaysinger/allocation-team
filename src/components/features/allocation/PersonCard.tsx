@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import DroppableDayColumn from "@/components/ui/DroppableDayColumn";
 import { Pessoa, AtividadeCompleta, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
+import { formatDate } from "@/app/utils/date";
+import { addDays } from "date-fns";
 
 interface PersonCardProps {
   person: Pessoa;
@@ -41,17 +43,14 @@ const PersonCard: React.FC<PersonCardProps> = ({
 
   // Calcular horas por dia
   useEffect(() => {
-    const calcularHoras = () => {
-      const horas: Record<string, number> = {};
-      for (let i = 0; i < 5; i++) {
-        const date = new Date(weekStart);
-        date.setDate(date.getDate() + i);
-        const dataStr = date.toISOString().split('T')[0];
-        horas[dataStr] = calcularHorasDia(person.id, dataStr);
-      }
-      setHorasPorDia(horas);
-    };
-    calcularHoras();
+    const newHoras: Record<string, number> = {};
+    for (let i = 0; i < 5; i++) {
+      // weekStart é Domingo. O board começa na Segunda (índice 0), então somamos i + 1.
+      const targetDay = addDays(weekStart, i + 1);
+      const dataStr = formatDate(targetDay);
+      newHoras[dataStr] = calcularHorasDia(person.id, dataStr);
+    }
+    setHorasPorDia(newHoras);
   }, [person.id, weekStart, atividades, calcularHorasDia]);
 
   const getTotalHours = () => {
@@ -61,12 +60,9 @@ const PersonCard: React.FC<PersonCardProps> = ({
   };
 
   const getDayDate = (dayIndex: number) => {
-    const date = new Date(weekStart);
-    date.setDate(date.getDate() + dayIndex);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    // weekStart é Domingo. O board começa na Segunda (índice 0), então somamos dayIndex + 1.
+    const targetDay = addDays(weekStart, dayIndex + 1);
+    return formatDate(targetDay);
   };
 
   const getAtividadesDoDia = (data: string) => {

@@ -5,7 +5,7 @@ import SearchableSelect, { SelectOption } from '@/components/ui/SearchableSelect
 import { X } from 'lucide-react';
 import { TIPOS_ATIVIDADE, DadosAtividade, Pessoa, TipoAtividade } from '@/backend/core/models';
 import { Projeto } from '@/backend/core/models/projeto/Projeto';
-import { getWeekNumber } from '@/app/utils/date';
+import { getWeekString } from '@/app/utils/date';
 
 interface ModalAdicionarAtividadeProps {
   isOpen: boolean;
@@ -35,7 +35,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
     tipo: 'Melhoria',
     projetoId: '',
     descricaoJira: '',
-    semana: getWeekNumber(dataSelecionada),
+    semana: getWeekString(new Date(dataSelecionada)),
     horas: 8,
     status: 'planejada'
   });
@@ -103,7 +103,7 @@ const ModalAdicionarAtividade: React.FC<ModalAdicionarAtividadeProps> = ({
       tipo: 'Melhoria',
       projetoId: '',
       descricaoJira: '',
-      semana: getWeekNumber(dataSelecionada),
+      semana: getWeekString(new Date(dataSelecionada)),
       horas: 8,
       status: 'planejada'
     });

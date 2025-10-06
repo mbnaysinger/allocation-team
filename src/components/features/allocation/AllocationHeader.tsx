@@ -1,14 +1,18 @@
 import React from "react";
+import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { Button } from "@/components/ui/Button";
+import { UserRole } from "@/backend/core/models/UserRole";
 
-const AllocationHeader = () => {
+const AllocationHeader = ({ userRole }: { userRole: UserRole }) => {
   const handleLogout = () => {
     signOut({ callbackUrl: '/login' });
   };
 
   return (
-    <div className="bg-slate-800 text-white p-8 border-b border-slate-700/50 shadow-lg relative">
+    <div className="flex flex-col gap-4">
+
       {/* Botão de Logout */}
       <button
         onClick={handleLogout}
@@ -18,14 +22,34 @@ const AllocationHeader = () => {
         <LogOut size={20} className="text-gray-300 group-hover:text-white transition-colors" />
       </button>
       
-      {/* Conteúdo centralizado */}
-      <div className="text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">
-          Painel de Alocação Semanal
-        </h1>
-        <div className="text-lg text-cyan-400">
+      {/* Conteúdo à esquerda */}
+      <div className="text-left">
+        <h2 className="text-2xl md:text-3xl font-bold mb-1 text-white pt-4 pl-4">
+          Alocação Semanal
+        </h2>
+        <div className="text-sm text-cyan-400 pl-4">
           Time de Soluções
         </div>
+        {/* Botões de Navegação (Apenas para Admin) */}
+      {userRole === UserRole.ADMIN && (
+        <div className="flex justify-center gap-4 pb-4">
+          <Link href="/projetos" passHref>
+            <Button variant="outline" size="sm" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-white">
+              Gerenciar Projetos
+            </Button>
+          </Link>
+          <Link href="/pessoas" passHref>
+            <Button variant="outline" size="sm" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-white">
+              Gerenciar Pessoas
+            </Button>
+          </Link>
+          <Link href="/usuarios" passHref>
+            <Button variant="outline" size="sm" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-white">
+              Gerenciar Usuários
+            </Button>
+          </Link>
+        </div>
+      )}
       </div>
     </div>
   );

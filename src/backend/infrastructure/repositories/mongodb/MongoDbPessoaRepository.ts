@@ -29,6 +29,7 @@ export class MongoDbPessoaRepository implements IPessoaRepository {
   }
 
   async findByIds(ids: string[]): Promise<Pessoa[]> {
+    console.log('IDs recebidos:', ids, 'Tipo:', typeof ids, 'É array:', Array.isArray(ids));
     const collection = await this.getPessoasCollection();
     const documents = await collection.find({ id: { $in: ids } }).toArray();
     return documents.map(fromDocument);

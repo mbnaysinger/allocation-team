@@ -13,7 +13,6 @@ interface AllocationControlsProps {
   onPreviousWeek: () => void;
   onNextWeek: () => void;
   onCurrentWeek: () => void;
-  onManageProjects: () => void;
   pessoas: Pessoa[];
   projetos: Projeto[];
   onFiltroPessoasChange: (pessoas: Pessoa[]) => void;
@@ -28,7 +27,6 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   onPreviousWeek,
   onNextWeek,
   onCurrentWeek,
-  onManageProjects,
   pessoas,
   projetos,
   onFiltroPessoasChange,
@@ -53,7 +51,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   };
 
   return (
-    <div className="bg-slate-800/50 border-b border-slate-700/50 p-4 md:p-6">
+    <div className="border-b border-slate-700/50 p-4 md:p-6">
       <div className="max-w-8xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
         <div className="flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto">
           {/* Controles de Navegação da Semana */}
@@ -65,7 +63,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
               className="flex items-center gap-2 bg-slate-700 border-slate-600 text-white hover:bg-slate-600 hover:border-slate-500"
             >
               <ChevronLeft size={16} />
-              <span className="hidden sm:inline">Semana Anterior</span>
+              <span className="hidden sm:inline">Anterior</span>
             </Button>
             
             <Button 
@@ -78,7 +76,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
               <span className="text-xs">Atual</span>
             </Button>
             
-            <span className="font-semibold text-white text-sm md:text-base text-center min-w-[140px]">
+            <span className="font-semibold text-white text-sm sm:text-base text-center min-w-[140px]">
               {dateRange}
             </span>
             
@@ -88,14 +86,14 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
               size="sm" 
               className="flex items-center gap-2 bg-slate-700 border-slate-600 text-white hover:bg-slate-600 hover:border-slate-500"
             >
-              <span className="hidden sm:inline">Próxima Semana</span>
+              <span className="hidden sm:inline">Próxima</span>
               <ChevronRight size={16} />
             </Button>
           </div>
           {/* Filtros */}
 
           <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
-            <div className="w-full lg:w-60">
+            <div className="w-full lg:w-60 text-white">
             {userRole === UserRole.ADMIN && (
               <>
                 <SearchableSelect
@@ -110,6 +108,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
             </div>
             <div className="w-full lg:w-60">
               <SearchableSelect
+                className="text-left"
                 instanceId="filtro-projetos-select"
                 isMulti
                 options={projetoOptions}
@@ -118,17 +117,6 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
               />
             </div>
           </div>
-        </div>
-        
-        {/* Botões de Adicionar */}
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          {userRole === UserRole.ADMIN && (
-            <>
-              <Button onClick={onManageProjects} variant="outline" size="sm" className="flex items-center gap-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-white">
-                Gerenciar Projetos
-              </Button>
-            </>
-          )}
         </div>
       </div>
     </div>

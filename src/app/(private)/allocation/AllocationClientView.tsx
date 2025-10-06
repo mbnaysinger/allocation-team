@@ -13,8 +13,9 @@ import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionar
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
 import ModalResumoSemanal from "@/components/features/modals/ModalResumoSemanal";
 import { Pessoa, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
-import { getWeekString } from "@/app/utils/date";
+import { getNowInSampa, formatDate, getWeekString } from "@/app/utils/date";
 import { Projeto } from "@/backend/core/models/projeto/Projeto";
+import { addDays } from "date-fns";
 
 interface AllocationClientViewProps {
   initialData: {
@@ -23,13 +24,10 @@ interface AllocationClientViewProps {
     atividades: AtividadeCompleta[];
     resumosSemanais: ResumoSemanal[];
   };
-  week: {
-    start: Date;
-    end: Date;
-  };
+  weekStartDate: Date;
 }
 
-const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData, week }) => {
+const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData, weekStartDate }) => {
   const router = useRouter();
   const { data: session } = useSession();
   const userRole = session?.user?.role;
@@ -74,6 +72,15 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
   const [atividadeSelecionada, setAtividadeSelecionada] = useState<AtividadeCompleta | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const atividadesFiltradas = React.useMemo(() => {
+    // Se há projetos filtrados, filtra as atividades por projeto
+    if (projetosFiltrados.length > 0) {
+      const projetosFiltradosIds = new Set(projetosFiltrados.map(p => p.projetoId));
+      return atividades.filter(a => a.projetoId && projetosFiltradosIds.has(a.projetoId));
+    }
+    return atividades;
+  }, [atividades, projetosFiltrados]);
+
   const pessoasExibidas = React.useMemo(() => {
     // 1. Define a lista base de pessoas (filtrada ou todas)
     let basePessoas = pessoasFiltradas.length > 0 ? pessoasFiltradas : pessoas;
@@ -84,7 +91,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       
       // Encontra os IDs das pessoas que têm atividades nos projetos selecionados
       const pessoasComAtividadesNosProjetos = new Set(
-        atividades
+        atividadesFiltradas
           .filter(a => a.projetoId && projetosFiltradosIds.has(a.projetoId))
           .map(a => a.pessoaId)
       );
@@ -94,25 +101,27 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     }
 
     return basePessoas;
-  }, [pessoas, pessoasFiltradas, projetosFiltrados, atividades]);
+  }, [pessoas, pessoasFiltradas, projetosFiltrados, atividadesFiltradas]);
 
 
   const navigateWeek = (direction: 'prev' | 'next') => {
-    const newStartDate = new Date(week.start);
-    newStartDate.setDate(newStartDate.getDate() + (direction === 'next' ? 7 : -7));
-    
-    const semana = getWeekString(newStartDate);
-    router.push(`/allocation?semana=${semana}`);
+    const newStartDate = addDays(weekStartDate, direction === 'next' ? 7 : -7);
+    router.push(`/allocation?date=${formatDate(newStartDate)}`);
   };
 
   const navigateToCurrentWeek = () => {
-    const today = new Date();
-    const semana = getWeekString(today);
-    router.push(`/allocation?semana=${semana}`);
+    let baseDate = getNowInSampa();
+    // REGRA DE NEGÓCIO: Se hoje for domingo, o painel deve abrir na próxima semana.
+    if (baseDate.getDay() === 0) {
+      baseDate = addDays(baseDate, 1);
+    }
+    // Não precisamos mais navegar, pois a lógica do servidor já nos coloca na data certa.
+    // Apenas limpamos o parâmetro da URL para que o servidor recalcule.
+    router.push(`/allocation`);
   };
   
   const calcularHorasDia = (pessoaId: string, data: string) => {
-    return atividades
+    return atividadesFiltradas
       .filter(a => a.pessoaId === pessoaId && a.data === data)
       .reduce((acc, a) => acc + a.horas, 0);
   };
@@ -352,7 +361,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           pessoaId: pessoaParaResumo.id,
-          semana: getWeekString(week.start),
+          semana: getWeekString(weekStartDate), // Usa a nova função
           comentario,
         }),
       });
@@ -385,17 +394,19 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     }
   };
 
+  // Calcula a data de fim da semana para passar para os controles
+  const weekEndDate = addDays(weekStartDate, 4); // Sexta-feira
+
   return (
     <div className="min-h-screen bg-slate-900">
-      <AllocationHeader />
+      <AllocationHeader userRole={userRole} />
       
       <AllocationControls
-        weekStart={week.start}
-        weekEnd={week.end}
+        weekStart={weekStartDate} // Passa a data de início correta
+        weekEnd={weekEndDate}     // Passa a data de fim calculada
         onPreviousWeek={() => navigateWeek('prev')}
         onNextWeek={() => navigateWeek('next')}
         onCurrentWeek={navigateToCurrentWeek}
-        onManageProjects={() => router.push('/projetos')}
         pessoas={pessoas}
         projetos={projetos}
         onFiltroPessoasChange={setPessoasFiltradas}
@@ -408,8 +419,8 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
           <PersonCard
             key={pessoa.id}
             person={pessoa}
-            weekStart={week.start}
-            atividades={atividades}
+            weekStart={weekStartDate} // Passa a data de início correta
+            atividades={atividadesFiltradas}
             onAddAllocation={handleAddAllocation}
             onEditAllocation={handleEditAllocation}
             onCloneAllocation={handleClonarAtividade}
