@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/Select";
 import { Badge } from "@/components/ui/Badge";
 import { Search, UserPlus, Edit, Ban, Filter } from "lucide-react";
-import { UserFormModal } from "@/components/features/modals/Usuario/UsuarioFormModal";
+import { PessoaFormModal } from "@/components/features/modals/pessoa/PessoaFormModal";
 
 type User = {
   id: string;
@@ -242,7 +242,7 @@ const PessoasClientView = () => {
         </div>
       </div>
 
-      <UserFormModal
+      <PessoaFormModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         user={editingUser}

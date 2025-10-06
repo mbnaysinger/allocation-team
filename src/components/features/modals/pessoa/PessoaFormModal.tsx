@@ -33,7 +33,7 @@ type UserFormModalProps = {
   onSave: (userData: Partial<User>) => void;
 };
 
-export function UserFormModal({
+export function PessoaFormModal({
   open,
   onOpenChange,
   user,
