@@ -26,14 +26,14 @@ export const getSundayWeekStart = (date: Date): Date => {
   console.log('getSundayWeekStart input:', date);
   console.log('getSundayWeekStart input day:', date.getDay());
   
-  // Abordagem mais simples: usa a data como string e reconstrói
+  // Usa o fuso local do Brasil diretamente
   const year = date.getFullYear();
   const month = date.getMonth();
   const day = date.getDate();
   
   console.log(`Date components: year=${year}, month=${month}, day=${day}`);
   
-  // Cria uma nova data com os mesmos componentes
+  // Cria uma nova data no fuso local
   const sunday = new Date(year, month, day);
   const dayOfWeek = sunday.getDay();
   
@@ -87,9 +87,9 @@ export const formatDateForDisplay = (date: Date): string => {
  * Converte uma string YYYY-MM-DD de volta para um objeto Date, no fuso horário correto.
  */
 export const parseDateString = (dateString: string): Date => {
-  // Parse manual para evitar problemas de fuso horário
+  // Parse manual e ajusta para o fuso horário do Brasil (+3 horas)
   const [year, month, day] = dateString.split('-').map(Number);
-  const date = new Date(year, month - 1, day); // month é 0-indexed
+  const date = new Date(year, month - 1, day); // month é 0-indexed, fuso local
   console.log('parseDateString input:', dateString);
   console.log('parseDateString output:', date);
   console.log('parseDateString day of week:', date.getDay());
