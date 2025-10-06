@@ -50,7 +50,7 @@ export const formatDate = (date: Date): string => {
  * Formata um objeto Date para o formato DD/MM/YYYY para exibição, usando UTC.
  */
 export const formatDateForDisplay = (date: Date): string => {
-  const year = date.getUTCFullYear();
+  const year = String(date.getUTCFullYear()).slice(-2);
   const month = String(date.getUTCMonth() + 1).padStart(2, '0');
   const day = String(date.getUTCDate()).padStart(2, '0');
   return `${day}/${month}/${year}`;

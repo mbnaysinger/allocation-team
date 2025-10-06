@@ -99,7 +99,7 @@ const SearchableSelect = <IsMulti extends boolean = false>(
       {...props}
       styles={customStyles}
       noOptionsMessage={() => 'Nenhuma opção encontrada'}
-      className="react-select-container"
+      className="react-select-container text-left"
       classNamePrefix="react-select"
     />
   );
