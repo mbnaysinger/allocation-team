@@ -10,7 +10,6 @@ import { UserRole } from "@/backend/core/models/UserRole";
 
 interface AllocationControlsProps {
   weekStart: Date;
-  weekEnd: Date;
   onPreviousWeek: () => void;
   onNextWeek: () => void;
   onCurrentWeek: () => void;
