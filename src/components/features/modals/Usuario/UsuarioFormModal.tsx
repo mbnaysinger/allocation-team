@@ -26,19 +26,19 @@ type User = {
   createdAt: string;
 };
 
-type UserFormModalProps = {
+type UsuarioFormModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   user?: User;
   onSave: (userData: Partial<User>) => void;
 };
 
-export function UserFormModal({
+export function UsuarioFormModal({
   open,
   onOpenChange,
   user,
   onSave,
-}: UserFormModalProps) {
+}: UsuarioFormModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"admin" | "user" | "moderator">("user");
@@ -93,7 +93,7 @@ export function UserFormModal({
           </div>
           <div className="space-y-2">
             <Label htmlFor="role">Permissão</Label>
-            <Select value={role} onValueChange={(value: "admin" | "user" | "moderator") => setRole(value)}>
+            <Select value={role} onValueChange={(value: "user" | "moderator" | "admin") => setRole(value)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

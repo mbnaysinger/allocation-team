@@ -53,7 +53,7 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   };
 
   return (
-    <div className="bg-slate-800/50 border-b border-slate-700/50 p-4 md:p-6">
+    <div className="border-b border-slate-700/50 p-4 md:p-6">
       <div className="max-w-8xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
         <div className="flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto">
           {/* Controles de Navegação da Semana */}

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/Select";
 import { Badge } from "@/components/ui/Badge";
 import { Search, UserPlus, Edit, Ban, Filter } from "lucide-react";
-import { UserFormModal } from "@/components/features/modals/usuario/UsuarioFormModal";
+import { UsuarioFormModal } from "@/components/features/modals/usuario/UsuarioFormModal";
 
 type User = {
   id: string;
@@ -242,7 +242,7 @@ const UsuariosClientView = () => {
         </div>
       </div>
 
-      <UserFormModal
+      <UsuarioFormModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         user={editingUser}

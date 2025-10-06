@@ -398,7 +398,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
 
   return (
     <div className="min-h-screen bg-slate-900">
-      <AllocationHeader />
+      <AllocationHeader userRole={userRole} />
       
       <AllocationControls
         weekStart={week.start}
