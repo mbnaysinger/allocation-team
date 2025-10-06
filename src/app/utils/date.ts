@@ -1,6 +1,6 @@
 // src/app/utils/date.ts
 import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
-import { startOfWeek, getWeek, parseISO } from 'date-fns';
+import { getWeek, parseISO } from 'date-fns';
 
 /**
  * A fonte da verdade para o fuso horário da aplicação.
