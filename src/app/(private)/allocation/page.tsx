@@ -1,7 +1,6 @@
 import React from "react";
 import AllocationClientView from "./AllocationClientView";
 import { getSundayWeekStart, getWeekString, getNowInSampa, parseDateString } from "@/app/utils/date";
-import { addDays } from "date-fns";
 import { dependencyFactory } from "@/backend/infrastructure/factories/DependencyFactory";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/config/auth";
