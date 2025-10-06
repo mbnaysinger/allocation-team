@@ -34,6 +34,13 @@ export const getSundayWeekStart = (date: Date): Date => {
   sunday.setDate(sunday.getDate() - daysToSubtract);
   sunday.setHours(0, 0, 0, 0); // Zera as horas para garantir que seja o início do dia
   
+  // Verifica se realmente é domingo, se não for, ajusta
+  if (sunday.getDay() !== 0) {
+    console.log('Warning: Sunday calculation failed, adjusting...');
+    const adjustment = sunday.getDay(); // Dias para ajustar
+    sunday.setDate(sunday.getDate() - adjustment);
+  }
+  
   console.log('getSundayWeekStart output:', sunday);
   console.log('getSundayWeekStart day of week:', sunday.getDay());
   return sunday;
