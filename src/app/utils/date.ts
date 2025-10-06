@@ -1,6 +1,6 @@
 // src/app/utils/date.ts
 import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
-import { getWeek, parseISO } from 'date-fns';
+import { getWeek } from 'date-fns';
 
 /**
  * A fonte da verdade para o fuso horário da aplicação.
@@ -26,34 +26,31 @@ export const getSundayWeekStart = (date: Date): Date => {
   console.log('getSundayWeekStart input:', date);
   console.log('getSundayWeekStart input day:', date.getDay());
   
-  // Cria uma nova data para não modificar a original
-  const sunday = new Date(date);
+  // Abordagem mais simples: usa a data como string e reconstrói
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
   
-  // Calcula quantos dias subtrair para chegar ao domingo da semana atual
-  const dayOfWeek = sunday.getDay(); // 0 = domingo, 1 = segunda, etc.
+  console.log(`Date components: year=${year}, month=${month}, day=${day}`);
+  
+  // Cria uma nova data com os mesmos componentes
+  const sunday = new Date(year, month, day);
+  const dayOfWeek = sunday.getDay();
+  
   console.log('Day of week to process:', dayOfWeek);
   
-  // Se for domingo (0), não subtrai nada. Se for segunda (1), subtrai 1, etc.
-  // Para sábado (6), subtrai 6 para chegar ao domingo da mesma semana
+  // Calcula o domingo da semana
   if (dayOfWeek !== 0) {
-    const originalDate = sunday.getDate();
-    sunday.setDate(sunday.getDate() - dayOfWeek);
-    console.log(`Subtracted ${dayOfWeek} days from ${originalDate} to get ${sunday.getDate()}`);
+    const daysToSubtract = dayOfWeek;
+    sunday.setDate(sunday.getDate() - daysToSubtract);
+    console.log(`Subtracted ${daysToSubtract} days`);
   }
   
-  // Zera as horas para garantir que seja o início do dia
+  // Zera as horas
   sunday.setHours(0, 0, 0, 0);
   
   console.log('getSundayWeekStart output:', sunday);
   console.log('getSundayWeekStart day of week:', sunday.getDay());
-  
-  // Verificação final - se ainda não for domingo, força
-  if (sunday.getDay() !== 0) {
-    console.log('ERROR: Still not Sunday! Forcing correction...');
-    const correction = sunday.getDay();
-    sunday.setDate(sunday.getDate() - correction);
-    console.log('After correction:', sunday.getDay());
-  }
   
   return sunday;
 };
@@ -90,9 +87,11 @@ export const formatDateForDisplay = (date: Date): string => {
  * Converte uma string YYYY-MM-DD de volta para um objeto Date, no fuso horário correto.
  */
 export const parseDateString = (dateString: string): Date => {
-  // parseISO cria a data no fuso local, sem conversão adicional
-  const date = parseISO(dateString);
+  // Parse manual para evitar problemas de fuso horário
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(year, month - 1, day); // month é 0-indexed
   console.log('parseDateString input:', dateString);
   console.log('parseDateString output:', date);
+  console.log('parseDateString day of week:', date.getDay());
   return date;
 };
