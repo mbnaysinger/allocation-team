@@ -13,7 +13,6 @@ interface AllocationControlsProps {
   onPreviousWeek: () => void;
   onNextWeek: () => void;
   onCurrentWeek: () => void;
-  onManageProjects: () => void;
   pessoas: Pessoa[];
   projetos: Projeto[];
   onFiltroPessoasChange: (pessoas: Pessoa[]) => void;
@@ -28,7 +27,6 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   onPreviousWeek,
   onNextWeek,
   onCurrentWeek,
-  onManageProjects,
   pessoas,
   projetos,
   onFiltroPessoasChange,
