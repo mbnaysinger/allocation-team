@@ -27,7 +27,7 @@ export class AtualizarAtividade {
         // Converte a string 'YYYY-MM-DD' para um objeto Date.
         // O formato YYYY-MM-DD é interpretado como UTC, o que é seguro.
         const dateObject = new Date(dados.data);
-        dados.semana = getWeekString(dateObject);
+        dados.semana = getWeekString(dateObject).toString();
       }
 
       if (!atividadeAtualizada) {

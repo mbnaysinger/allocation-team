@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import DroppableDayColumn from "@/components/ui/DroppableDayColumn";
 import { Pessoa, AtividadeCompleta, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
-import { toSampaTime, formatDate } from "@/app/utils/date";
+import { formatDate } from "@/app/utils/date";
 import { addDays } from "date-fns";
 
 interface PersonCardProps {
@@ -43,10 +43,10 @@ const PersonCard: React.FC<PersonCardProps> = ({
 
   // Calcular horas por dia
   useEffect(() => {
-    const zonedStart = toSampaTime(weekStart);
     const newHoras: Record<string, number> = {};
     for (let i = 0; i < 5; i++) {
-      const targetDay = addDays(zonedStart, i);
+      // weekStart é Domingo. O board começa na Segunda (índice 0), então somamos i + 1.
+      const targetDay = addDays(weekStart, i + 1);
       const dataStr = formatDate(targetDay);
       newHoras[dataStr] = calcularHorasDia(person.id, dataStr);
     }
@@ -60,9 +60,9 @@ const PersonCard: React.FC<PersonCardProps> = ({
   };
 
   const getDayDate = (dayIndex: number) => {
-    const zonedStart = toSampaTime(weekStart);
-    const targetDay = addDays(zonedStart, dayIndex);
-    return formatDate(targetDay); // formatDate do nosso utils já é seguro
+    // weekStart é Domingo. O board começa na Segunda (índice 0), então somamos dayIndex + 1.
+    const targetDay = addDays(weekStart, dayIndex + 1);
+    return formatDate(targetDay);
   };
 
   const getAtividadesDoDia = (data: string) => {
