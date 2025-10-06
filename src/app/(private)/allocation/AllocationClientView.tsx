@@ -105,10 +105,15 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
 
 
   const navigateWeek = (direction: 'prev' | 'next') => {
-    // Calcula a data de segunda-feira atual
-    const currentMonday = addDays(weekStartDate, 1);
-    // Navega para a próxima ou anterior segunda-feira
-    const newMonday = addDays(currentMonday, direction === 'next' ? 7 : -7);
+    // Navega diretamente a partir do domingo atual
+    const newSunday = addDays(weekStartDate, direction === 'next' ? 7 : -7);
+    // Calcula a segunda-feira da nova semana
+    const newMonday = addDays(newSunday, 1);
+    console.log('Navigation:', direction);
+    console.log('Current week start (Sunday):', weekStartDate);
+    console.log('New Sunday:', newSunday);
+    console.log('New Monday:', newMonday);
+    console.log('New URL:', `/allocation?date=${formatDate(newMonday)}`);
     router.push(`/allocation?date=${formatDate(newMonday)}`);
   };
 
