@@ -31,7 +31,7 @@ type User = {
   createdAt: string;
 };
 
-const UsuariosClientView = () => {
+const PessoasClientView = () => {
   const [users, setUsers] = useState<User[]>([
     {
       id: "1",
@@ -252,4 +252,4 @@ const UsuariosClientView = () => {
   );
 };
 
-export default UsuariosClientView;
+export default PessoasClientView;
