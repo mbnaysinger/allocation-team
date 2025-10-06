@@ -23,15 +23,14 @@ export const toSampaTime = (date: Date): Date => {
  * Retorna o início (Domingo) da semana para uma data específica.
  */
 export const getSundayWeekStart = (date: Date): Date => {
-  const zonedDate = toSampaTime(date);
-  console.log('getSundayWeekStart input:', zonedDate);
-  console.log('getSundayWeekStart input day:', zonedDate.getDay());
+  console.log('getSundayWeekStart input:', date);
+  console.log('getSundayWeekStart input day:', date.getDay());
   
-  // Calcula manualmente o domingo da semana
-  const dayOfWeek = zonedDate.getDay(); // 0 = domingo, 1 = segunda, etc.
+  // Calcula manualmente o domingo da semana sem conversão de fuso
+  const dayOfWeek = date.getDay(); // 0 = domingo, 1 = segunda, etc.
   const daysToSubtract = dayOfWeek; // Se for domingo (0), subtrai 0. Se for segunda (1), subtrai 1, etc.
   
-  const sunday = new Date(zonedDate);
+  const sunday = new Date(date);
   sunday.setDate(sunday.getDate() - daysToSubtract);
   sunday.setHours(0, 0, 0, 0); // Zera as horas para garantir que seja o início do dia
   
@@ -72,7 +71,9 @@ export const formatDateForDisplay = (date: Date): string => {
  * Converte uma string YYYY-MM-DD de volta para um objeto Date, no fuso horário correto.
  */
 export const parseDateString = (dateString: string): Date => {
-  // parseISO não precisa de fuso, ele cria a data como se fosse local,
-  // e toSampaTime ajusta para o fuso correto.
-  return toSampaTime(parseISO(dateString));
+  // parseISO cria a data no fuso local, sem conversão adicional
+  const date = parseISO(dateString);
+  console.log('parseDateString input:', dateString);
+  console.log('parseDateString output:', date);
+  return date;
 };
