@@ -24,8 +24,20 @@ export const toSampaTime = (date: Date): Date => {
  */
 export const getSundayWeekStart = (date: Date): Date => {
   const zonedDate = toSampaTime(date);
-  // date-fns `startOfWeek` com `{ weekStartsOn: 0 }` define Domingo como início.
-  return startOfWeek(zonedDate, { weekStartsOn: 0 });
+  console.log('getSundayWeekStart input:', zonedDate);
+  console.log('getSundayWeekStart input day:', zonedDate.getDay());
+  
+  // Calcula manualmente o domingo da semana
+  const dayOfWeek = zonedDate.getDay(); // 0 = domingo, 1 = segunda, etc.
+  const daysToSubtract = dayOfWeek; // Se for domingo (0), subtrai 0. Se for segunda (1), subtrai 1, etc.
+  
+  const sunday = new Date(zonedDate);
+  sunday.setDate(sunday.getDate() - daysToSubtract);
+  sunday.setHours(0, 0, 0, 0); // Zera as horas para garantir que seja o início do dia
+  
+  console.log('getSundayWeekStart output:', sunday);
+  console.log('getSundayWeekStart day of week:', sunday.getDay());
+  return sunday;
 };
 
 /**
