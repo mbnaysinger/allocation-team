@@ -1,6 +1,7 @@
 import React from "react";
 import AllocationClientView from "./AllocationClientView";
 import { getSundayWeekStart, getWeekString, getNowInSampa, parseDateString } from "@/app/utils/date";
+import { addDays } from "date-fns";
 import { dependencyFactory } from "@/backend/infrastructure/factories/DependencyFactory";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/config/auth";
@@ -53,7 +54,9 @@ export default async function AllocationPage({ searchParams }: AllocationPagePro
 
   if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
     // Se a URL tem o parâmetro de data, usa-o para definir o início da semana.
-    weekStartDate = getSundayWeekStart(parseDateString(dateParam));
+    // A data na URL representa segunda-feira, então precisamos voltar para o domingo
+    const mondayDate = parseDateString(dateParam);
+    weekStartDate = getSundayWeekStart(addDays(mondayDate, -1));
   } else {
     // Se não, calcula com base na data atual.
     const baseDate = getNowInSampa();

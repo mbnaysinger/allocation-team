@@ -5,6 +5,7 @@ import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect
 import { Pessoa } from "@/backend/core/models";
 import { Projeto } from "@/backend/core/models/projeto/Projeto";
 import { formatDateForDisplay } from "@/app/utils/date";
+import { addDays } from "date-fns";
 import { UserRole } from "@/backend/core/models/UserRole";
 
 interface AllocationControlsProps {
@@ -23,7 +24,6 @@ interface AllocationControlsProps {
 
 const AllocationControls: React.FC<AllocationControlsProps> = ({
   weekStart,
-  weekEnd,
   onPreviousWeek,
   onNextWeek,
   onCurrentWeek,
@@ -33,7 +33,10 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   onFiltroProjetosChange,
   userRole,
 }) => {
-  const dateRange = `${formatDateForDisplay(weekStart)} - ${formatDateForDisplay(weekEnd)}`;
+  // weekStart é domingo, então segunda-feira é +1 e sexta-feira é +5
+  const mondayDate = addDays(weekStart, 1);
+  const fridayDate = addDays(weekStart, 5);
+  const dateRange = `${formatDateForDisplay(mondayDate)} - ${formatDateForDisplay(fridayDate)}`;
 
   const pessoaOptions: SelectOption[] = pessoas.map(p => ({ value: p.id, label: p.nome }));
   const projetoOptions: SelectOption[] = projetos.map(p => ({ value: p.projetoId, label: p.nome }));
