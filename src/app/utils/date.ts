@@ -26,23 +26,35 @@ export const getSundayWeekStart = (date: Date): Date => {
   console.log('getSundayWeekStart input:', date);
   console.log('getSundayWeekStart input day:', date.getDay());
   
-  // Calcula manualmente o domingo da semana sem conversão de fuso
-  const dayOfWeek = date.getDay(); // 0 = domingo, 1 = segunda, etc.
-  const daysToSubtract = dayOfWeek; // Se for domingo (0), subtrai 0. Se for segunda (1), subtrai 1, etc.
-  
+  // Cria uma nova data para não modificar a original
   const sunday = new Date(date);
-  sunday.setDate(sunday.getDate() - daysToSubtract);
-  sunday.setHours(0, 0, 0, 0); // Zera as horas para garantir que seja o início do dia
   
-  // Verifica se realmente é domingo, se não for, ajusta
-  if (sunday.getDay() !== 0) {
-    console.log('Warning: Sunday calculation failed, adjusting...');
-    const adjustment = sunday.getDay(); // Dias para ajustar
-    sunday.setDate(sunday.getDate() - adjustment);
+  // Calcula quantos dias subtrair para chegar ao domingo da semana atual
+  const dayOfWeek = sunday.getDay(); // 0 = domingo, 1 = segunda, etc.
+  console.log('Day of week to process:', dayOfWeek);
+  
+  // Se for domingo (0), não subtrai nada. Se for segunda (1), subtrai 1, etc.
+  // Para sábado (6), subtrai 6 para chegar ao domingo da mesma semana
+  if (dayOfWeek !== 0) {
+    const originalDate = sunday.getDate();
+    sunday.setDate(sunday.getDate() - dayOfWeek);
+    console.log(`Subtracted ${dayOfWeek} days from ${originalDate} to get ${sunday.getDate()}`);
   }
+  
+  // Zera as horas para garantir que seja o início do dia
+  sunday.setHours(0, 0, 0, 0);
   
   console.log('getSundayWeekStart output:', sunday);
   console.log('getSundayWeekStart day of week:', sunday.getDay());
+  
+  // Verificação final - se ainda não for domingo, força
+  if (sunday.getDay() !== 0) {
+    console.log('ERROR: Still not Sunday! Forcing correction...');
+    const correction = sunday.getDay();
+    sunday.setDate(sunday.getDate() - correction);
+    console.log('After correction:', sunday.getDay());
+  }
+  
   return sunday;
 };
 
