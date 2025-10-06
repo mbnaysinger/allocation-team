@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/Select";
 import { Badge } from "@/components/ui/Badge";
 import { Search, UserPlus, Edit, Ban, Filter } from "lucide-react";
-import { UsuarioFormModal } from "@/components/features/modals/usuario/UsuarioFormModal";
+import { UsuarioFormModal } from "@/components/features/modals/pessoa/UsuarioFormModal";
 
 type User = {
   id: string;
