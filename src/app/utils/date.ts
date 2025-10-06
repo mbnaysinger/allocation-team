@@ -33,8 +33,8 @@ export const getSundayWeekStart = (date: Date): Date => {
   
   console.log(`Date components: year=${year}, month=${month}, day=${day}`);
   
-  // Cria uma nova data no fuso local
-  const sunday = new Date(year, month, day);
+  // Cria uma nova data no fuso local com 3 horas para garantir o dia correto
+  const sunday = new Date(year, month, day, 3, 0, 0);
   const dayOfWeek = sunday.getDay();
   
   console.log('Day of week to process:', dayOfWeek);
@@ -46,8 +46,8 @@ export const getSundayWeekStart = (date: Date): Date => {
     console.log(`Subtracted ${daysToSubtract} days`);
   }
   
-  // Zera as horas
-  sunday.setHours(0, 0, 0, 0);
+  // Mantém as 3 horas para garantir o dia correto
+  sunday.setHours(3, 0, 0, 0);
   
   console.log('getSundayWeekStart output:', sunday);
   console.log('getSundayWeekStart day of week:', sunday.getDay());
@@ -87,9 +87,9 @@ export const formatDateForDisplay = (date: Date): string => {
  * Converte uma string YYYY-MM-DD de volta para um objeto Date, no fuso horário correto.
  */
 export const parseDateString = (dateString: string): Date => {
-  // Parse manual e ajusta para o fuso horário do Brasil (+3 horas)
+  // Parse manual e adiciona 3 horas para garantir o dia correto
   const [year, month, day] = dateString.split('-').map(Number);
-  const date = new Date(year, month - 1, day); // month é 0-indexed, fuso local
+  const date = new Date(year, month - 1, day, 3, 0, 0); // month é 0-indexed, adiciona 3 horas
   console.log('parseDateString input:', dateString);
   console.log('parseDateString output:', date);
   console.log('parseDateString day of week:', date.getDay());
