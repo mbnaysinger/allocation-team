@@ -55,14 +55,8 @@ export default async function AllocationPage({ searchParams }: AllocationPagePro
     // Se a URL tem o parâmetro de data, usa-o para definir o início da semana.
     // A data na URL representa segunda-feira, então precisamos voltar para o domingo
     const mondayDate = parseDateString(dateParam);
-    console.log('URL date param:', dateParam);
-    console.log('Parsed Monday date:', mondayDate);
-    console.log('Parsed Monday date day:', mondayDate.getDay());
-    
     // Usa diretamente a função getSundayWeekStart que já calcula o domingo correto
     weekStartDate = getSundayWeekStart(mondayDate);
-    console.log('Calculated week start (Sunday):', weekStartDate);
-    console.log('Calculated week start day:', weekStartDate.getDay());
   } else {
     // Se não, calcula com base na data atual.
     const baseDate = getNowInSampa();

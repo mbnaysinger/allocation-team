@@ -23,34 +23,23 @@ export const toSampaTime = (date: Date): Date => {
  * Retorna o início (Domingo) da semana para uma data específica.
  */
 export const getSundayWeekStart = (date: Date): Date => {
-  console.log('getSundayWeekStart input:', date);
-  console.log('getSundayWeekStart input day:', date.getDay());
-  
   // Usa o fuso local do Brasil diretamente
   const year = date.getFullYear();
   const month = date.getMonth();
   const day = date.getDate();
   
-  console.log(`Date components: year=${year}, month=${month}, day=${day}`);
-  
   // Cria uma nova data no fuso local com 3 horas para garantir o dia correto
   const sunday = new Date(year, month, day, 3, 0, 0);
   const dayOfWeek = sunday.getDay();
-  
-  console.log('Day of week to process:', dayOfWeek);
   
   // Calcula o domingo da semana
   if (dayOfWeek !== 0) {
     const daysToSubtract = dayOfWeek;
     sunday.setDate(sunday.getDate() - daysToSubtract);
-    console.log(`Subtracted ${daysToSubtract} days`);
   }
   
   // Mantém as 3 horas para garantir o dia correto
   sunday.setHours(3, 0, 0, 0);
-  
-  console.log('getSundayWeekStart output:', sunday);
-  console.log('getSundayWeekStart day of week:', sunday.getDay());
   
   return sunday;
 };
@@ -90,8 +79,5 @@ export const parseDateString = (dateString: string): Date => {
   // Parse manual e adiciona 3 horas para garantir o dia correto
   const [year, month, day] = dateString.split('-').map(Number);
   const date = new Date(year, month - 1, day, 3, 0, 0); // month é 0-indexed, adiciona 3 horas
-  console.log('parseDateString input:', dateString);
-  console.log('parseDateString output:', date);
-  console.log('parseDateString day of week:', date.getDay());
   return date;
 };
