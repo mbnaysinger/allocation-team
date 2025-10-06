@@ -57,10 +57,8 @@ export default async function AllocationPage({ searchParams }: AllocationPagePro
     const mondayDate = parseDateString(dateParam);
     console.log('URL date param:', dateParam);
     console.log('Parsed Monday date:', mondayDate);
-    // Para obter o domingo da semana, subtraímos 1 dia da segunda-feira
-    const sundayDate = new Date(mondayDate);
-    sundayDate.setDate(sundayDate.getDate() - 1);
-    weekStartDate = getSundayWeekStart(sundayDate);
+    // Usa diretamente a função getSundayWeekStart que já calcula o domingo correto
+    weekStartDate = getSundayWeekStart(mondayDate);
     console.log('Calculated week start (Sunday):', weekStartDate);
   } else {
     // Se não, calcula com base na data atual.
