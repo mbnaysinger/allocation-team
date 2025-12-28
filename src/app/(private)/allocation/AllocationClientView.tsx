@@ -1,50 +1,178 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from "next-auth/react";
 import AllocationHeader from "@/components/features/allocation/AllocationHeader";
 import AllocationControls from "@/components/features/allocation/AllocationControls";
 import PersonCard from "@/components/features/allocation/PersonCard";
-import AllocationLegend from "@/components/features/allocation/AllocationLegend";
-import ModalAdicionarPessoa from "@/components/features/modals/ModalAdicionarPessoa";
-import ModalAdicionarProjeto from "@/components/features/modals/ModalAdicionarProjeto";
 import ModalAdicionarAtividade from "@/components/features/modals/ModalAdicionarAtividade";
 import ModalEditarAtividade from "@/components/features/modals/ModalEditarAtividade";
 import ModalResumoSemanal from "@/components/features/modals/ModalResumoSemanal";
-import { Pessoa, AtividadeCompleta, DadosPessoa, DadosProjeto, DadosAtividade, StatusAtividade, ResumoSemanal } from "@/backend/core/models";
-import { getNowInSampa, formatDate, getWeekString } from "@/app/utils/date";
+import { AtividadeCompleta, DadosAtividade, StatusAtividade } from "@/backend/core/models/Atividade";
+import { ResumoSemanal } from "@/backend/core/models/ResumoSemanal";
+import { Pessoa } from "@/backend/core/models/Pessoa";
+import { formatDate, getWeekString } from "@/app/utils/date";
 import { Projeto } from "@/backend/core/models/projeto/Projeto";
 import { addDays } from "date-fns";
+import { SelectOption } from "@/components/ui/SearchableSelect";
+import { toast } from "@/hooks/use-toast";
+import { UserRole } from "@/backend/core/models/UserRole";
+import { arrayMove } from "@dnd-kit/sortable";
 
 interface AllocationClientViewProps {
-  initialData: {
-    pessoas: Pessoa[];
-    projetos: Projeto[];
-    atividades: AtividadeCompleta[];
-    resumosSemanais: ResumoSemanal[];
-  };
   weekStartDate: Date;
 }
 
-const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData, weekStartDate }) => {
+const AllocationClientView: React.FC<AllocationClientViewProps> = ({ weekStartDate }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
   const userRole = session?.user?.role;
-  const [pessoas, setPessoas] = useState(initialData.pessoas);
-  const [projetos, setProjetos] = useState(initialData.projetos);
-  const [atividades, setAtividades] = useState(initialData.atividades);
-  const [resumos, setResumos] = useState(initialData.resumosSemanais);
-  const [pessoasFiltradas, setPessoasFiltradas] = useState<Pessoa[]>([]);
-  const [projetosFiltrados, setProjetosFiltrados] = useState<Projeto[]>([]);
-  const [colaboradoresOptions, setColaboradoresOptions] = useState<Pessoa[]>([]);
-  
-  useEffect(() => {
-    setPessoas(initialData.pessoas);
-    setProjetos(initialData.projetos);
-    setAtividades(initialData.atividades);
-    setResumos(initialData.resumosSemanais);
 
+  // Data state
+  const [pessoas, setPessoas] = useState<Pessoa[]>([]);
+  const [atividades, setAtividades] = useState<AtividadeCompleta[]>([]);
+  const [resumos, setResumos] = useState<ResumoSemanal[]>([]);
+
+  // Filter options state
+  const [squadOptions, setSquadOptions] = useState<SelectOption[]>([]);
+  const [pessoaOptions, setPessoaOptions] = useState<SelectOption[]>([]);
+  const [projetoOptions, setProjetoOptions] = useState<SelectOption[]>([]);
+
+  // Selected filters state
+  const [selectedSquads, setSelectedSquads] = useState<SelectOption[]>([]);
+  const [selectedPessoas, setSelectedPessoas] = useState<SelectOption[]>([]);
+  const [selectedProjetos, setSelectedProjetos] = useState<SelectOption[]>([]);
+
+  // UI state
+  const [loading, setLoading] = useState(true);
+  const [showUseFiltersMessage, setShowUseFiltersMessage] = useState(false);
+
+  // Modal state
+  const [modalAdicionarAtividade, setModalAdicionarAtividade] = useState(false);
+  const [modalEditarAtividade, setModalEditarAtividade] = useState(false);
+  const [isResumoModalOpen, setIsResumoModalOpen] = useState(false);
+  const [pessoaParaResumo, setPessoaParaResumo] = useState<Pessoa | null>(null);
+  const [dataSelecionada, setDataSelecionada] = useState('');
+  const [pessoaSelecionada, setPessoaSelecionada] = useState<Pessoa | null>(null);
+  const [atividadeSelecionada, setAtividadeSelecionada] = useState<AtividadeCompleta | null>(null);
+
+  const [colaboradoresOptions, setColaboradoresOptions] = useState<Pessoa[]>([]);
+  const [projetosModais, setProjetosModais] = useState<Projeto[]>([]);
+
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    const week = getWeekString(weekStartDate);
+    const params = new URLSearchParams();
+
+    selectedSquads.forEach(s => params.append('squads', s.value));
+    selectedPessoas.forEach(p => params.append('pessoas', p.value));
+    selectedProjetos.forEach(p => params.append('projetos', p.value));
+
+    const response = await fetch(`/api/v1/atividades/semana/${week}?${params.toString()}`);
+    const data = await response.json();
+
+    if (selectedSquads.length > 0 && selectedPessoas.length === 0 && selectedProjetos.length === 0) {
+      const squadParams = new URLSearchParams();
+      selectedSquads.forEach(s => squadParams.append('squads', s.value));
+      const pessoasResponse = await fetch(`/api/v1/pessoas?${squadParams.toString()}`);
+      const todasAsPessoasDaSquad = await pessoasResponse.json();
+
+      const pessoasComAtividadesIds = new Set(data.pessoas.map((p: Pessoa) => p.id));
+      const pessoasSemAtividades = todasAsPessoasDaSquad.filter((p: Pessoa) => !pessoasComAtividadesIds.has(p.id));
+
+      setPessoas([...data.pessoas, ...pessoasSemAtividades]);
+    } else {
+      setPessoas(data.pessoas);
+    }
+
+    setAtividades(data.atividades);
+
+    if (data.pessoas.length > 0 && userRole === UserRole.ADMIN) {
+      const pessoaIds = data.pessoas.map((p: Pessoa) => p.id);
+      const resumosParams = new URLSearchParams();
+      pessoaIds.forEach((id: string) => resumosParams.append('pessoaIds', id));
+      const resumosResponse = await fetch(`/api/v1/resumo-semanal/semana/${week}?${resumosParams.toString()}`);
+      const resumosData = await resumosResponse.json();
+      setResumos(resumosData || []);
+    } else {
+      setResumos([]);
+    }
+
+    setLoading(false);
+
+    setShowUseFiltersMessage(data.pessoas.length === 0 && selectedSquads.length === 0 && selectedPessoas.length === 0);
+
+  }, [weekStartDate, selectedSquads, selectedPessoas, selectedProjetos, userRole]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    const fetchSquads = async () => {
+      const response = await fetch('/api/v1/pessoas/squads');
+      const data = await response.json();
+      setSquadOptions(data.map((s: string) => ({ value: s, label: s })));
+    };
+    fetchSquads();
+  }, []);
+
+  useEffect(() => {
+    const fetchPessoas = async () => {
+      if (selectedSquads.length > 0) {
+        const params = new URLSearchParams();
+        selectedSquads.forEach(s => params.append('squads', s.value));
+        const response = await fetch(`/api/v1/pessoas?${params.toString()}`);
+        const data = await response.json();
+        setPessoaOptions(data.map((p: Pessoa) => ({ value: p.id, label: p.nome })));
+      } else {
+        setPessoaOptions([]);
+        if (selectedPessoas.length > 0) {
+          setSelectedPessoas([]);
+        }
+      }
+    };
+    fetchPessoas();
+  }, [selectedSquads, selectedPessoas.length]);
+
+  useEffect(() => {
+    const fetchProjetos = async () => {
+      if (selectedSquads.length > 0 || selectedPessoas.length > 0) {
+        const params = new URLSearchParams();
+        selectedSquads.forEach(s => params.append('squads', s.value));
+        selectedPessoas.forEach(p => params.append('pessoas', p.value));
+        const response = await fetch(`/api/v1/projetos?${params.toString()}`);
+        const data = await response.json();
+        setProjetoOptions(data.map((p: Projeto) => ({ value: p.projetoId, label: p.nome })));
+      } else {
+        setProjetoOptions([]);
+        if (selectedProjetos.length > 0) {
+          setSelectedProjetos([]);
+        }
+      }
+    };
+    fetchProjetos();
+  }, [selectedSquads, selectedPessoas, selectedProjetos.length]);
+
+
+  useEffect(() => {
+    const fetchProjetosModais = async () => {
+      try {
+        const response = await fetch(`/api/v1/projetos/buscar-todos`);
+        const data = await response.json();
+        setProjetosModais(data);
+      } catch (error) {
+        console.error("Erro ao carregar projetos para os modais:", error);
+      }
+    };
+
+    fetchProjetosModais();
+  }, []);
+
+  useEffect(() => {
     // Busca a lista completa de pessoas para os modais
     const fetchPessoasParaModal = async () => {
       try {
@@ -59,126 +187,37 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     };
 
     fetchPessoasParaModal();
-  }, [initialData]);
-
-  const [modalAdicionarPessoa, setModalAdicionarPessoa] = useState(false);
-  const [modalAdicionarProjeto, setModalAdicionarProjeto] = useState(false);
-  const [modalAdicionarAtividade, setModalAdicionarAtividade] = useState(false);
-  const [modalEditarAtividade, setModalEditarAtividade] = useState(false);
-  const [isResumoModalOpen, setIsResumoModalOpen] = useState(false);
-  const [pessoaParaResumo, setPessoaParaResumo] = useState<Pessoa | null>(null);
-  const [dataSelecionada, setDataSelecionada] = useState('');
-  const [pessoaSelecionada, setPessoaSelecionada] = useState<Pessoa | null>(null);
-  const [atividadeSelecionada, setAtividadeSelecionada] = useState<AtividadeCompleta | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const atividadesFiltradas = React.useMemo(() => {
-    // Se há projetos filtrados, filtra as atividades por projeto
-    if (projetosFiltrados.length > 0) {
-      const projetosFiltradosIds = new Set(projetosFiltrados.map(p => p.projetoId));
-      return atividades.filter(a => a.projetoId && projetosFiltradosIds.has(a.projetoId));
-    }
-    return atividades;
-  }, [atividades, projetosFiltrados]);
-
-  const pessoasExibidas = React.useMemo(() => {
-    // 1. Define a lista base de pessoas (filtrada ou todas)
-    let basePessoas = pessoasFiltradas.length > 0 ? pessoasFiltradas : pessoas;
-
-    // 2. Se houver projetos filtrados, refine a lista de pessoas
-    if (projetosFiltrados.length > 0) {
-      const projetosFiltradosIds = new Set(projetosFiltrados.map(p => p.projetoId));
-      
-      // Encontra os IDs das pessoas que têm atividades nos projetos selecionados
-      const pessoasComAtividadesNosProjetos = new Set(
-        atividadesFiltradas
-          .filter(a => a.projetoId && projetosFiltradosIds.has(a.projetoId))
-          .map(a => a.pessoaId)
-      );
-
-      // Filtra a lista base para incluir apenas essas pessoas
-      basePessoas = basePessoas.filter(p => pessoasComAtividadesNosProjetos.has(p.id));
-    }
-
-    return basePessoas;
-  }, [pessoas, pessoasFiltradas, projetosFiltrados, atividadesFiltradas]);
+  }, []);
 
 
   const navigateWeek = (direction: 'prev' | 'next') => {
-    // Calcula a segunda-feira atual a partir do domingo
     const currentMonday = addDays(weekStartDate, 1);
-    // Navega para a próxima ou anterior segunda-feira
     const newMonday = addDays(currentMonday, direction === 'next' ? 7 : -7);
-    router.push(`/allocation?date=${formatDate(newMonday)}`);
+
+    const params = new URLSearchParams(searchParams);
+    params.set('date', formatDate(newMonday));
+    router.push(`/allocation?${params.toString()}`);
   };
 
   const navigateToCurrentWeek = () => {
-    let baseDate = getNowInSampa();
-    // REGRA DE NEGÓCIO: Se hoje for domingo, o painel deve abrir na próxima semana.
-    if (baseDate.getDay() === 0) {
-      baseDate = addDays(baseDate, 1);
-    }
-    // Não precisamos mais navegar, pois a lógica do servidor já nos coloca na data certa.
-    // Apenas limpamos o parâmetro da URL para que o servidor recalcule.
-    router.push(`/allocation`);
+    const params = new URLSearchParams(searchParams);
+    params.delete('date');
+    router.push(`/allocation?${params.toString()}`);
   };
-  
-  const calcularHorasDia = (pessoaId: string, data: string) => {
-    return atividadesFiltradas
+
+  const calcularTempoDia = (pessoaId: string, data: string) => {
+    return atividades
       .filter(a => a.pessoaId === pessoaId && a.data === data)
-      .reduce((acc, a) => acc + a.horas, 0);
+      .reduce((acc, a) => acc + a.tempo, 0);
   };
 
-  const handleAdicionarPessoa = async (dados: DadosPessoa) => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/v1/pessoas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Falha ao adicionar pessoa.');
-      }
-      
-      setModalAdicionarPessoa(false);
-      router.refresh(); 
-
-    } catch (error) {
-      console.error(error);
-      // TODO: Mostrar o erro para o usuário no modal
-    } finally {
-      setLoading(false);
-    }
+  const calcularTempoDiaExecutado = (pessoaId: string, data: string) => {
+    return atividades
+      .filter(a => a.pessoaId === pessoaId && a.data === data)
+      .reduce((acc, a) => acc + (a.tmp_executado || 0), 0);
   };
-  const handleAdicionarProjeto = async (dados: DadosProjeto) => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/v1/projetos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados),
-      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Falha ao adicionar projeto.');
-      }
-      
-      setModalAdicionarProjeto(false);
-      router.refresh(); 
-
-    } catch (error) {
-      console.error(error);
-      // TODO: Mostrar o erro para o usuário no modal
-    } finally {
-      setLoading(false);
-    }
-  };
   const handleAdicionarAtividade = async (dados: DadosAtividade) => {
-    setLoading(true);
     try {
       const response = await fetch('/api/v1/atividades', {
         method: 'POST',
@@ -190,7 +229,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         const errorData = await response.json();
         throw new Error(errorData.message || 'Falha ao adicionar atividade.');
       }
-      
+
       setModalAdicionarAtividade(false);
       const novasAtividades = await response.json();
       setAtividades(prev => [...prev, ...novasAtividades]);
@@ -198,12 +237,9 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
     } catch (error) {
       console.error(error);
       // TODO: Mostrar erro no modal
-    } finally {
-      setLoading(false);
     }
   };
   const handleEditarAtividade = async (atividadeId: string, dados: Partial<DadosAtividade>) => {
-    setLoading(true);
     try {
       const response = await fetch(`/api/v1/atividades/atualizar`, {
         method: 'POST',
@@ -213,26 +249,32 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Falha ao editar atividade.');
+        toast({
+          title: "Ops, um ERRO aqui...",
+          description: errorData.message || 'Falha ao editar atividade.',
+          variant: "destructive",
+        });
+        return;
       }
-      
+
       setModalEditarAtividade(false);
       const atividadeAtualizada = await response.json();
-      setAtividades(prev => 
-        prev.map(atividade => 
+      setAtividades(prev =>
+        prev.map(atividade =>
           atividade.id === atividadeId ? atividadeAtualizada : atividade
         )
       );
 
     } catch (error) {
       console.error(error);
-      // TODO: Mostrar erro no modal
-    } finally {
-      setLoading(false);
+      toast({
+        title: "Erro inesperado",
+        description: "Ocorreu um erro inesperado ao editar a atividade.",
+        variant: "destructive",
+      });
     }
   };
   const handleDeletarAtividade = async (atividadeId: string) => {
-    setLoading(true);
     try {
       const response = await fetch(`/api/v1/atividades/${atividadeId}`, {
         method: 'DELETE',
@@ -243,21 +285,18 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         const errorData = await response.json();
         throw new Error(errorData.message || 'Falha ao deletar atividade.');
       }
-      
+
       setModalEditarAtividade(false);
       setAtividades(prev => prev.filter(atividade => atividade.id !== atividadeId));
 
     } catch (error) {
       console.error(error);
       // TODO: Mostrar erro no modal
-    } finally {
-      setLoading(false);
     }
   };
   const handleClonarAtividade = async (atividadeId: string) => {
-    setLoading(true);
     try {
-      const response = await fetch(`/api/v1/clone-atividade`, {
+      const response = await fetch(`/api/v1/atividades/clone`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: atividadeId }),
@@ -267,43 +306,127 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         const errorData = await response.json();
         throw new Error(errorData.message || 'Falha ao clonar atividade.');
       }
-      
+
       const atividadeClonada = await response.json();
-    
+
       setAtividades(prev => [...prev, atividadeClonada]);
     } catch (error) {
       console.error(error);
       // TODO: Mostrar erro no modal
-    } finally {
-      setLoading(false);
     }
   };
-  const handleMoveAtividade = async (atividadeId: string, novaData: string) => {
-    setLoading(true);
+  const handleMoveAtividade = async (atividadeId: string, novaData: string, novaOrderedActivityIds: string[]
+  ) => {
+    const originalAtividades = [...atividades];
+    let dadosParaApi: { pessoaId?: string; dataOriginal?: string } = {};
+
+    setAtividades(prevAtividades => {
+      const activeAtividade = prevAtividades.find(a => a.id === atividadeId);
+      if (!activeAtividade) return prevAtividades;
+
+      const pessoaAlvoId = activeAtividade.pessoaId;
+      const dataOriginal = activeAtividade.data;
+      dadosParaApi = { pessoaId: pessoaAlvoId, dataOriginal };
+
+      // Isolamento de atividades não movidas (referências originais)
+      const untouchedActivities = prevAtividades.filter(
+        a => a.pessoaId !== pessoaAlvoId
+      );
+
+      // Filtrar apenas atividades da pessoa-alvo (útil para visão ADM)
+      const targetPersonActivities = prevAtividades.filter(
+        a => a.pessoaId === pessoaAlvoId
+      );
+
+      // Atividades da pessoa-alvo que NÃO SÃO da origem NEM do destino
+      const otherDaysForTarget = targetPersonActivities.filter(
+        a => a.data !== dataOriginal && a.data !== novaData
+      );
+
+      // Atividades da coluna origem sem a atividade movida
+      const originActivitiesForTarget = targetPersonActivities.filter(
+        a => a.data === dataOriginal && a.id !== atividadeId
+      );
+
+      const movedActivity = {
+        ...activeAtividade,
+        data: novaData
+      };
+
+      // Atividades da coluna destino da pessoa-alvo
+      const destinationActivitiesForTarget = targetPersonActivities.filter(
+        a => a.data === novaData
+      );
+
+      // Combinação de atividades da pessoa-alvo
+      const allDestinationActivities = [...destinationActivitiesForTarget, movedActivity];
+
+      // Reordena as referências com base na nova ordem
+      const orderedDestinationActivities: AtividadeCompleta[] = [];
+      for (const id of novaOrderedActivityIds) {
+        const activity = allDestinationActivities.find(a => a.id === id);
+        if (activity) {
+          orderedDestinationActivities.push(activity);
+        }
+      }
+
+      return [
+        ...untouchedActivities,
+        ...otherDaysForTarget,
+        ...originActivitiesForTarget,
+        ...orderedDestinationActivities
+      ];
+    });
+
     try {
-      const response = await fetch(`/api/v1/atividades/atualizar`, {
+      const response = await fetch(`/api/v1/atividades/move-and-reorder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: atividadeId, data: novaData }),
+        body: JSON.stringify({
+          atividadeId,
+          pessoaId: dadosParaApi.pessoaId,
+          novaData,
+          novaOrderedActivityIds
+        }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Falha ao mover atividade.');
       }
-      //atualiza no formato otimista
-      const atividadeAtualizada = await response.json();
-      setAtividades(prev => 
-        prev.map(atividade => 
-          atividade.id === atividadeId ? atividadeAtualizada : atividade
-        )
-      );
 
     } catch (error) {
       console.error(error);
-      // TODO: Mostrar erro no modal
-    } finally {
-      setLoading(false);
+      setAtividades(originalAtividades); // Rollback
+    }
+  };
+
+  const handleReorderActivitiesInDay = async (activeId: string, overId: string, dayData: string) => {
+    let newActivitiesInDay: AtividadeCompleta[] = [];
+
+    setAtividades((prevAtividades) => {
+      const activitiesInDay = prevAtividades.filter(a => a.data === dayData);
+      const otherActivities = prevAtividades.filter(a => a.data !== dayData);
+
+      const oldIndex = activitiesInDay.findIndex(a => a.id === activeId);
+      const newIndex = activitiesInDay.findIndex(a => a.id === overId);
+
+      newActivitiesInDay = arrayMove(activitiesInDay, oldIndex, newIndex);
+
+      return [...otherActivities, ...newActivitiesInDay];
+    });
+
+    if (newActivitiesInDay.length > 0) {
+      const response = await fetch('/api/v1/atividades/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pessoaId: newActivitiesInDay[0].pessoaId, data: dayData, orderedActivityIds: newActivitiesInDay.map(a => a.id) }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Falha ao reordenar atividades.');
+      }
     }
   };
 
@@ -328,9 +451,9 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
 
   const handleUpdateStatus = async (id: string, newStatus: StatusAtividade) => {
     const originalAtividades = [...atividades];
-    
+
     // Atualização Otimista
-    const updatedActivities = atividades.map(a => 
+    const updatedActivities = atividades.map(a =>
       a.id === id ? { ...a, status: newStatus } : a
     );
     setAtividades(updatedActivities);
@@ -362,7 +485,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       const response = await fetch('/api/v1/resumo-semanal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           pessoaId: pessoaParaResumo.id,
           semana: getWeekString(weekStartDate), // Usa a nova função
           comentario,
@@ -372,9 +495,9 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
       if (!response.ok) {
         throw new Error('Falha ao salvar o resumo no servidor.');
       }
-      
+
       const resumoSalvo = await response.json();
-      
+
       // Atualiza o estado local com o resumo salvo
       setResumos(prev => {
         const index = prev.findIndex(r => r.id === resumoSalvo.id);
@@ -386,7 +509,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
           return [...prev, resumoSalvo];
         }
       });
-      
+
       setIsResumoModalOpen(false);
 
     } catch (error) {
@@ -399,56 +522,60 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
 
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      <AllocationHeader userRole={userRole} />
-      
-      <AllocationControls
-        weekStart={weekStartDate} // Passa a data de início correta
-        onPreviousWeek={() => navigateWeek('prev')}
-        onNextWeek={() => navigateWeek('next')}
-        onCurrentWeek={navigateToCurrentWeek}
-        pessoas={pessoas}
-        projetos={projetos}
-        onFiltroPessoasChange={setPessoasFiltradas}
-        onFiltroProjetosChange={setProjetosFiltrados}
-        userRole={userRole}
-      />
+    <div className="flex flex-col h-screen bg-slate-900">
+      <div className="sticky top-0 z-10 bg-slate-900">
+        <AllocationHeader userRole={userRole} />
 
-      <div className="p-4 md:p-8 space-y-6 md:space-y-8 bg-slate-900">
-        {pessoasExibidas.map((pessoa: Pessoa) => (
-          <PersonCard
-            key={pessoa.id}
-            person={pessoa}
-            weekStart={weekStartDate} // Passa a data de início correta
-            atividades={atividadesFiltradas}
-            onAddAllocation={handleAddAllocation}
-            onEditAllocation={handleEditAllocation}
-            onCloneAllocation={handleClonarAtividade}
-            onMoveAtividade={handleMoveAtividade}
-            onUpdateStatus={handleUpdateStatus}
-            onOpenResumoModal={handleOpenResumoModal}
-            calcularHorasDia={calcularHorasDia}
-            resumoDaSemana={resumos.find(r => r.pessoaId === pessoa.id)}
-          />
-        ))}
+        <AllocationControls
+          weekStart={weekStartDate}
+          onPreviousWeek={() => navigateWeek('prev')}
+          onNextWeek={() => navigateWeek('next')}
+          onCurrentWeek={navigateToCurrentWeek}
+          squadOptions={squadOptions}
+          pessoaOptions={pessoaOptions}
+          projetoOptions={projetoOptions}
+          selectedSquads={selectedSquads}
+          selectedPessoas={selectedPessoas}
+          selectedProjetos={selectedProjetos}
+          onFiltroSquadChange={setSelectedSquads}
+          onFiltroPessoasChange={setSelectedPessoas}
+          onFiltroProjetosChange={setSelectedProjetos}
+          userRole={userRole}
+        />
       </div>
 
-      <AllocationLegend />
+      <div className="flex-grow overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
+        {loading ? (
+          <div className="text-center text-white">Carregando...</div>
+        ) : showUseFiltersMessage ? (
+          <div className="text-center text-white">Utilize os filtros para visualizar os dados.</div>
+        ) : (
+          pessoas
+            .slice()
+            .sort((a, b) => a.nome.localeCompare(b.nome))
+            .map((pessoa: Pessoa) => (
+              <PersonCard
+                key={pessoa.id}
+                person={pessoa}
+                weekStart={weekStartDate}
+                atividades={atividades}
+                onAddAllocation={handleAddAllocation}
+                onEditAllocation={handleEditAllocation}
+                onCloneAllocation={handleClonarAtividade}
+                onMoveAtividade={handleMoveAtividade}
+                onUpdateStatus={handleUpdateStatus}
+                onOpenResumoModal={handleOpenResumoModal}
+                calcularTempoDia={calcularTempoDia}
+                calcularTempoDiaExecutado={calcularTempoDiaExecutado}
+                resumoDaSemana={resumos.find(r => r.pessoaId === pessoa.id)}
+                userRole={userRole}
+                onReorderActivitiesInDay={handleReorderActivitiesInDay}
+              />
+            ))
+        )}
+      </div>
 
-      {/* Modais */}
-      <ModalAdicionarPessoa
-        isOpen={modalAdicionarPessoa}
-        onClose={() => setModalAdicionarPessoa(false)}
-        onSubmit={handleAdicionarPessoa}
-        loading={loading}
-      />
-
-      <ModalAdicionarProjeto
-        isOpen={modalAdicionarProjeto}
-        onClose={() => setModalAdicionarProjeto(false)}
-        onSubmit={handleAdicionarProjeto}
-        loading={loading}
-      />
+      {/* <AllocationLegend /> */}
 
       <ModalAdicionarAtividade
         isOpen={modalAdicionarAtividade}
@@ -458,7 +585,7 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         }}
         onSubmit={handleAdicionarAtividade}
         pessoas={colaboradoresOptions}
-        projetos={projetos}
+        projetos={projetosModais}
         dataSelecionada={dataSelecionada}
         pessoaSelecionada={pessoaSelecionada}
         loading={loading}
@@ -474,8 +601,9 @@ const AllocationClientView: React.FC<AllocationClientViewProps> = ({ initialData
         onDelete={handleDeletarAtividade}
         atividade={atividadeSelecionada}
         pessoas={pessoas}
-        projetos={projetos}
+        projetos={projetosModais}
         loading={loading}
+        userRole={userRole}
       />
 
       <ModalResumoSemanal

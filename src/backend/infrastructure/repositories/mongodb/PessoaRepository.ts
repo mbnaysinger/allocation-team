@@ -1,7 +1,7 @@
-import { Collection, Document } from 'mongodb';
+import { Collection, Document, Filter } from 'mongodb';
 import { getCollection } from '../../../../config/databases/mongodb';
 import { IPessoaRepository } from '../../../core/ports/IPessoaRepository';
-import { Pessoa, DadosPessoa } from '../../../core/models';
+import { Pessoa, DadosPessoa } from '../../../core/models/Pessoa';
 
 // Helper to convert MongoDB document to a Pessoa object
 const fromDocument = (doc: Document): Pessoa => {
@@ -11,33 +11,44 @@ const fromDocument = (doc: Document): Pessoa => {
     id: data.id,
     nome: data.nome,
     cargo: data.cargo,
+    squad: data.squad,
     ativo: data.ativo,
     createdAt: new Date(data.createdAt),
     updatedAt: new Date(data.updatedAt),
   } as Pessoa;
 };
 
-export class MongoDbPessoaRepository implements IPessoaRepository {
+export class PessoaRepository implements IPessoaRepository {
   private async getPessoasCollection(): Promise<Collection<Document>> {
     return getCollection('pessoas');
   }
 
-  async buscarTodos(): Promise<Pessoa[]> {
+  async buscarPessoas(squads?: string[]): Promise<Pessoa[]> {
     const collection = await this.getPessoasCollection();
-    const documents = await collection.find({}).toArray();
+    const query = squads && squads.length > 0 ? { squad: { $in: squads } } : {};
+    const documents = await collection.find(query).sort({ nome: 1 }).toArray();
     return documents.map(fromDocument);
   }
 
   async findByIds(ids: string[]): Promise<Pessoa[]> {
-    console.log('IDs recebidos:', ids, 'Tipo:', typeof ids, 'É array:', Array.isArray(ids));
     const collection = await this.getPessoasCollection();
     const documents = await collection.find({ id: { $in: ids } }).toArray();
     return documents.map(fromDocument);
   }
 
-  async buscarAtivos(): Promise<Pessoa[]> {
+  async buscarAtivosPorIds(ids: string[]): Promise<Pessoa[]> {
     const collection = await this.getPessoasCollection();
-    const documents = await collection.find({ ativo: true })
+    const documents = await collection.find({ id: { $in: ids }, ativo: true }).toArray();
+    return documents.map(fromDocument);
+  }
+
+  async buscarAtivos(squads?: string[]): Promise<Pessoa[]> {
+    const collection = await this.getPessoasCollection();
+    const query: Filter<Document> = { ativo: true };
+    if (squads && squads.length > 0) {
+      query.squad = { $in: squads };
+    }
+    const documents = await collection.find(query)
     .sort({ nome: 1 })
     .toArray();
     return documents.map(fromDocument);
@@ -78,8 +89,8 @@ export class MongoDbPessoaRepository implements IPessoaRepository {
       { returnDocument: 'after' }
     );
 
-    if (result) {
-      return fromDocument(result);
+    if (result && result.value) {
+      return fromDocument(result.value as Document);
     }
     
     return null;
@@ -94,10 +105,16 @@ export class MongoDbPessoaRepository implements IPessoaRepository {
       { returnDocument: 'after' }
     );
 
-    if (result) {
-      return fromDocument(result);
+    if (result && result.value) {
+      return fromDocument(result.value as Document);
     }
     
     return null;
+  }
+
+  async buscarSquads(): Promise<string[]> {
+    const collection = await this.getPessoasCollection();
+    const squads = await collection.distinct('squad');
+    return squads.filter(s => s);
   }
 }

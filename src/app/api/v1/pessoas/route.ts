@@ -1,12 +1,16 @@
 // src/app/api/v1/pessoas/route.ts
 import { NextResponse } from 'next/server';
 import { dependencyFactory } from '../../../../backend/infrastructure/factories/DependencyFactory';
-import { DadosPessoa } from '../../../../backend/core/models';
+import { DadosPessoa } from '../../../../backend/core/models/Pessoa';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const buscarPessoas = dependencyFactory.createBuscarPessoas();
-    const pessoas = await buscarPessoas.execute();
+    const { searchParams } = new URL(request.url);
+    const squads = searchParams.getAll('squads');
+    
+    const pessoaService = dependencyFactory.createPessoaService();
+    const pessoas = await pessoaService.buscarPessoasAtivas(squads.length > 0 ? squads : undefined);
+    
     return NextResponse.json(pessoas);
   } catch (error) {
     const err = error as Error;
@@ -22,8 +26,8 @@ export async function POST(request: Request) {
   try {
     const dados: DadosPessoa = await request.json();
 
-    const criarPessoa = dependencyFactory.createCriarPessoa();
-    const novaPessoa = await criarPessoa.execute(dados);
+    const criarPessoa = dependencyFactory.createPessoaService();
+    const novaPessoa = await criarPessoa.criarPessoa(dados);
 
     return NextResponse.json(novaPessoa, { status: 201 });
   } catch (error) {

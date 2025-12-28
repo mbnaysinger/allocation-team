@@ -6,8 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Checkbox } from '@/components/ui/Checkbox';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Eye, EyeOff, Lock, User } from 'lucide-react';
 
 export default function LoginPage() {
   const [name, setName] = useState('');
@@ -15,7 +14,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const router = useRouter();
 
@@ -114,7 +112,7 @@ export default function LoginPage() {
           </div>
 
           {/* Toggle between login and register */}
-          <div className="flex mb-6 bg-slate-700 rounded-lg p-1">
+          {/* <div className="flex mb-6 bg-slate-700 rounded-lg p-1">
             <button
               type="button"
               onClick={() => setIsLoginMode(true)}
@@ -137,21 +135,21 @@ export default function LoginPage() {
             >
               Registrar
             </button>
-          </div>
+          </div> */}
 
           {/* Login form */}
           {isLoginMode ? (
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="login-email" className="text-white font-medium">
-                  Email
+                  Usuário
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
                     id="login-email"
-                    type="email"
-                    placeholder="seu@email.com"
+                    type="text"
+                    placeholder="seu usuário de rede..."
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
@@ -190,7 +188,7 @@ export default function LoginPage() {
               </div>
 
               {/* Remember me and forgot password */}
-              <div className="flex items-center justify-between">
+              {/* <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="remember"
@@ -210,14 +208,14 @@ export default function LoginPage() {
                 >
                   Esqueci minha senha
                 </a>
-              </div>
+              </div> */}
 
               {/* Login button */}
               <Button 
                 type="submit" 
                 variant="login"
                 size="lg"
-                className="w-full"
+                className="w-full mt-4"
               >
                 Entrar
               </Button>
@@ -243,7 +241,7 @@ export default function LoginPage() {
                   Email
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
                     id="register-email"
                     type="email"
@@ -298,7 +296,7 @@ export default function LoginPage() {
           )}
 
           {/* Footer */}
-          <div className="mt-8 pt-6 border-t border-slate-700/50 text-center">
+          {/* <div className="mt-8 pt-6 border-t border-slate-700/50 text-center">
             <p className="text-sm text-gray-400">
               {isLoginMode ? (
                 <>
@@ -322,7 +320,7 @@ export default function LoginPage() {
                 </>
               )}
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
 

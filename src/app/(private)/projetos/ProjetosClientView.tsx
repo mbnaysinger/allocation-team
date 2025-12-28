@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useEffect } from "react";
-import { Projeto } from "@/backend/core/models/projeto/Projeto";
+import { useState, useEffect, useCallback } from "react";
+import { Projeto, Entidade } from "@/backend/core/models/projeto/Projeto";
 import { Epico } from "@/backend/core/models/projeto/Epico";
 import { Tarefa } from "@/backend/core/models/projeto/Tarefa";
+import { useSession, signOut } from "next-auth/react";
+import Sidebar from "@/components/ui/Sidebar";
+import { LogOut } from "lucide-react";
 
 interface ProjectWithChildren extends Projeto {
   epics: EpicWithChildren[];
@@ -12,7 +15,6 @@ interface ProjectWithChildren extends Projeto {
 interface EpicWithChildren extends Epico {
   tarefas: Tarefa[];
 }
-import { ProjectSidebar } from "@/components/project/ProjectSidebar";
 import { ProjectCreateModal } from "@/components/project/ProjectCreateModal";
 import { ProjectEditModal } from "@/components/project/ProjectEditModal";
 import { EpicCreateModal } from "@/components/project/EpicCreateModal";
@@ -34,8 +36,18 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { TaskEditModal } from "@/components/project/TaskEditModal";
+import ProjectControls from "@/components/features/project/ProjectControls";
+import { ProjectListDisplay } from "@/components/features/project/ProjectListDisplay";
+
+interface SelectOption {
+  value: string;
+  label: string;
+}
 
 const ProjetosClientView = () => {
+  const { data: session } = useSession();
+  const userRole = session?.user?.role;
+
   const [projects, setProjects] = useState<ProjectWithChildren[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +55,19 @@ const ProjetosClientView = () => {
   
   const [selectedItem, setSelectedItem] = useState<{ type: 'project' | 'epic' | 'task'; id: string } | null>(null);
   
+  // Filter states
+  const [selectedSearch, setSelectedSearch] = useState<string>('');
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [selectedEntity, setSelectedEntity] = useState<string>('all');
+  const [entityOptions, setEntityOptions] = useState<SelectOption[]>([]);
+
+  const statusOptions: SelectOption[] = [
+    { value: 'em_andamento', label: 'Em Andamento' },
+    { value: 'backlog', label: 'Backlog' },
+    { value: 'concluido', label: 'Concluído' },
+    { value: 'cancelado', label: 'Cancelado' },
+  ];
+
   // Modal states
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   const [epicModalOpen, setEpicModalOpen] = useState(false);
@@ -53,14 +78,23 @@ const ProjetosClientView = () => {
 
   const { toast } = useToast();
 
+  const handleLogout = () => {
+    signOut({ callbackUrl: '/login' });
+  };
+
   // Buscar dados
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
+      const params = new URLSearchParams();
+      if (selectedSearch) params.append('nome', selectedSearch);
+      if (selectedStatus !== 'all') params.append('status', selectedStatus);
+      if (selectedEntity !== 'all') params.append('entidade', selectedEntity);
+
       const [projectsRes, epicsRes, tasksRes] = await Promise.all([
-        fetch('/api/v1/projetos'),
+        fetch(`/api/v1/projetos?${params.toString()}`),
         fetch('/api/v1/epicos'),
         fetch('/api/v1/tarefas')
       ]);
@@ -74,6 +108,10 @@ const ProjetosClientView = () => {
         epicsRes.json(),
         tasksRes.json()
       ]);
+
+      // Extract unique entities for filter options
+      const uniqueEntities: Entidade[] = Array.from(new Set(projectsData.map((p: Projeto) => p.entidade).filter(Boolean)));
+      setEntityOptions(uniqueEntities.map((entity: Entidade) => ({ value: entity, label: entity })));
 
       // Estruturar projetos com seus épicos e tarefas
       const projectsWithChildren: ProjectWithChildren[] = projectsData.map((project: Projeto) => ({
@@ -92,7 +130,7 @@ const ProjetosClientView = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedSearch, selectedStatus, selectedEntity]);
 
   // Operações CRUD com atualização otimista
   const createProject = async (data: Partial<Projeto>) => {
@@ -283,7 +321,7 @@ const ProjetosClientView = () => {
   // Carregar dados na inicialização
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData, selectedSearch, selectedStatus, selectedEntity]);
 
   // Helper functions
   const findProject = (id: string) => projects.find(p => p.projetoId === id);
@@ -449,7 +487,7 @@ const ProjetosClientView = () => {
         <div className="flex items-center justify-center h-full text-slate-500">
           <div className="text-center">
             <Target className="h-16 w-16 mx-auto mb-4 opacity-50" />
-            <p className="text-lg">Selecione um item para ver os detalhes</p>
+            <p className="text-lg">Selecione um projeto para ver os detalhes</p>
           </div>
         </div>
       );
@@ -603,26 +641,59 @@ const ProjetosClientView = () => {
   }
 
   return (
-    <div className="min-h-screen flex bg-slate-900 text-slate-200">
-      {/* Sidebar */}
-      <div className="w-80 flex-shrink-0">
-        <ProjectSidebar
-          projects={projects}
-          selectedItem={selectedItem}
-          onSelectItem={handleSelectItem}
-          onCreateProject={handleCreateProject}
-          onCreateEpic={handleCreateEpic}
-          onCreateTask={handleCreateTask}
-          onEditItem={handleEditItem as (type: 'project' | 'epic' | 'task', item: Projeto | Epico | Tarefa) => void}
-          onDeleteItem={handleDeleteItem}
-          updatingItems={updatingItems}
+    <div className="flex flex-col h-screen bg-slate-900">
+      <div className="sticky top-0 z-10 bg-slate-900">
+        {/* Sidebar com menu hambúrguer */}
+        <Sidebar userRole={userRole} />
+
+        {/* Botão de Logout */}
+        <button
+          onClick={handleLogout}
+          className="absolute top-4 right-4 p-2 bg-slate-700 hover:bg-slate-600 border border-slate-600 hover:border-slate-500 rounded-lg transition-all duration-200 group"
+          title="Sair"
+        >
+          <LogOut size={20} className="text-gray-300 group-hover:text-white transition-colors" />
+        </button>
+        
+        {/* Conteúdo à esquerda */}
+        <div className="text-left">
+          <h2 className="text-2xl md:text-3xl font-bold mb-1 text-white pt-4 pl-20">
+            Projetos
+            <span className="text-cyan-400 text-xl text-center pl-6">Soluções Corporativas e de Negócios</span>
+          </h2>
+        </div>
+
+        <ProjectControls
+          onSearchChange={setSelectedSearch}
+          onStatusChange={setSelectedStatus}
+          onEntityChange={setSelectedEntity}
+          onNewProject={handleCreateProject}
+          statusOptions={statusOptions}
+          entityOptions={entityOptions}
+          selectedSearch={selectedSearch}
+          selectedStatus={selectedStatus}
+          selectedEntity={selectedEntity}
         />
       </div>
 
-      {/* Main Content */}
-      <main className="flex-1 p-6 overflow-auto">
-        {renderContent()}
-      </main>
+      <div className="flex-grow overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8 flex">
+        <div className="w-1/3 pr-4">
+          <ProjectListDisplay
+            projects={projects}
+            selectedItem={selectedItem}
+            onSelectItem={handleSelectItem}
+            onCreateEpic={handleCreateEpic}
+            onCreateTask={handleCreateTask}
+            onEditItem={handleEditItem as (type: 'project' | 'epic' | 'task', item: Projeto | Epico | Tarefa) => void}
+            onDeleteItem={handleDeleteItem}
+            updatingItems={updatingItems}
+            onCreateProject={handleCreateProject}
+          />
+        </div>
+        <main className="flex-1 p-6 overflow-auto">
+          {renderContent()}
+        </main>
+      </div>
 
       {/* Modals */}
       <ProjectCreateModal

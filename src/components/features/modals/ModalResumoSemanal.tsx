@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Pessoa, ResumoSemanal } from '@/backend/core/models';
+import { ResumoSemanal } from '@/backend/core/models/ResumoSemanal';
+import { Pessoa } from '@/backend/core/models/Pessoa';
 import { Button } from '@/components/ui/Button';
 import { X } from 'lucide-react';
 
@@ -71,7 +72,6 @@ const ModalResumoSemanal: React.FC<ModalResumoSemanalProps> = ({
               onChange={(e) => setComentario(e.target.value)}
               placeholder="Descreva aqui os destaques, impedimentos e o progresso geral da semana..."
               className="w-full h-48 p-4 bg-slate-700 border-2 border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 resize-none"
-              required
             />
           </div>
 

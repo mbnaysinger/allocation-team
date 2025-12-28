@@ -1,7 +1,7 @@
 import { Collection, Document } from 'mongodb';
 import { getCollection } from '../../../../config/databases/mongodb';
 import { IProjetoRepository } from '../../../core/ports/IProjetoRepository';
-import { Projeto, DadosProjeto } from '../../../core/models/projeto/Projeto';
+import { Projeto, DadosProjeto, ProjetoSelect } from '../../../core/models/projeto/Projeto';
 
 const fromDocument = (doc: Document): Projeto => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -24,27 +24,99 @@ const fromDocument = (doc: Document): Projeto => {
   } as Projeto;
 };
 
-export class MongoDbProjetoRepository implements IProjetoRepository {
+const fromDocumentSelect = (doc: Document): ProjetoSelect => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { _id, ...data } = doc;
+  return {
+    projetoId: data.projetoId,
+    abreviatura: data.abreviatura,
+    nome: data.nome,
+  } as ProjetoSelect;
+};
+
+export class ProjetoRepository implements IProjetoRepository {
   private async getProjetosCollection(): Promise<Collection<Document>> {
     return getCollection('projetos');
   }
 
-  async buscarTodos(): Promise<Projeto[]> {
-    const collection = await this.getProjetosCollection();
-    const documents = await collection.find({}).toArray();
-    return documents.map(fromDocument);
+  private async getAtividadesCollection(): Promise<Collection<Document>> {
+    return getCollection('atividades');
+  }
+
+  private async getPessoasCollection(): Promise<Collection<Document>> {
+    return getCollection('pessoas');
+  }
+
+  async buscarProjetos(squads?: string[], pessoas?: string[]): Promise<Projeto[]> {
+    const atividadesCollection = await this.getAtividadesCollection();
+    
+    const pipeline: Document[] = [];
+
+    // Se pessoas for especificado, o filtro principal é por pessoaId
+    if (pessoas && pessoas.length > 0) {
+      pipeline.push({ $match: { pessoaId: { $in: pessoas } } });
+    } 
+    // Se não, e se squads for especificado, precisamos buscar as pessoas do squad primeiro
+    else if (squads && squads.length > 0) {
+      const pessoasCollection = await this.getPessoasCollection();
+      const pessoasNoSquad = await pessoasCollection.find({ squad: { $in: squads } }).project({ id: 1 }).toArray();
+      const pessoasIds = pessoasNoSquad.map(p => p.id);
+      pipeline.push({ $match: { pessoaId: { $in: pessoasIds } } });
+    }
+
+    // Agrupa para obter projetos distintos
+    pipeline.push({ $group: {  _id: '$projetoId' } });
+    pipeline.push({ $project: { projetoId: '$_id' } });
+
+    const atividades = await atividadesCollection.aggregate(pipeline).toArray();
+    const projetoIds = atividades.map(a => a.projetoId).filter(id => id);
+
+    if (projetoIds.length === 0) {
+      return [];
+    }
+
+    const projetosCollection = await this.getProjetosCollection();
+    const projetos = await projetosCollection.find({ projetoId: { $in: projetoIds } }).sort({ nome: 1 }).toArray();
+
+    return projetos.map(fromDocument);
+  }
+
+  async buscarProjetosPorIds(projetoIds: string[]): Promise<Projeto[]> {
+    if (projetoIds.length === 0) {
+      return [];
+    }
+
+    const projetosCollection = await this.getProjetosCollection();
+    const projetos = await projetosCollection.find({ projetoId: { $in: projetoIds } }).sort({ nome: 1 }).toArray();
+
+    return projetos.map(fromDocument);
   }
 
   async buscarAtivos(): Promise<Projeto[]> {
     const collection = await this.getProjetosCollection();
-    const documents = await collection.find({ ativo: true }).toArray();
+    const documents = await collection.find({}).sort({ nome: 1 }).toArray();
     return documents.map(fromDocument);
+  }
+
+  async buscarSelect(): Promise<ProjetoSelect[]> {
+    const collection = await this.getProjetosCollection();
+    const documents = await collection.find({}).sort({ nome: 1 }).toArray();
+    return documents.map(fromDocumentSelect);
   }
 
   async buscarPorId(id: string): Promise<Projeto | null> {
     const collection = await this.getProjetosCollection();
     const document = await collection.findOne({ id });
     return document ? fromDocument(document) : null;
+  }
+  
+  async buscarProjetosCardPorId(projetoId: string): Promise<ProjetoSelect> {
+    const collection = await this.getProjetosCollection();
+    const document = await collection.findOne({ projetoId });
+    if (!document) {
+      throw new Error('Projeto não encontrado');
+    }
+    return fromDocumentSelect(document);
   }
 
   async criar(dados: DadosProjeto): Promise<Projeto> {
@@ -75,8 +147,8 @@ export class MongoDbProjetoRepository implements IProjetoRepository {
       { returnDocument: 'after' }
     );
 
-    if (result) {
-      return fromDocument(result);
+    if (result && result.value) {
+      return fromDocument(result.value as Document);
     }
     
     return null;
@@ -91,8 +163,8 @@ export class MongoDbProjetoRepository implements IProjetoRepository {
       { returnDocument: 'after' }
     );
 
-    if (result) {
-      return fromDocument(result);
+    if (result && result.value) {
+      return fromDocument(result.value as Document);
     }
     
     return null;

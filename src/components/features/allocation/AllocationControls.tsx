@@ -1,9 +1,8 @@
 import React from "react";
 import { Button } from "@/components/ui/Button";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
-import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
-import { Pessoa } from "@/backend/core/models";
-import { Projeto } from "@/backend/core/models/projeto/Projeto";
+import TruncatedMultiSelect from "@/components/ui/TruncatedMultiSelect";
+import { SelectOption } from "@/components/ui/SearchableSelect";
 import { formatDateForDisplay } from "@/app/utils/date";
 import { addDays } from "date-fns";
 import { UserRole } from "@/backend/core/models/UserRole";
@@ -13,11 +12,15 @@ interface AllocationControlsProps {
   onPreviousWeek: () => void;
   onNextWeek: () => void;
   onCurrentWeek: () => void;
-  pessoas: Pessoa[];
-  projetos: Projeto[];
-  onFiltroPessoasChange: (pessoas: Pessoa[]) => void;
-  onFiltroProjetosChange: (projetos: Projeto[]) => void;
-  onOpenLogs?: () => void;
+  squadOptions: SelectOption[];
+  pessoaOptions: SelectOption[];
+  projetoOptions: SelectOption[];
+  selectedSquads: SelectOption[];
+  selectedPessoas: SelectOption[];
+  selectedProjetos: SelectOption[];
+  onFiltroSquadChange: (selected: SelectOption[]) => void;
+  onFiltroPessoasChange: (selected: SelectOption[]) => void;
+  onFiltroProjetosChange: (selected: SelectOption[]) => void;
   userRole?: UserRole;
 }
 
@@ -26,31 +29,20 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
   onPreviousWeek,
   onNextWeek,
   onCurrentWeek,
-  pessoas,
-  projetos,
+  squadOptions,
+  pessoaOptions,
+  projetoOptions,
+  selectedSquads,
+  selectedPessoas,
+  selectedProjetos,
+  onFiltroSquadChange,
   onFiltroPessoasChange,
   onFiltroProjetosChange,
   userRole,
 }) => {
-  // weekStart é domingo, então segunda-feira é +1 e sexta-feira é +5
   const mondayDate = addDays(weekStart, 1);
   const fridayDate = addDays(weekStart, 5);
   const dateRange = `${formatDateForDisplay(mondayDate)} - ${formatDateForDisplay(fridayDate)}`;
-
-  const pessoaOptions: SelectOption[] = pessoas.map(p => ({ value: p.id, label: p.nome }));
-  const projetoOptions: SelectOption[] = projetos.map(p => ({ value: p.projetoId, label: p.nome }));
-
-  const handleFiltroPessoaChange = (selectedOptions: readonly SelectOption[]) => {
-    const selectedIds = selectedOptions.map(option => option.value);
-    const pessoasFiltradas = pessoas.filter(p => selectedIds.includes(p.id));
-    onFiltroPessoasChange(pessoasFiltradas);
-  };
-
-  const handleFiltroProjetoChange = (selectedOptions: readonly SelectOption[]) => {
-    const selectedIds = selectedOptions.map(option => option.value);
-    const projetosFiltrados = projetos.filter(p => selectedIds.includes(p.projetoId));
-    onFiltroProjetosChange(projetosFiltrados);
-  };
 
   return (
     <div className="border-b border-slate-700/50 p-4 md:p-6">
@@ -95,28 +87,43 @@ const AllocationControls: React.FC<AllocationControlsProps> = ({
           {/* Filtros */}
 
           <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
-            <div className="w-full lg:w-60 text-white">
             {userRole === UserRole.ADMIN && (
-              <>
-                <SearchableSelect
-                  instanceId="filtro-pessoas-select"
-                  isMulti
-                  options={pessoaOptions}
-                  onChange={handleFiltroPessoaChange}
-                  placeholder="Filtrar por pessoa..."
+              <div className="w-full lg:w-65 text-white">
+                <TruncatedMultiSelect
+                  instanceId="filtro-squads-select"
+                  options={squadOptions}
+                  value={selectedSquads}
+                  onChange={onFiltroSquadChange}
+                  placeholder="Filtrar por squad..."
+                  maxDisplayItems={1}
                 />
-              </>
+              </div>
+            )}
+            <div className="w-full lg:w-65 text-white">
+              {userRole === UserRole.ADMIN && (
+                <TruncatedMultiSelect
+                  instanceId="filtro-pessoas-select"
+                  options={pessoaOptions}
+                  value={selectedPessoas}
+                  onChange={onFiltroPessoasChange}
+                  placeholder="Filtrar por pessoa..."
+                  maxDisplayItems={1}
+                  isDisabled={selectedSquads.length === 0}
+                />
               )}
             </div>
-            <div className="w-full lg:w-60">
-              <SearchableSelect
-                className="text-left"
+            <div className="w-full lg:w-65">
+              {userRole === UserRole.ADMIN && (
+              <TruncatedMultiSelect
                 instanceId="filtro-projetos-select"
-                isMulti
                 options={projetoOptions}
-                onChange={handleFiltroProjetoChange}
+                value={selectedProjetos}
+                onChange={onFiltroProjetosChange}
                 placeholder="Filtrar por projeto..."
+                maxDisplayItems={1}
+                isDisabled={selectedSquads.length === 0 && selectedPessoas.length === 0}
               />
+              )}
             </div>
           </div>
         </div>

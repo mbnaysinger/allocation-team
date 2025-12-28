@@ -2,7 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CalendarIcon, Users, Target, X } from "lucide-react";
+import { CalendarIcon, X } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -26,6 +26,7 @@ import {
 import { Calendar } from "@/components/ui/Calendar";
 import { ENTIDADES, FASES_PROJETO, STATUS_PROJETO } from "@/backend/core/models/projeto/Projeto";
 import SearchableSelect, { SelectOption } from "@/components/ui/SearchableSelect";
+import { Pessoa } from "@/backend/core/models/Pessoa";
 
 const projectSchema = z.object({
   abreviatura: z.string().min(2, "Abreviatura deve ter pelo menos 2 caracteres").max(10, "Máximo 10 caracteres"),
@@ -53,6 +54,25 @@ export function ProjectCreateModal({
   onClose,
   onSubmit,
 }: ProjectCreateModalProps) {
+  const [activePeople, setActivePeople] = React.useState<Pessoa[]>([]);
+
+  React.useEffect(() => {
+    const fetchActivePeople = async () => {
+      try {
+        const response = await fetch('/api/v1/pessoas');
+        if (!response.ok) throw new Error('Failed to fetch people');
+        const data = await response.json();
+        setActivePeople(data);
+      } catch (error) {
+        console.error("Error fetching active people:", error);
+      }
+    };
+
+    if (isOpen) {
+      fetchActivePeople();
+    }
+  }, [isOpen]);
+
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
@@ -87,254 +107,272 @@ export function ProjectCreateModal({
   const statusOptions: SelectOption[] = STATUS_PROJETO.map(s => ({ value: s, label: s === 'backlog' ? 'Backlog' : s === 'em_andamento' ? 'Em Andamento' : s === 'concluido' ? 'Concluído' : 'Cancelado' }));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
-      <div className="bg-slate-800 rounded-lg shadow-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto text-slate-200">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-            <Target className="h-5 w-5 text-sky-400" />
+    <div className="fixed inset-0 bg-overlay/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      
+      {/* CONTAINER DA MODAL: CLASSES DE TAMANHO ALTERADAS 
+        w-11/12 h-5/6 max-w-4xl max-h-[95vh]
+      */}
+      <div className="bg-slate-800/95 backdrop-blur-md rounded-xl border border-slate-600 shadow-glass w-11/12 h-5/6 max-w-4xl max-h-[95vh] overflow-y-auto">
+        
+        {/* Header - OK com padding p-6, sticky para rolagem */}
+        <div className="sticky top-0 bg-slate-800/95 backdrop-blur-md z-10 flex items-center justify-between p-6 border-b border-slate-600">
+          <h2 className="text-xl font-semibold text-white">
             Novo Projeto
           </h2>
-          <Button variant="ghost" size="sm" onClick={onClose} className="text-slate-400 hover:text-white">
-            <X className="h-4 w-4" />
+          <Button
+            onClick={onClose}
+            variant="cancel"
+            size="sm"
+            className="p-2"
+          >
+            <X size={16} />
           </Button>
         </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* CORPO DA MODAL: ADICIONANDO PADDING (p-6) AQUI */}
+        <div className="p-6">
+          <Form {...form}>
+            {/* space-y-6 para um espaçamento vertical mais agradável */}
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6"> 
+              
+              {/* PRIMEIRA LINHA */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* Ajustado para gap-6 */}
+                <FormField
+                  control={form.control}
+                  name="abreviatura"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Abreviatura *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: ECOM" {...field} className="w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="nome"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nome do projeto" {...field} className="w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* DESCRIÇÃO */}
               <FormField
                 control={form.control}
-                name="abreviatura"
+                name="descricao"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Abreviatura *</FormLabel>
+                    <FormLabel>Descrição</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: ECOM" {...field} className="bg-slate-700 border-slate-600 text-white" />
+                      <Textarea 
+                        placeholder="Descreva o objetivo e escopo do projeto"
+                        rows={3}
+                        {...field} 
+                        className="w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all resize-none"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* SEGUNDA LINHA */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* Ajustado para gap-6 */}
+                <FormField
+                  control={form.control}
+                  name="entidade"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Entidade</FormLabel>
+                      <SearchableSelect
+                        options={entidadeOptions}
+                        value={entidadeOptions.find(o => o.value === field.value)}
+                        onChange={(option) => field.onChange(option ? option.value : null)}
+                        placeholder="Selecione a entidade"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                              <FormField
+                                control={form.control}
+                                name="responsavelId"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Responsável *</FormLabel>
+                                    <SearchableSelect
+                                      options={activePeople.map(p => ({ value: p.nome, label: p.nome }))}
+                                      value={activePeople.map(p => ({ value: p.nome, label: p.nome })).find(o => o.value === field.value)}
+                                      onChange={(option) => field.onChange(option ? option.value : "")}
+                                      placeholder="Selecione o responsável"
+                                    />
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />              </div>
+
+              {/* TERCEIRA LINHA */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* Ajustado para gap-6 */}
+                <FormField
+                  control={form.control}
+                  name="fase"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Fase</FormLabel>
+                      <SearchableSelect
+                        options={faseOptions}
+                        value={faseOptions.find(o => o.value === field.value)}
+                        onChange={(option) => field.onChange(option ? option.value : null)}
+                        placeholder="Selecione a fase"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <SearchableSelect
+                        options={statusOptions}
+                        value={statusOptions.find(o => o.value === field.value)}
+                        onChange={(option) => field.onChange(option ? option.value : null)}
+                        placeholder="Selecione o status"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* LINK DOCUMENTAÇÃO */}
               <FormField
                 control={form.control}
-                name="nome"
+                name="linkDocumentacao"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nome *</FormLabel>
+                    <FormLabel>Link da Documentação</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome do projeto" {...field} className="bg-slate-700 border-slate-600 text-white" />
+                      <Input placeholder="https://..." {...field} className="w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </div>
 
-            <FormField
-              control={form.control}
-              name="descricao"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Descreva o objetivo e escopo do projeto"
-                      rows={3}
-                      {...field} 
-                      className="bg-slate-700 border-slate-600 text-white"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              {/* QUARTA LINHA (DATAS) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* Ajustado para gap-6 */}
+                <FormField
+                  control={form.control}
+                  name="dataInicio"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Data de Início</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all justify-start text-left font-normal",
+                                !field.value && "text-slate-400"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP", { locale: ptBR })
+                              ) : (
+                                <span>Selecione a data</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0 bg-slate-800 border-slate-700" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="entidade"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Entidade</FormLabel>
-                    <SearchableSelect
-                      options={entidadeOptions}
-                      value={entidadeOptions.find(o => o.value === field.value)}
-                      onChange={(option) => field.onChange(option ? option.value : null)}
-                      placeholder="Selecione a entidade"
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="dataFimPrevisto"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Data de Término Prevista</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all justify-start text-left font-normal",
+                                !field.value && "text-slate-400"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP", { locale: ptBR })
+                              ) : (
+                                <span>Selecione a data</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0 bg-slate-800 border-slate-700" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                              form.getValues().dataInicio ? date < form.getValues().dataInicio : false
+                            }
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="responsavelId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Responsável *</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <Input 
-                          className="pl-10 bg-slate-700 border-slate-600 text-white"
-                          placeholder="ID do responsável" 
-                          {...field} 
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="fase"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Fase</FormLabel>
-                    <SearchableSelect
-                      options={faseOptions}
-                      value={faseOptions.find(o => o.value === field.value)}
-                      onChange={(option) => field.onChange(option ? option.value : null)}
-                      placeholder="Selecione a fase"
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <SearchableSelect
-                      options={statusOptions}
-                      value={statusOptions.find(o => o.value === field.value)}
-                      onChange={(option) => field.onChange(option ? option.value : null)}
-                      placeholder="Selecione o status"
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="linkDocumentacao"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Link da Documentação</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://..." {...field} className="bg-slate-700 border-slate-600 text-white" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="dataInicio"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Data de Início</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full pl-3 text-left font-normal bg-slate-700 border-slate-600 text-white hover:bg-slate-600",
-                              !field.value && "text-slate-400"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP", { locale: ptBR })
-                            ) : (
-                              <span>Selecione a data</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-slate-800 border-slate-700" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                          className="pointer-events-auto"
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="dataFimPrevisto"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Data de Término Prevista</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full pl-3 text-left font-normal bg-slate-700 border-slate-600 text-white hover:bg-slate-600",
-                              !field.value && "text-slate-400"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP", { locale: ptBR })
-                            ) : (
-                              <span>Selecione a data</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-slate-800 border-slate-700" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) =>
-                            form.getValues().dataInicio ? date < form.getValues().dataInicio! : false
-                          }
-                          initialFocus
-                          className="pointer-events-auto"
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={onClose} className="border-slate-700 hover:bg-slate-700">
-                Cancelar
-              </Button>
-              <Button type="submit" className="min-w-[100px] bg-sky-500 hover:bg-sky-600 text-white">
-                Criar
-              </Button>
-            </div>
-          </form>
-        </Form>
+              {/* RODAPÉ/BOTÕES */}
+              <div className="flex justify-end gap-2 pt-4 border-t border-slate-700 mt-6"> 
+                <Button type="button" variant="cancel" onClick={onClose} className="border-slate-700 hover:bg-slate-700">
+                  Cancelar
+                </Button>
+                <Button type="submit" variant="login" className="min-w-[100px] bg-sky-500 hover:bg-sky-600 text-white">
+                  Criar
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
+        
       </div>
     </div>
   );

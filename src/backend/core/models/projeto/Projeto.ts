@@ -19,6 +19,12 @@ export interface Projeto {
   updatedAt: Date;
 }
 
+export interface ProjetoSelect {
+  projetoId: string;
+  nome: string;
+  abreviatura: string;
+}
+
 export interface DadosProjeto {
   abreviatura: string;
   nome: string;

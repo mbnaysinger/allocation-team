@@ -1,6 +1,6 @@
-import { ResumoSemanal } from "../models";
+import { ResumoSemanal } from "../models/ResumoSemanal";
 
 export interface IResumoSemanalRepository {
-  salvar(resumo: Omit<ResumoSemanal, 'id' | 'createdAt' | 'updatedAt'>): Promise<ResumoSemanal>;
-  buscarPorPessoasESemana(pessoaIds: string[], semana: string): Promise<ResumoSemanal[]>;
+  save(resumo: Omit<ResumoSemanal, 'id' | 'createdAt' | 'updatedAt'>): Promise<ResumoSemanal>;
+  getByPersonIdsAndWeek(pessoaIds: string[], semana: string): Promise<ResumoSemanal[]>;
 }

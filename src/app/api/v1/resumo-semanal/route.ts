@@ -10,8 +10,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Campos pessoaId, semana e comentario são obrigatórios.' }, { status: 400 });
     }
 
-    const salvarResumoSemanal = dependencyFactory.createSalvarResumoSemanal();
-    const resumoSalvo = await salvarResumoSemanal.execute({ pessoaId, semana, comentario });
+    const resumosSemanaisService = dependencyFactory.createResumosSemanaisService();
+    const resumoSalvo = await resumosSemanaisService.add({ pessoaId, semana, comentario });
 
     return NextResponse.json(resumoSalvo, { status: 200 });
 

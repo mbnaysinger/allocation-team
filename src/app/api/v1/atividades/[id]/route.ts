@@ -9,8 +9,8 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    const deletarAtividade = dependencyFactory.createDeletarAtividade();
-    await deletarAtividade.execute(id);
+    const atividadeService = dependencyFactory.createAtividadeService();
+    await atividadeService.delete(id);
 
     return NextResponse.json({ message: 'Atividade deletada com sucesso.' }, { status: 200 });
   } catch (error) {

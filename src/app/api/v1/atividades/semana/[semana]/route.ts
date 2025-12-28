@@ -11,23 +11,31 @@ export async function GET(
   try {
     const session = await getServerSession(authOptions);
     const userRole = session?.user?.role;
-    const personIds = session?.user?.personIds;
+    const userPersonIds = session?.user?.personIds;
     const { semana } = await params;
+
+    const { searchParams } = new URL(request.url);
+    const squads = searchParams.getAll('squads');
+    const pessoas = searchParams.getAll('pessoas');
+    const projetos = searchParams.getAll('projetos');
 
     if (!semana) {
       return NextResponse.json({ message: 'O parâmetro semana é obrigatório' }, { status: 400 });
     }
 
-    const buscarAlocacaoSemana = dependencyFactory.createBuscarAlocacaoSemana();
+    const alocacaoSemanalService = dependencyFactory.createAlocacaoSemanalService();
 
-    // Se o usuário for USER e não tiver pessoas associadas, retorna vazio.
-    if (userRole === UserRole.USER && (!personIds || personIds.length === 0)) {
+    // Se o usuário for USER e não tiver pessoas associadas, e nenhum filtro for aplicado, retorna vazio.
+    if (userRole === UserRole.USER && (!userPersonIds || userPersonIds.length === 0) && squads.length === 0 && pessoas.length === 0) {
       return NextResponse.json({ pessoas: [], projetos: [], atividades: [] });
     }
 
-    const alocacaoData = await buscarAlocacaoSemana.execute({
+    const alocacaoData = await alocacaoSemanalService.getWeeklyAllocationWithFilters({
       semana,
-      personIds: userRole === UserRole.ADMIN ? undefined : personIds,
+      squads: squads.length > 0 ? squads : undefined,
+      pessoas: pessoas.length > 0 ? pessoas : undefined,
+      projetos: projetos.length > 0 ? projetos : undefined,
+      personIds: userRole === UserRole.USER ? userPersonIds : undefined,
     });
 
     return NextResponse.json(alocacaoData);

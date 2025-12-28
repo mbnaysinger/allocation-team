@@ -14,7 +14,7 @@ const ContadorCaracteres: React.FC<ContadorCaracteresProps> = ({ texto, limite, 
   const getCorTexto = () => {
     if (estaAcimaDoLimite) return 'text-red-500';
     if (estaNoLimite) return 'text-yellow-500';
-    return 'text-accent/60';
+    return 'text-gray-400';
   };
 
   return (

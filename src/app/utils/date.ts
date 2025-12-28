@@ -69,7 +69,7 @@ export const formatDate = (date: Date): string => {
  * Formata um objeto Date para o formato DD/MM para exibição nos cards.
  */
 export const formatDateForDisplay = (date: Date): string => {
-  return formatInTimeZone(date, TIMEZONE, 'dd/MM');
+  return formatInTimeZone(date, TIMEZONE, 'dd/MM/yyyy');
 };
 
 /**

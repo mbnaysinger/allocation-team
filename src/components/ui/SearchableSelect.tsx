@@ -60,9 +60,9 @@ const customStyles: StylesConfig<SelectOption, boolean> = {
   }),
   option: (provided, state) => ({
     ...provided,
-    backgroundColor: state.isSelected 
+    backgroundColor: state.isSelected
       ? '#06b6d4' // cyan-500
-      : state.isFocused 
+      : state.isFocused
         ? '#475569' // slate-600
         : 'transparent',
     color: '#ffffff',

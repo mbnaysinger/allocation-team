@@ -1,6 +1,6 @@
 // src/app/api/v1/clone-atividade/route.ts
 import { NextResponse } from 'next/server';
-import { dependencyFactory } from '../../../../backend/infrastructure/factories/DependencyFactory';
+import { dependencyFactory } from '../../../../../backend/infrastructure/factories/DependencyFactory';
 
 export async function POST(request: Request) {
   try {
@@ -10,8 +10,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'O ID da atividade é obrigatório.' }, { status: 400 });
     }
 
-    const clonarAtividade = dependencyFactory.createClonarAtividade();
-    const atividadeClonada = await clonarAtividade.execute(id);
+    const atividadeService = dependencyFactory.createAtividadeService();
+    const atividadeClonada = await atividadeService.clone(id);
 
     return NextResponse.json(atividadeClonada, { status: 201 });
   } catch (error) {

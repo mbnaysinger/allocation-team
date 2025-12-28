@@ -4,27 +4,22 @@ import { IPessoaRepository } from '../../core/ports/IPessoaRepository';
 import { IProjetoRepository } from '../../core/ports/IProjetoRepository';
 import { IEpicoRepository } from '../../core/ports/IEpicoRepository';
 import { ITarefaRepository } from '../../core/ports/ITarefaRepository';
-import { MongoDbAtividadeRepository } from '../repositories/mongodb/MongoDbAtividadeRepository';
-import { MongoDbPessoaRepository } from '../repositories/mongodb/MongoDbPessoaRepository';
-import { MongoDbProjetoRepository } from '../repositories/mongodb/ProjetoRepository';
-import { MongoDbResumoSemanalRepository } from '../repositories/mongodb/MongoDbResumoSemanalRepository';
+import { AtividadeRepository } from '../repositories/mongodb/AtividadeRepository';
+import { PessoaRepository } from '../repositories/mongodb/PessoaRepository';
+import { ProjetoRepository } from '../repositories/mongodb/ProjetoRepository';
+import { ResumoSemanalRepository } from '../repositories/mongodb/ResumoSemanalRepository';
 import { MongoDbEpicoRepository } from '../repositories/mongodb/MongoDbEpicoRepository';
 import { MongoDbTarefaRepository } from '../repositories/mongodb/MongoDbTarefaRepository';
 import { IUserRepository } from '../../core/ports/IUserRepository';
 import { MongoDbUserRepository } from '../repositories/mongodb/MongoDbUserRepository';
 
-import { BuscarAlocacaoSemana } from '../../core/services/BuscarAlocacaoSemana';
-import { CriarAtividade } from '../../core/services/CriarAtividade';
-import { AtualizarAtividade } from '../../core/services/AtualizarAtividade';
-import { DeletarAtividade } from '../../core/services/DeletarAtividade';
-import { ClonarAtividade } from '../../core/services/ClonarAtividade';
+import { AlocacaoSemanalService } from '../../core/services/AlocacaoSemanalService';
+import { AtividadeService } from '../../core/services/AtividadeService';
 import { ProjetoService } from '../../core/services/projeto/ProjetoService';
 import { EpicoService } from '../../core/services/projeto/EpicoService';
 import { TarefaService } from '../../core/services/projeto/TarefaService';
-import { CriarPessoa } from '../../core/services/CriarPessoa';
-import { BuscarPessoas } from '../../core/services/BuscarPessoas';
-import { SalvarResumoSemanal } from '../../core/services/SalvarResumoSemanal';
-import { BuscarResumosSemanais } from '../../core/services/BuscarResumosSemanais';
+import { PessoaService } from '../../core/services/PessoaService';
+import { ResumosSemanaisService } from '../../core/services/ResumosSemanaisService';
 import { CriarUsuario } from '../../core/services/CriarUsuario';
 
 
@@ -34,15 +29,15 @@ class DependencyFactory {
   private createAtividadeRepository(): IAtividadeRepository {
     // Futuramente, poderíamos ter um if aqui baseado na config para retornar
     // um FirebaseAtividadeRepository()
-    return new MongoDbAtividadeRepository();
+    return new AtividadeRepository();
   }
 
   private createPessoaRepository(): IPessoaRepository {
-    return new MongoDbPessoaRepository();
+    return new PessoaRepository();
   }
   
   private createProjetoRepository(): IProjetoRepository {
-    return new MongoDbProjetoRepository();
+    return new ProjetoRepository();
   }
 
   private createEpicoRepository(): IEpicoRepository {
@@ -54,7 +49,7 @@ class DependencyFactory {
   }
 
   private createResumoSemanalRepository(): IResumoSemanalRepository {
-    return new MongoDbResumoSemanalRepository();
+    return new ResumoSemanalRepository();
   }
 
   public async createUserRepository(): Promise<IUserRepository> {
@@ -64,44 +59,20 @@ class DependencyFactory {
   // --- Serviços ---
   // Os serviços recebem os repositórios de que precisam.
   
-  public createBuscarAlocacaoSemana(): BuscarAlocacaoSemana {
-    return new BuscarAlocacaoSemana(
-      this.createPessoaRepository(),
+  public createAlocacaoSemanalService(): AlocacaoSemanalService {
+    return new AlocacaoSemanalService(
       this.createProjetoRepository(),
-      this.createAtividadeRepository()
+      this.createPessoaService(),
+      this.createAtividadeService()
     );
   }
 
-  public createCriarAtividade(): CriarAtividade {
-    return new CriarAtividade(this.createAtividadeRepository());
+  public createAtividadeService(): AtividadeService {
+    return new AtividadeService(this.createAtividadeRepository(), this.createProjetoRepository());
   }
 
-  public createAtualizarAtividade(): AtualizarAtividade {
-    return new AtualizarAtividade(this.createAtividadeRepository());
-  }
-
-  public createDeletarAtividade(): DeletarAtividade {
-    return new DeletarAtividade(this.createAtividadeRepository());
-  }
-
-  public createClonarAtividade(): ClonarAtividade {
-    return new ClonarAtividade(this.createAtividadeRepository());
-  }
-
-  public createSalvarResumoSemanal(): SalvarResumoSemanal {
-    return new SalvarResumoSemanal(this.createResumoSemanalRepository());
-  }
-
-  public createBuscarResumosSemanais(): BuscarResumosSemanais {
-    return new BuscarResumosSemanais(this.createResumoSemanalRepository());
-  }
-
-  public createBuscarPessoas(): BuscarPessoas {
-    return new BuscarPessoas(this.createPessoaRepository());
-  }
-  
-  public createCriarPessoa(): CriarPessoa {
-    return new CriarPessoa(this.createPessoaRepository());
+  public createResumosSemanaisService(): ResumosSemanaisService {
+    return new ResumosSemanaisService(this.createResumoSemanalRepository());
   }
 
   public createProjetoService(): ProjetoService {
@@ -114,6 +85,10 @@ class DependencyFactory {
 
   public createTarefaService(): TarefaService {
     return new TarefaService(this.createTarefaRepository());
+  }
+
+  public createPessoaService(): PessoaService {
+    return new PessoaService(this.createPessoaRepository());
   }
 
   public async createCriarUsuario(): Promise<CriarUsuario> {

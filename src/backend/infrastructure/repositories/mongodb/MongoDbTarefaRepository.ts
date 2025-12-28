@@ -72,8 +72,8 @@ export class MongoDbTarefaRepository implements ITarefaRepository {
       { returnDocument: 'after' }
     );
 
-    if (result) {
-      return fromDocument(result);
+    if (result && result.value) {
+      return fromDocument(result.value as Document);
     }
     
     return null;

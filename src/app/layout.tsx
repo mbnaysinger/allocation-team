@@ -3,6 +3,7 @@ import { Inter, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import AuthProvider from './providers/AuthProvider';
+import { Toaster } from "@/components/ui/Toaster";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -20,8 +21,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Maike Naysinger Borges",
-  description: "Portfólio profissional de desenvolvimento full-stack",
+  title: "TAP GINFO",
+  description: "Team Allocation Planning GINFO",
 };
 
 export default function RootLayout({
@@ -38,6 +39,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
+        <Toaster />
         <Analytics />
       </body>
     </html>

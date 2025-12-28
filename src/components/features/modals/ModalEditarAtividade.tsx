@@ -2,9 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import ContadorCaracteres from '@/components/ui/ContadorCaracteres';
 import SearchableSelect, { SelectOption } from '@/components/ui/SearchableSelect';
+import { Checkbox } from '@/components/ui/Checkbox';
 import { X, Trash2 } from 'lucide-react';
-import { AtividadeCompleta, DadosAtividade, Pessoa, TipoAtividade, TIPOS_ATIVIDADE } from '@/backend/core/models';
+import { AtividadeCompleta, DadosAtividade, TipoAtividade, TIPOS_ATIVIDADE } from '@/backend/core/models/Atividade';
+import { Pessoa } from '@/backend/core/models/Pessoa';
 import { Projeto } from '@/backend/core/models/projeto/Projeto';
+import { hhmmToSeconds, secondsToHHMM, adjustHHMM, formatHHMM } from '@/app/utils/time';
+import { getWeekString } from '@/app/utils/date';
+import { parseISO } from 'date-fns';
+import { UserRole } from '@/backend/core/models/UserRole';
 
 interface ModalEditarAtividadeProps {
   isOpen: boolean;
@@ -15,6 +21,7 @@ interface ModalEditarAtividadeProps {
   pessoas: Pessoa[];
   projetos: Projeto[];
   loading?: boolean;
+  userRole: UserRole;
 }
 
 const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
@@ -24,9 +31,10 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
   onDelete,
   atividade,
   projetos,
-  loading = false
+  loading = false,
+  userRole
 }) => {
-  const [formData, setFormData] = useState<DadosAtividade>({
+  const [formData, setFormData] = useState<Omit<DadosAtividade, 'tempo' | 'tmp_executado'> & { tempo: string, tmp_executado: string, version?: number }>({
     titulo: '',
     data: '',
     pessoaId: '',
@@ -35,10 +43,14 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
     descricaoJira: '',
     semana: '',
     status: 'planejada',
-    horas: 8
+    tempo: '00:00',
+    tmp_executado: '00:00',
+    isDesvio: false
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const isUserView = userRole === UserRole.USER;
 
   // Preencher formulário quando atividade mudar
   useEffect(() => {
@@ -51,8 +63,11 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
         projetoId: atividade.projetoId || '',
         descricaoJira: atividade.descricaoJira || '',
         semana: atividade.semana,
-        horas: atividade.horas,
-        status: atividade.status
+        tempo: secondsToHHMM(atividade.tempo),
+        tmp_executado: secondsToHHMM(atividade.tmp_executado || 0),
+        status: atividade.status,
+        isDesvio: atividade.isDesvio || false,
+        version: atividade.version // Armazena a versão
       });
       setErrors({});
     }
@@ -80,11 +95,19 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
     if (formData.tipo === 'Projeto' && !formData.projetoId) {
       newErrors.projetoId = 'Projeto é obrigatório quando tipo é "Projeto"';
     }
-    if (formData.descricaoJira && formData.descricaoJira.length > 100) {
-      newErrors.descricaoJira = 'Descrição deve ter no máximo 100 caracteres';
+    if (formData.descricaoJira && formData.descricaoJira.length > 8000) {
+      newErrors.descricaoJira = 'Descrição deve ter no máximo 8000 caracteres';
     }
-    if (!formData.horas || formData.horas <= 0) {
-      newErrors.horas = 'Horas deve ser um número positivo';
+    const tempoEmSegundos = formData.isDesvio ? 0 : hhmmToSeconds(formData.tempo);
+    if (!formData.isDesvio) {
+      if (!formData.tempo || !/^\d{2}:\d{2}$/.test(formData.tempo) || tempoEmSegundos <= 0) {
+        newErrors.tempo = 'Tempo é obrigatório, no formato hh:mm e deve ser maior que 00:00';
+      }
+    }
+
+    const tmpExecutadoEmSegundos = hhmmToSeconds(formData.tmp_executado);
+    if (!formData.tmp_executado || !/^\d{2}:\d{2}$/.test(formData.tmp_executado) || tmpExecutadoEmSegundos < 0) {
+      newErrors.tmp_executado = 'Tempo executado é obrigatório, no formato hh:mm e não pode ser negativo';
     }
     
     if (Object.keys(newErrors).length > 0) {
@@ -93,7 +116,13 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
     }
     
     try {
-      await onSubmit(atividade.id, formData);
+      const dadosParaSubmit = {
+        ...formData,
+        tempo: tempoEmSegundos,
+        tmp_executado: tmpExecutadoEmSegundos,
+        version: atividade.version // Inclui a versão atual para o backend verificar
+      };
+      await onSubmit(atividade.id, dadosParaSubmit);
       handleClose();
     } catch {
       // Erro será tratado pelo componente pai
@@ -128,7 +157,8 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
       descricaoJira: '',
       semana: '',
       status: 'planejada',
-      horas: 8
+      tempo: '00:00',
+      tmp_executado: '00:00'
     });
     setErrors({});
     onClose();
@@ -163,15 +193,19 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
             Editar Atividade
           </h2>
           <div className="flex items-center gap-2">
+            {!isUserView && (
+              <>
             <Button
               onClick={handleDelete}
               variant="outline"
               size="sm"
               className="p-2 text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
-              disabled={loading || deleteLoading}
+              disabled={loading || deleteLoading || isUserView}
             >
               <Trash2 size={16} />
             </Button>
+            </>
+            )}
             <Button
               onClick={handleClose}
               variant="cancel"
@@ -195,13 +229,14 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               id="titulo"
               value={formData.titulo}
               onChange={(e) => {
-                setFormData((prev: DadosAtividade) => ({ ...prev, titulo: e.target.value }));
+                setFormData(prev => ({ ...prev, titulo: e.target.value }));
                 clearError('titulo');
               }}
               className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
                 errors.titulo ? 'border-red-500' : 'border-slate-600'
-              }`}
+              } ${isUserView ? 'opacity-50 cursor-not-allowed' : ''}`}
               placeholder="Título da atividade"
+              disabled={isUserView}
             />
             {errors.titulo && (
               <p className="text-red-500 text-sm mt-1">{errors.titulo}</p>
@@ -209,6 +244,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
           </div>
 
           {/* Data */}
+          {!isUserView && (
           <div>
             <label htmlFor="data" className="block text-sm font-medium text-white mb-2">
               Data *
@@ -218,17 +254,24 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               id="data"
               value={formData.data}
               onChange={(e) => {
-                setFormData((prev: DadosAtividade) => ({ ...prev, data: e.target.value }));
+                const novaData = e.target.value;
+                if (novaData) {
+                  const weekString = getWeekString(parseISO(novaData));
+                  setFormData(prev => ({ ...prev, data: novaData, semana: weekString }));
+                } else {
+                  setFormData(prev => ({ ...prev, data: novaData, semana: '' }));
+                }
                 clearError('data');
               }}
               className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
                 errors.data ? 'border-red-500' : 'border-slate-600'
-              }`}
+              } ${isUserView ? 'opacity-50 cursor-not-allowed' : ''}`}
             />
             {errors.data && (
               <p className="text-red-500 text-sm mt-1">{errors.data}</p>
             )}
           </div>
+          )}
 
           {/* Pessoa - Hidden field */}
           <input
@@ -270,6 +313,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
           */}
 
           {/* Tipo */}
+          {!isUserView && (
           <div>
             <label htmlFor="tipo" className="block text-sm font-medium text-white mb-2">
               Tipo *
@@ -279,7 +323,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               value={formData.tipo}
               onChange={(e) => {
                 const newTipo = e.target.value as TipoAtividade;
-                setFormData((prev: DadosAtividade) => ({ 
+                setFormData(prev => ({ 
                   ...prev, 
                   tipo: newTipo,
                   projetoId: newTipo === 'Projeto' ? prev.projetoId : ''
@@ -289,7 +333,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               }}
               className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
                 errors.tipo ? 'border-red-500' : 'border-slate-600'
-              }`}
+              } ${isUserView ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {TIPOS_ATIVIDADE.map((tipo: TipoAtividade) => (
                 <option key={tipo} value={tipo}>
@@ -301,9 +345,10 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
               <p className="text-red-500 text-sm mt-1">{errors.tipo}</p>
             )}
           </div>
+          )}
 
           {/* Projeto (condicional) */}
-          {formData.tipo === 'Projeto' && (
+          {!isUserView && formData.tipo === 'Projeto' && (
             <div>
               <label htmlFor="projetoId" className="block text-sm font-medium text-white mb-2">
                 Projeto *
@@ -315,7 +360,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
                 value={selectedProject}
                 placeholder="Digite ou selecione..."
                 onChange={(option) => {
-                  setFormData((prev: DadosAtividade) => ({ ...prev, projetoId: option?.value || '' }));
+                  setFormData(prev => ({ ...prev, projetoId: option?.value || '' }));
                   clearError('projetoId');
                 }}
                 isClearable
@@ -330,51 +375,117 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
           {/* Descrição Jira */}
           <div>
             <label htmlFor="descricaoJira" className="block text-sm font-medium text-white mb-2">
-              Descrição/Link Jira (Opcional)
+              Descrição (Opcional)
             </label>
             <textarea
               id="descricaoJira"
               value={formData.descricaoJira}
               onChange={(e) => {
-                setFormData((prev: DadosAtividade) => ({ ...prev, descricaoJira: e.target.value }));
+                setFormData(prev => ({ ...prev, descricaoJira: e.target.value }));
                 clearError('descricaoJira');
               }}
-              rows={2}
-              maxLength={100}
+              rows={4}
+              maxLength={8000}
               className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all resize-none ${
                 errors.descricaoJira ? 'border-red-500' : 'border-slate-600'
               }`}
               placeholder="Descrição ou link do Jira"
             />
             <div className="flex justify-between items-center mt-1">
-              <ContadorCaracteres texto={formData.descricaoJira || ''} limite={100} />
+              <ContadorCaracteres texto={formData.descricaoJira || ''} limite={8000} />
               {errors.descricaoJira && (
                 <p className="text-red-500 text-sm">{errors.descricaoJira}</p>
               )}
             </div>
           </div>
 
-          {/* Horas */}
+          {/* Tempo */}
+          {!formData.isDesvio && (
+            <div>
+              <label htmlFor="tempo" className="block text-sm font-medium text-white mb-2">
+                Tempo Planejado *
+              </label>
+              <input
+                type="text"
+                id="tempo"
+                value={formData.tempo}
+                onChange={(e) => {
+                  const formattedTime = formatHHMM(e.target.value);
+                  setFormData(prev => ({ ...prev, tempo: formattedTime }));
+                  clearError('tempo');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setFormData(prev => ({ ...prev, tempo: adjustHHMM(prev.tempo, 15) }));
+                  } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setFormData(prev => ({ ...prev, tempo: adjustHHMM(prev.tempo, -15) }));
+                  }
+                }}
+                maxLength={5}
+                className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${errors.tempo ? 'border-red-500' : 'border-slate-600'
+                  } ${isUserView ? 'opacity-50 cursor-not-allowed' : ''}`}
+                placeholder="hh:mm"
+                disabled={isUserView}
+              />
+              {errors.tempo && (
+                <p className="text-red-500 text-sm mt-1">{errors.tempo}</p>
+              )}
+            </div>
+          )}
+
+          {/* Tempo Executado */}
           <div>
-            <label htmlFor="horas" className="block text-sm font-medium text-white mb-2">
-              Horas *
+            <label htmlFor="tmp_executado" className="block text-sm font-medium text-white mb-2">
+              Tempo Executado *
             </label>
             <input
-              type="number"
-              id="horas"
-              min="1"
-              max="24"
-              value={formData.horas}
+              type="text"
+              id="tmp_executado"
+              value={formData.tmp_executado}
               onChange={(e) => {
-                setFormData((prev: DadosAtividade) => ({ ...prev, horas: parseInt(e.target.value) || 0 }));
-                clearError('horas');
+                const formattedTime = formatHHMM(e.target.value);
+                setFormData(prev => ({ ...prev, tmp_executado: formattedTime }));
+                clearError('tmp_executado');
               }}
-              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${
-                errors.horas ? 'border-red-500' : 'border-slate-600'
-              }`}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  setFormData(prev => ({ ...prev, tmp_executado: adjustHHMM(prev.tmp_executado, 15) }));
+                } else if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  setFormData(prev => ({ ...prev, tmp_executado: adjustHHMM(prev.tmp_executado, -15) }));
+                }
+              }}
+              maxLength={5}
+              className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all ${errors.tmp_executado ? 'border-red-500' : 'border-slate-600'}`}
+              placeholder="hh:mm"
             />
-            {errors.horas && (
-              <p className="text-red-500 text-sm mt-1">{errors.horas}</p>
+            {errors.tmp_executado && (
+              <p className="text-red-500 text-sm mt-1">{errors.tmp_executado}</p>
+            )}
+          </div>
+
+          {/* Checkbox isDesvio */}
+          <div className="flex items-center space-x-2">
+            {!isUserView && (
+              <>
+            <Checkbox
+              id="isDesvio"
+              checked={formData.isDesvio}
+              onCheckedChange={(checked) => {
+                setFormData(prev => ({ ...prev, isDesvio: checked as boolean, tempo: checked ? '00:00' : prev.tempo }));
+                clearError('tempo');
+              }}
+            />
+            <label
+              htmlFor="isDesvio"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-white"
+            >
+              Desvio de planejamento
+            </label>
+            </>
             )}
           </div>
 
@@ -391,7 +502,7 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
             </Button>
             <Button
               type="submit"
-              variant="default"
+              variant="login"
               className="flex-1"
               disabled={loading || deleteLoading}
             >
@@ -404,4 +515,4 @@ const ModalEditarAtividade: React.FC<ModalEditarAtividadeProps> = ({
   );
 };
 
-export default ModalEditarAtividade; 
+export default ModalEditarAtividade;

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { dependencyFactory } from '@/backend/infrastructure/factories/DependencyFactory';
-import { StatusAtividade } from '@/backend/core/models';
+import { StatusAtividade } from '@/backend/core/models/Atividade';
 
 export async function POST(request: Request) {
   try {
@@ -17,8 +17,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Status inválido.' }, { status: 400 });
     }
 
-    const atualizarStatusAtividade = dependencyFactory.createAtualizarAtividade();
-    await atualizarStatusAtividade.updateStatus(id, status);
+    const atividadeService = dependencyFactory.createAtividadeService();
+    await atividadeService.updateStatus(id, status);
 
     return new NextResponse(null, { status: 204 });
 

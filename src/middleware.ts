@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
   // Rotas públicas que não exigem autenticação
-  const publicRoutes = ['/login', '/api/auth', '/api/register'];
+  const publicRoutes = ['/login', '/api/auth', '/api/register', '/api/v1/health', '/api-docs'];
   if (publicRoutes.some(path => pathname.startsWith(path))) {
     return NextResponse.next();
   }

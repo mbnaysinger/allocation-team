@@ -1,5 +1,5 @@
 import { IProjetoRepository } from '../../ports/IProjetoRepository';
-import { Projeto, DadosProjeto } from '../../models/projeto/Projeto';
+import { Projeto, DadosProjeto, ProjetoSelect } from '../../models/projeto/Projeto';
 
 const validarDadosProjeto = (dados: DadosProjeto): void => {
   if (!dados.nome || dados.nome.trim().length < 3) {
@@ -24,8 +24,16 @@ export class ProjetoService {
     }
   }
 
-  async buscarProjetos(): Promise<Projeto[]> {
-    return this.projetoRepository.buscarTodos();
+  async buscarProjetosAtivos(): Promise<ProjetoSelect[]> {
+    return this.projetoRepository.buscarSelect();
+  }
+
+  async buscarProjetos(squads?: string[], pessoas?: string[]): Promise<Projeto[]> {
+    return this.projetoRepository.buscarProjetos(squads, pessoas);
+  }
+
+  async buscarProjetosPorIds(projetoIds: string[]): Promise<Projeto[]> {
+    return this.projetoRepository.buscarProjetosPorIds(projetoIds);
   }
 
   async buscarProjetoPorId(id: string): Promise<Projeto | null> {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 
 import { X } from 'lucide-react';
-import { DadosProjeto, ENTIDADES, Entidade } from '@/backend/core/models';
+import { DadosProjeto, ENTIDADES, Entidade } from '@/backend/core/models/projeto/Projeto';
 
 interface ModalAdicionarProjetoProps {
   isOpen: boolean;
@@ -22,7 +22,13 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
     nome: '',
     descricao: '',
     entidade: undefined,
-    linkJira: ''
+    linkDocumentacao: '',
+    responsavelId: '',
+    fase: 'internal',
+    status: 'backlog',
+    dataInicio: new Date(),
+    dataFimPrevisto: new Date(),
+    dataFimReal: new Date()
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -60,7 +66,13 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
       nome: '',
       descricao: '',
       entidade: undefined,
-      linkJira: ''
+      linkDocumentacao: '',
+      responsavelId: '',
+      fase: 'internal',
+      status: 'backlog',
+      dataInicio: new Date(),
+      dataFimPrevisto: new Date(),
+      dataFimReal: new Date()
     });
     setErrors({});
     onClose();
@@ -200,7 +212,7 @@ const ModalAdicionarProjeto: React.FC<ModalAdicionarProjetoProps> = ({
             <input
               type="url"
               id="linkJira"
-              value={formData.linkJira}
+              value={formData.linkDocumentacao}
               onChange={(e) => {
                 setFormData(prev => ({ ...prev, linkJira: e.target.value }));
               }}

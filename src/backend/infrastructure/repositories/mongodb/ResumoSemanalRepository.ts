@@ -1,7 +1,7 @@
 import { Collection, Document } from 'mongodb';
 import { getCollection } from '../../../../config/databases/mongodb';
 import { IResumoSemanalRepository } from '../../../core/ports/IResumoSemanalRepository';
-import { ResumoSemanal } from '../../../core/models';
+import { ResumoSemanal } from '../../../core/models/ResumoSemanal';
 
 const fromDocument = (doc: Document): ResumoSemanal => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -16,12 +16,12 @@ const fromDocument = (doc: Document): ResumoSemanal => {
   } as ResumoSemanal;
 };
 
-export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository {
+export class ResumoSemanalRepository implements IResumoSemanalRepository {
   private async getResumosCollection(): Promise<Collection<Document>> {
     return getCollection('resumos_semanais');
   }
 
-  async salvar(resumo: Omit<ResumoSemanal, 'id' | 'createdAt' | 'updatedAt'>): Promise<ResumoSemanal> {
+  async save(resumo: Omit<ResumoSemanal, 'id' | 'createdAt' | 'updatedAt'>): Promise<ResumoSemanal> {
     const collection = await this.getResumosCollection();
     const now = new Date();
 
@@ -48,8 +48,8 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
       }
     );
 
-    if (result) {
-      return fromDocument(result);
+    if (result && result.value) {
+      return fromDocument(result.value as Document);
     }
     
     // Este fallback pode ser necessário se o upsert não retornar o documento em alguns casos raros
@@ -64,7 +64,7 @@ export class MongoDbResumoSemanalRepository implements IResumoSemanalRepository 
     return fromDocument(novoDocumento);
   }
 
-  async buscarPorPessoasESemana(pessoaIds: string[], semana: string): Promise<ResumoSemanal[]> {
+  async getByPersonIdsAndWeek(pessoaIds: string[], semana: string): Promise<ResumoSemanal[]> {
     const collection = await this.getResumosCollection();
     const documents = await collection.find({
       pessoaId: { $in: pessoaIds },

@@ -2,33 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { dependencyFactory } from '@/backend/infrastructure/factories/DependencyFactory';
 import { DadosProjeto } from '@/backend/core/models/projeto/Projeto';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const squads = searchParams.getAll('squads');
+    const pessoas = searchParams.getAll('pessoas');
+
     const projetoService = dependencyFactory.createProjetoService();
-    const epicoService = dependencyFactory.createEpicoService();
     
-    const projetos = await projetoService.buscarProjetos();
-    const projetosComEpicos = await Promise.all(
-      projetos.map(async (projeto) => {
-        const epicos = await epicoService.buscarEpicosPorProjeto(projeto.projetoId);
-        const epicosComTarefas = await Promise.all(
-          epicos.map(async (epico) => {
-            const tarefaService = dependencyFactory.createTarefaService();
-            const tarefas = await tarefaService.buscarTarefasPorEpico(epico.epicoId);
-            return {
-              ...epico,
-              tarefas
-            };
-          })
-        );
-        return {
-          ...projeto,
-          epicos: epicosComTarefas
-        };
-      })
+    const projetos = await projetoService.buscarProjetos(
+      squads.length > 0 ? squads : undefined,
+      pessoas.length > 0 ? pessoas : undefined
     );
 
-    return NextResponse.json(projetosComEpicos);
+    return NextResponse.json(projetos);
   } catch (error) {
     console.error('Erro ao buscar projetos:', error);
     return NextResponse.json(

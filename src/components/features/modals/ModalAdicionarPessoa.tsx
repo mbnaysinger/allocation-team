@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 
 import { X } from 'lucide-react';
-import { DadosPessoa, CARGOS, Cargo } from '@/backend/core/models';
+import { DadosPessoa, CARGOS, Cargo } from '@/backend/core/models/Pessoa';
 
 interface ModalAdicionarPessoaProps {
   isOpen: boolean;
@@ -19,7 +19,8 @@ const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
 }) => {
   const [formData, setFormData] = useState<DadosPessoa>({
     nome: '',
-    cargo: 'Analista de TI'
+    cargo: 'Analista de TI',
+    squad: 'Desenvolvimento'
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -49,7 +50,7 @@ const ModalAdicionarPessoa: React.FC<ModalAdicionarPessoaProps> = ({
   };
 
   const handleClose = () => {
-    setFormData({ nome: '', cargo: 'Analista de TI' });
+    setFormData({ nome: '', cargo: 'Analista de TI', squad: 'Desenvolvimento' });
     setErrors({});
     onClose();
   };

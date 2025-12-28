@@ -1,8 +1,8 @@
-# Allocation Team - Ferramenta de Alocação de Equipes
+# Team Allocation Planning - Ferramenta de Alocação de Equipes
 
 ## Visão Geral
 
-O **Allocation Team** é uma aplicação web Full-Stack construída com **Next.js**, projetada para facilitar o gerenciamento e a alocação de tempo de equipes em diferentes projetos e atividades. A ferramenta oferece uma interface visual intuitiva que permite aos gestores visualizar a carga de trabalho de cada membro da equipe, adicionar, editar e mover tarefas em uma linha do tempo semanal.
+O **Team Allocation Planning** é uma aplicação web Full-Stack construída com **Next.js**, projetada para facilitar o gerenciamento e a alocação de tempo de equipes em diferentes projetos e atividades. A ferramenta oferece uma interface visual intuitiva que permite aos gestores visualizar a carga de trabalho de cada membro da equipe, adicionar, editar e mover tarefas em uma linha do tempo semanal.
 
 Este projeto foi desenvolvido com uma filosofia inspirada na **Clean Architecture**, mesmo sendo um monorepo. O objetivo é manter uma separação clara entre as responsabilidades do back-end (lógica de negócio, acesso a dados) e do front-end (interface do usuário, estado da UI), garantindo um código organizado, manutenível e escalável.
 
@@ -22,15 +22,15 @@ A estrutura do projeto segue uma abordagem de componentização e separação de
     - **`repositories`**: Implementações concretas dos repositórios (ex: `MongoDbPessoaRepository`) que interagem com o banco de dados.
     - **`factories`**: Fábricas de dependência para instanciar os serviços com suas implementações concretas.
 - **`src/components`**: Componentes React reutilizáveis, divididos entre `features` (específicos de uma funcionalidade) e `ui` (genéricos).
-- **`src/config`**: Configurações da aplicação, incluindo a conexão com o banco de dados e o inovador serviço de configuração.
+- **`src/config`**: Configurações da aplicação, incluindo a conexão com o banco de dados e o serviço de configuração.
 
 ### Principais Conceitos Implementados
 
 - **Clean Architecture (Adaptada)**: Separação clara entre a lógica de negócio (core) e os detalhes de infraestrutura (framework, banco de dados), promovendo baixo acoplamento e alta testabilidade.
 - **Inversão de Dependência**: O `core` define as interfaces (`ports`) e a `infrastructure` as implementa. Isso permite trocar o banco de dados ou qualquer outra dependência externa com o mínimo de impacto na lógica de negócio.
 - **Service Layer**: A lógica de negócio é encapsulada em serviços, tornando os casos de uso explícitos e reutilizáveis.
-- **API Endpoints como Controladores**: Os `route.ts` do Next.js agem como controladores, orquestrando o fluxo da requisição para a camada de serviço.
-- **Componentização e Hooks**: O front-end é construído com componentes React e utiliza hooks customizados (`useDragAndDrop`) para isolar lógicas complexas.
+- **API Endpoints como Controladores**: Os arquivos `route.ts` do Next.js agem como controladores, orquestrando o fluxo da requisição para a camada de serviço.
+- **Componentização e Hooks**: O front-end é construído com componentes React e utiliza hooks customizados (ex: `useDragAndDrop`) para isolar lógicas complexas.
 
 ---
 
@@ -57,29 +57,60 @@ O projeto inclui uma documentação de API interativa gerada automaticamente. Pa
 
 ## Configuração e Gerenciamento de Ambientes
 
-O `Allocation Team` utiliza um sistema de configuração flexível que se adapta a diferentes ambientes (desenvolvimento e produção).
+O `Team Allocation Planning` utiliza um sistema de configuração flexível que se adapta a diferentes ambientes (desenvolvimento e produção).
 
 ### `ConfigService`
 
-O `src/config/config.service.ts` é responsável por carregar as variáveis de ambiente.
+O `src/config/config.service.ts` é responsável por carregar as variáveis de ambiente de forma segura.
 
-- **Em Desenvolvimento (`NODE_ENV=development`)**: As configurações são lidas do arquivo `.env.yml` na raiz do projeto.
+- **Em Desenvolvimento (`NODE_ENV=development`)**: As configurações são lidas do arquivo `.env.yml` na raiz do projeto e processadas em build time para compatibilidade com Edge Runtime.
 - **Em Produção**: As configurações são buscadas de um **Config Server**, cuja URL deve ser definida na variável de ambiente `CONFIG_SERVER_URL`.
 
-### Configuração para Vercel
+### Processamento em Build Time
 
-Para deploy na Vercel, você pode definir as variáveis de ambiente diretamente na plataforma (via dashboard ou Vercel CLI). O `ConfigService` foi projetado para, caso a `CONFIG_SERVER_URL` não esteja definida, automaticamente buscar as configurações diretamente do `process.env` da aplicação.
+Para garantir compatibilidade com o Edge Runtime (usado pelo middleware do Next.js), as configurações do arquivo `.env.yml` são processadas em build time através do script `scripts/build-config.js`. Este script:
 
-Você deve configurar as seguintes variáveis de ambiente na Vercel, utilizando a convenção de nomes em **MAIÚSCULAS e com underscores** (`_`) no lugar dos pontos (`.`):
+1. Lê o arquivo `.env.yml` durante o build
+2. Gera um arquivo `src/config/build-time-config.ts` com as configurações
+3. Este arquivo é usado pelo `ConfigService` em runtime
 
--   `CONFIG_DATABASE_MONGODB_URI`: URI de conexão com o MongoDB (ex: `mongodb://user:pass@host:port/db_name`)
--   `CONFIG_DATABASE_MONGODB_DB_NAME`: Nome do banco de dados MongoDB (ex: `allocation_team`)
+**Scripts relacionados:**
+- `npm run build:config`: Processa as configurações do `.env.yml`
+- `npm run dev`: Executa automaticamente o build das configurações antes de iniciar o servidor
+- `npm run build`: Executa automaticamente o build das configurações antes de compilar para produção
 
-Exemplo de como seria a configuração de variáveis de ambiente na Vercel:
+### Inicialização Preguiçosa (Lazy Loading) de Configurações
 
+Para evitar erros durante o processo de build do Next.js, que pode tentar acessar `process.env` antes de estar disponível, o sistema de configuração e a conexão com o banco de dados foram refatorados para usar um padrão de **inicialização preguiçosa (lazy loading)**.
+
+Isso significa que as configurações e a conexão com o banco só são carregadas na **primeira requisição da aplicação**, e não durante o build.
+
+**Como adicionar novas configurações de forma segura:**
+
+1.  Adicione a nova variável no seu arquivo `.env.yml` (para desenvolvimento) ou no seu Config Server (para produção).
+2.  No módulo onde você precisa da configuração (ex: um repositório, um serviço), utilize o `configService` para buscar o valor.
+3.  **Importante**: Faça a chamada ao `configService.get()` dentro de uma função `async`, no momento do uso, e não no escopo global do módulo.
+
+**Exemplo:**
+```typescript
+// Dentro de uma função de um repositório ou serviço
+import { configService } from '@/config/config.service';
+
+async function minhaFuncaoQueUsaConfig() {
+  // A configuração é buscada aqui, no momento da execução
+  const minhaChaveSecreta = await configService.get<string>('config.minha_api.chave_secreta');
+  
+  // Use a chave...
+}
 ```
-CONFIG_DATABASE_MONGODB_URI=mongodb://user:pass@your-mongo-host:27017/allocation_team
-CONFIG_DATABASE_MONGODB_DB_NAME=allocation_team
+**Nunca faça isso no topo do arquivo**, pois anularia o benefício do lazy loading:
+```typescript
+// EVITAR! Isso será executado no tempo de build.
+const minhaChaveSecreta = await configService.get<string>('config.minha_api.chave_secreta'); // ERRADO
+
+export class MeuServico {
+  // ...
+}
 ```
 
 ### Arquivo `.env.yml`
@@ -87,12 +118,21 @@ CONFIG_DATABASE_MONGODB_DB_NAME=allocation_team
 Para rodar em ambiente de desenvolvimento, crie um arquivo `.env.yml` na raiz do projeto com a seguinte estrutura:
 
 ```yaml
+server:
+  port: 3000
+
 config:
   database:
     mongodb:
       uri: "mongodb://admin:password123@localhost:27017"
-      db_name: "allocation_team"
-  # Outras configurações podem ser adicionadas aqui
+      db_name: "tap"
+  
+  # Configurações do NextAuth
+  NEXTAUTH_SECRET: "seu-secret-aqui"
+  NEXTAUTH_URL: "http://localhost:3000"
+  
+  # URL do servidor de configuração (para produção)
+  CONFIG_SERVER_URL: "https://seu-config-server.com/config"
 ```
 
 **Importante**: Este arquivo **não deve** ser versionado no Git. Ele contém informações sensíveis.
@@ -111,9 +151,9 @@ A maneira mais simples de configurar o ambiente de desenvolvimento é usando Doc
 ### Passos
 
 1.  **Clone o repositório:**
-```bash
+    ```bash
     git clone <URL_DO_REPOSITORIO>
-    cd allocation-team
+    cd tap-webapp
     ```
 
 2.  **Crie o arquivo de configuração `.env.yml`:**
@@ -121,17 +161,17 @@ A maneira mais simples de configurar o ambiente de desenvolvimento é usando Doc
 
 3.  **Suba os contêineres do Docker:**
     Este comando irá iniciar o MongoDB e o Mongo Express.
-```bash
+    ```bash
     docker-compose up -d
-```
+    ```
 
 4.  **Instale as dependências do projeto:**
-```bash
+    ```bash
     npm install
     ```
 
 5.  **Rode a aplicação em modo de desenvolvimento:**
-```bash
+    ```bash
     npm run dev
     ```
 
@@ -152,14 +192,12 @@ A maneira mais simples de configurar o ambiente de desenvolvimento é usando Doc
 ## Débitos Técnicos
 
 -   **Melhorar Divisão do Domínio**: Aprimorar a organização de models, ENUMs e outros objetos na camada de domínio (`core/models`).
--   **Criar Entidades**: Implementar `entities` para segregar as responsabilidades das variáveis entre as camadas de domínio e infraestrutura.
+-   **Criar Entidades**: Implementar `entidades` para segregar as responsabilidades das variáveis entre as camadas de domínio e infraestrutura.
 -   **Segurança**: Implementar uma tela de login e aplicar regras de segurança nos endpoints da API.
--   **Autenticação Centralizada**: Integrar o [Keycloak](https://www.keycloak.org/) para gerenciamento de identidade e acesso.
+-   **Autenticação Centralizada**: Integrar o `Keycloak` para gerenciamento de identidade e acesso.
 
 ## Próximas Features (Roadmap)
 
--   **Autoavaliação Semanal**: Implementar um campo para que cada usuário possa registrar impeditivos, justificativas e uma revisão da semana, planejando a semana seguinte.
--   **Atividades Colaborativas**: Permitir a criação de um "card" para uma pessoa existente ao marcar uma atividade como sendo em conjunto.
 -   **Gerenciamento de Skills**: Adicionar a funcionalidade de gerenciar as habilidades (skills) de cada pessoa.
 -   **Gerenciamento de Pessoas**: Desenvolver uma tela dedicada para gerenciar (CRUD) as pessoas, superando a necessidade de alterações diretas no banco de dados.
 -   **Gerenciamento de Projetos**: Criar uma tela para o gerenciamento completo de projetos.
