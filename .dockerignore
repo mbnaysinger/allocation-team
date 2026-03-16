@@ -1,3 +1,5 @@
+Dockerfile
+.dockerignore
 node_modules
 npm-debug.log
 .git
@@ -15,4 +17,4 @@ dist
 coverage
 .nyc_output
 .DS_Store
-*.log 
+*.log
